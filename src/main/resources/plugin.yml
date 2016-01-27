@@ -1,0 +1,6 @@
+name: @name@
+description: @description@
+main: @mainClass@
+version: @version@
+authors: [twiz_mwazin]
+prefix: Cardinal
