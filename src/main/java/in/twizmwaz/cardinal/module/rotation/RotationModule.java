@@ -23,55 +23,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.module.rotation;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+public class RotationModule extends AbstractModule {
 
-public final class Cardinal extends JavaPlugin {
-
-  @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
-
-  /**
-   * Creates a new Cardinal object.
-   */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
-    }
-    instance = this;
-
+  public RotationModule() {
+    super("rotation");
   }
 
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
+  @ModuleEntry("rotation")
+  public static RotationModule makeModule() {
+    return new RotationModule();
   }
 
-  @Override
-  public void onDisable() {
-
-  }
-
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
 }

@@ -23,55 +23,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.module.repository;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
+import in.twizmwaz.cardinal.module.contributor.Contributor;
+import in.twizmwaz.cardinal.util.Proto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jdom2.Document;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import java.util.Map;
+import javax.annotation.Nullable;
 
-public final class Cardinal extends JavaPlugin {
+@Data
+public class LoadedMap {
 
+  private final Document document;
+  private final Proto proto;
+
+  private final String gamemode;
+  private final Edition edition;
+  private final String objective;
+  private final Map<Contributor, String> authors;
+  private final Map<Contributor, String> contributors;
+  private final int maxPlayers;
+
+  @AllArgsConstructor
   @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
+  public enum Edition {
+    STANDARD("standard"),
+    RANKED("ranked"),
+    TOURNAMENT("tournament");
 
-  /**
-   * Creates a new Cardinal object.
-   */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
+    private final String name;
+
+    /**
+     * @param name Name of edition.
+     * @return The edition enum object.
+     */
+    @Nullable
+    public static Edition forName(String name) {
+      for (Edition edition : values()) {
+        if (name.equalsIgnoreCase(edition.getName())) {
+          return edition;
+        }
+      }
+      return null;
     }
-    instance = this;
-
   }
 
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
-  }
-
-  @Override
-  public void onDisable() {
-
-  }
-
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
 }

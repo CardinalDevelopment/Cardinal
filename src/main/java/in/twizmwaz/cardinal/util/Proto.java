@@ -23,55 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.util;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import lombok.Data;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+/**
+ * Class to represent XML protocols, based on semantic versioning.
+ */
+@Data
+public class Proto {
 
-public final class Cardinal extends JavaPlugin {
-
-  @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
+  private final int major;
+  private final int minor;
+  private final int patch;
 
   /**
-   * Creates a new Cardinal object.
+   * @param in The semantic version string to be parsed.
+   * @return The parsed Proto.
    */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
+  public static Proto parseProto(String in) {
+    String[] components = in.split("\\.");
+    if (components.length != 3) {
+      throw new NumberFormatException("A proto must be a semantic version.");
     }
-    instance = this;
-
+    int major = Integer.parseInt(components[0]);
+    int minor = Integer.parseInt(components[1]);
+    int patch = Integer.parseInt(components[2]);
+    return new Proto(major, minor, patch);
   }
 
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
-  }
-
-  @Override
-  public void onDisable() {
-
-  }
-
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
 }

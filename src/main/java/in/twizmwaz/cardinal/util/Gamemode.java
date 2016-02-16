@@ -23,55 +23,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.util;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
+import com.google.common.collect.Maps;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import java.util.Map;
+import javax.annotation.Nullable;
 
-public final class Cardinal extends JavaPlugin {
+@AllArgsConstructor
+@Getter
+public enum Gamemode {
 
-  @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
+  TEAM_DEATHMATCH("tdm", "Team Deathmatch"),
+  CAPTURE_THE_FLAG("ctf", "Capture the Flag"),
+  DESTROY_THE_MONUMENT("dtc", "Destroy the Monument"),
+  KING_OF_THE_HILL("koth", "King of the Hill"),
+  RAGE("rage", "RAGE"),
+  ARCADE("arcade", "Arcade"),
+  FREE_FOR_ALL("ffa", "Free for All"),
+  CAPTURE_THE_WOOL("ctw", "Capture the Wool"),
+  DESTROY_THE_CORE("dtc", "Destroy the Core"),
+  ATTACK_DEFEND("ad", "Attack/Defend"),
+  BLITZ("blitz", "Blitz"),
+  SCOREBOX("scorebox", "Scorebox"),
+  GHOST_SQUADRON("gs", "Ghost Squadron"),
+  MIXED("mixed", "Mixed Gamemodes");
 
-  /**
-   * Creates a new Cardinal object.
-   */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
+  private static final Map<String, Gamemode> BY_ID = Maps.newHashMap();
+
+  private final String id;
+  private final String name;
+
+  static {
+    for (Gamemode gamemode : values()) {
+      BY_ID.put(gamemode.getId(), gamemode);
     }
-    instance = this;
-
   }
 
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
+  @Nullable
+  public static Gamemode byId(@Nullable String name) {
+    return BY_ID.get(name);
   }
 
-  @Override
-  public void onDisable() {
-
-  }
-
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
 }

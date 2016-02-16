@@ -23,55 +23,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.module;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jdom2.Document;
 
-import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.Collection;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-public final class Cardinal extends JavaPlugin {
-
-  @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
+/**
+ * Represents a Cardinal module.
+ */
+public interface Module {
 
   /**
-   * Creates a new Cardinal object.
+   * @return The name of the module, must match the value of {@link ModuleEntry}.
    */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
-    }
-    instance = this;
-
-  }
-
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
-  }
-
-  @Override
-  public void onDisable() {
-
-  }
-
   @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
+  String getName();
+
+  /**
+   * @return The names of modules to load matches before the given module.
+   */
+  @Nullable
+  String[] getDepends();
+
+  /**
+   * Clear the match information from the module, prepare for the next match.
+   */
+  void clearMatch();
+
+  /**
+   * @param document Map XML document to load from.
+   * @return Returns true if the module loaded without interruption. Returns false for a
+   *         match-blocking failure.
+   */
+  boolean loadMatch(@Nonnull Document document);
+
+  /**
+   * @return Errors, if any, generated when loading the current map.
+   */
+  @Nonnull
+  Collection<ModuleError> getErrors();
+
 }

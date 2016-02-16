@@ -23,55 +23,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.util;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.junit.Assert;
+import org.junit.Test;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+public class GamemodeTest {
 
-public final class Cardinal extends JavaPlugin {
-
-  @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
-
-  /**
-   * Creates a new Cardinal object.
-   */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
-    }
-    instance = this;
-
+  @Test
+  public void testId() {
+    Assert.assertEquals(Gamemode.byId(null), null);
   }
 
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
-  }
-
-  @Override
-  public void onDisable() {
-
-  }
-
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
 }

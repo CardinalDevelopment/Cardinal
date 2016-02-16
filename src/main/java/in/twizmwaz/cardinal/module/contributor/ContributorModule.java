@@ -23,55 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.module.contributor;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.Module;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import java.util.UUID;
 
-public final class Cardinal extends JavaPlugin {
+public class ContributorModule extends AbstractModule {
 
-  @Getter
-  private static Cardinal instance;
-  @Getter
-  private ModuleLoader moduleLoader;
-
-  /**
-   * Creates a new Cardinal object.
-   */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
-    }
-    instance = this;
-
+  public ContributorModule() {
+    super("contributor");
   }
 
-  @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
+  public Contributor forName(String name) {
+    //TODO
+    return null;
   }
 
-  @Override
-  public void onDisable() {
-
+  public Contributor forUuid(UUID uuid) {
+    //TODO
+    return null;
   }
 
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
+  @ModuleEntry("contributor")
+  public static Module makeModule() {
+    return new ContributorModule();
   }
+
 }

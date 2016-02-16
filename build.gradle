@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.12.1'
-        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.3"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
 
@@ -29,8 +29,12 @@ repositories {
 }
 
 dependencies {
+    compile 'org.projectlombok:lombok:1.16.6'
     compile 'tc.oc:sportbukkit:1.8.7-R0.1-SNAPSHOT'
     compile 'org.jdom:jdom2:2.0.6'
+    compile 'org.ow2.asm:asm-all:5.0.4'
+
+    testCompile('junit:junit:4.12')
 }
 
 processResources {
@@ -49,6 +53,8 @@ shadowJar {
     dependencies {
         include(dependency('org.jdom:jdom2:2.0.6'))
         relocate 'org.jdom2', 'in.twizmwaz.cardinal.libs.jdom2'
+        include(dependency('org.ow2.asm:asm-all:5.0.4'))
+        relocate 'org.objectweb.asm', 'in.twizmwaz.cardinal.libs.asm'
     }
 }
 

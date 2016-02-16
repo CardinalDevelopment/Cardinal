@@ -23,55 +23,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal;
+package in.twizmwaz.cardinal.module;
 
-import in.twizmwaz.cardinal.module.ModuleLoader;
+import com.google.common.collect.Lists;
 import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jdom2.Document;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import java.util.List;
 
-public final class Cardinal extends JavaPlugin {
+public abstract class AbstractModule implements Module {
 
   @Getter
-  private static Cardinal instance;
+  protected final String name;
   @Getter
-  private ModuleLoader moduleLoader;
+  protected String[] depends;
+  @Getter
+  protected List<ModuleError> errors;
 
-  /**
-   * Creates a new Cardinal object.
-   */
-  public Cardinal() {
-    if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
-    }
-    instance = this;
-
+  public AbstractModule(String name) {
+    this.name = name;
+    errors = Lists.newArrayList();
   }
 
   @Override
-  public void onEnable() {
-    moduleLoader = new ModuleLoader();
-    try {
-      moduleLoader.findEntries(getFile());
-    } catch (IOException ex) {
-      getLogger().severe("A fatal exception occurred while trying to load internal modules.");
-      ex.printStackTrace();
-      setEnabled(false);
-      return;
-    }
-    this.getLogger().info("Cardinal has loaded");
+  public void clearMatch() {
   }
 
   @Override
-  public void onDisable() {
-
+  public boolean loadMatch(Document document) {
+    return true;
   }
 
-  @Nonnull
-  public static Logger getPluginLogger() {
-    return Cardinal.getInstance().getLogger();
-  }
 }
