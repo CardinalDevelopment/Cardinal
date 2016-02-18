@@ -23,56 +23,64 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.repository;
+package in.twizmwaz.cardinal.module.cycle;
 
-import in.twizmwaz.cardinal.module.contributor.Contributor;
-import in.twizmwaz.cardinal.util.Proto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.Module;
+import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
+import in.twizmwaz.cardinal.module.rotation.RotationModule;
+import lombok.AccessLevel;
 import lombok.Getter;
-import org.jdom2.Document;
+import lombok.Setter;
+import org.bukkit.World;
+import org.bukkit.event.EventHandler;
 
 import java.io.File;
-import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.UUID;
 
-@Data
-public class LoadedMap {
+public final class CycleModule extends AbstractModule {
 
-  private final File directory;
-
-  private final Document document;
-  private final Proto proto;
-
-  private final String gamemode;
-  private final Edition edition;
-  private final String objective;
-  private final Map<Contributor, String> authors;
-  private final Map<Contributor, String> contributors;
-  private final int maxPlayers;
-
-  @AllArgsConstructor
   @Getter
-  public enum Edition {
-    STANDARD("standard"),
-    RANKED("ranked"),
-    TOURNAMENT("tournament");
+  @Setter(AccessLevel.PACKAGE)
+  private World matchWorld;
+  @Getter
+  @Setter(AccessLevel.PACKAGE)
+  private File matchFile;
 
-    private final String name;
+  @Getter
+  private CycleRunnable cycle;
 
-    /**
-     * @param name Name of edition.
-     * @return The edition enum object.
-     */
-    @Nullable
-    public static Edition forName(String name) {
-      for (Edition edition : values()) {
-        if (name.equalsIgnoreCase(edition.getName())) {
-          return edition;
-        }
-      }
-      return null;
-    }
+  public CycleModule() {
+    super("cycle");
+  }
+
+  /**
+   * Creates a new cycle object for the initial server cycle.
+   *
+   * @param event The event listened for.
+   */
+  @EventHandler
+  public void onModuleLoad(ModuleLoadCompleteEvent event) {
+    cycle = new CycleRunnable(this, UUID.randomUUID(),
+        ((RotationModule) Cardinal.getModule("rotation")).getNext());
+  }
+
+  /**
+   * Initiates the cycling process.
+   *
+   * @return If the cycle was successful.
+   */
+  public boolean cycle() {
+    Cardinal.getInstance().getModuleHandler().clearMatch();
+    cycle.run();
+    return true;
+  }
+
+  @ModuleEntry("cycle")
+  public static Module makeModule() {
+    return new CycleModule();
   }
 
 }

@@ -23,56 +23,55 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.repository;
+package in.twizmwaz.cardinal.module;
 
-import in.twizmwaz.cardinal.module.contributor.Contributor;
-import in.twizmwaz.cardinal.util.Proto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.google.common.collect.Lists;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.Validate;
 import org.jdom2.Document;
 
-import java.io.File;
-import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.Nonnull;
 
-@Data
-public class LoadedMap {
+/**
+ * Object to control modules.
+ */
+@RequiredArgsConstructor
+public class ModuleHandler {
 
-  private final File directory;
-
-  private final Document document;
-  private final Proto proto;
-
-  private final String gamemode;
-  private final Edition edition;
-  private final String objective;
-  private final Map<Contributor, String> authors;
-  private final Map<Contributor, String> contributors;
-  private final int maxPlayers;
-
-  @AllArgsConstructor
   @Getter
-  public enum Edition {
-    STANDARD("standard"),
-    RANKED("ranked"),
-    TOURNAMENT("tournament");
+  private final ModuleRegistry registry;
 
-    private final String name;
+  public void clearMatch() {
+    registry.getModules().entrySet().forEach(entry -> entry.getValue().clearMatch());
+  }
 
-    /**
-     * @param name Name of edition.
-     * @return The edition enum object.
-     */
-    @Nullable
-    public static Edition forName(String name) {
-      for (Edition edition : values()) {
-        if (name.equalsIgnoreCase(edition.getName())) {
-          return edition;
+  /**
+   * @param document The document modules should load the map from
+   * @return If the modules loaded successfully.
+   */
+  public boolean loadMatch(@Nonnull Document document) {
+    Validate.notNull(document);
+    // Already loaded modules
+    List<String> completed = Lists.newArrayList();
+    // As long as all modules are not loaded
+    while (completed.size() < registry.getModules().size()) {
+      // For each
+      for (Module module : registry.getModules().values()) {
+        // If all dependent modules are completed but this one isn't
+        if (completed.contains(module.getName())
+            && completed.containsAll(Arrays.asList(module.getDepends()))) {
+          // Load and return false if it fails
+          if (!module.loadMatch(document)) {
+            return false;
+          }
         }
       }
-      return null;
     }
+    // If all goes well
+    return true;
   }
 
 }

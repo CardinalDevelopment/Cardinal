@@ -33,6 +33,7 @@ import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.contributor.Contributor;
 import in.twizmwaz.cardinal.util.Proto;
+import lombok.Getter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -47,10 +48,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class RepositoryModule extends AbstractModule {
 
+  @Getter
   private final Map<String, LoadedMap> loadedMaps = Maps.newHashMap();
 
   /**
@@ -67,20 +71,22 @@ public class RepositoryModule extends AbstractModule {
    * @param file Recursively loads maps from a directory.
    */
   public void loadRepository(File file) {
-    if (!file.exists() && file.canWrite()) {
+    if (!file.exists()) {
       file.mkdir();
     }
-    List<File> canidates = Lists.asList(file, (File[]) scanForDirectories(file).toArray());
+    List<File> candidates = Lists.newArrayList();
+    candidates.add(file);
+    scanForDirectories(file).forEach(found -> {
+      candidates.add(found);
+    });
     List<File> maps = Lists.newArrayList();
-    for (File canidate : canidates) {
-      if (checkDirectory(canidate)) {
-        maps.add(canidate);
-      }
-    }
-
+    maps.addAll(candidates.stream().filter(candidate ->
+        checkDirectory(candidate)).collect(Collectors.toList()));
+    Cardinal.getPluginLogger().info("Loaded " + maps.size()
+        + " maps from " + file.getAbsolutePath());
   }
 
-  private List<File> scanForDirectories(File file) {
+  private List<File> scanForDirectories(@Nonnull File file) {
     List<File> results = Lists.newArrayList();
     for (File toCheck : file.listFiles((FileFilter) DirectoryFileFilter.INSTANCE)) {
       results.add(toCheck);
@@ -89,7 +95,7 @@ public class RepositoryModule extends AbstractModule {
     return results;
   }
 
-  private boolean checkDirectory(File file) {
+  private boolean checkDirectory(@Nonnull File file) {
     List<String> requirements = Arrays.asList("map.xml", "region", "level.dat");
     if (file.listFiles() != null) {
       for (File map : file.listFiles()) {
@@ -128,7 +134,8 @@ public class RepositoryModule extends AbstractModule {
         }
       }
 
-      return new LoadedMap(doc, proto, gamemode, edition, objective, authors, contributors, 0);
+      return
+          new LoadedMap(file, doc, proto, gamemode, edition, objective, authors, contributors, 0);
     } catch (JDOMException | IOException ex) {
       ex.printStackTrace();
       return null;

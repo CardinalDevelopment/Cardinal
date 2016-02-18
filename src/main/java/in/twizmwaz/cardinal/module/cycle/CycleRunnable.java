@@ -23,56 +23,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.repository;
+package in.twizmwaz.cardinal.module.cycle;
 
-import in.twizmwaz.cardinal.module.contributor.Contributor;
-import in.twizmwaz.cardinal.util.Proto;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import org.jdom2.Document;
+import lombok.Setter;
+import org.apache.commons.io.FileUtils;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 
 import java.io.File;
-import java.util.Map;
-import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.UUID;
 
-@Data
-public class LoadedMap {
+@AllArgsConstructor
+@Getter
+@Setter
+public final class CycleRunnable implements Runnable {
 
-  private final File directory;
+  private final CycleModule parent;
+  private final UUID uuid;
+  private LoadedMap map;
 
-  private final Document document;
-  private final Proto proto;
-
-  private final String gamemode;
-  private final Edition edition;
-  private final String objective;
-  private final Map<Contributor, String> authors;
-  private final Map<Contributor, String> contributors;
-  private final int maxPlayers;
-
-  @AllArgsConstructor
-  @Getter
-  public enum Edition {
-    STANDARD("standard"),
-    RANKED("ranked"),
-    TOURNAMENT("tournament");
-
-    private final String name;
-
-    /**
-     * @param name Name of edition.
-     * @return The edition enum object.
-     */
-    @Nullable
-    public static Edition forName(String name) {
-      for (Edition edition : values()) {
-        if (name.equalsIgnoreCase(edition.getName())) {
-          return edition;
-        }
-      }
-      return null;
+  @Override
+  public void run() {
+    File dest = new File(Cardinal.getInstance().getDataFolder(), "matches/" + uuid.toString());
+    try {
+      FileUtils.copyDirectory(map.getDirectory(), dest);
+    } catch (IOException ex) {
+      ex.printStackTrace();
     }
+    World world = new WorldCreator(dest.getAbsolutePath()).generator(new NullChunkGenerator())
+        .createWorld();
+    world.setPVP(true);
+    parent.setMatchWorld(world);
+    parent.setMatchFile(dest);
   }
 
 }

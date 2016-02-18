@@ -25,13 +25,50 @@
 
 package in.twizmwaz.cardinal.module.rotation;
 
+import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
+import in.twizmwaz.cardinal.module.repository.RepositoryModule;
+import lombok.Getter;
+
+import java.util.List;
 
 public class RotationModule extends AbstractModule {
 
+  @Getter
+  private final List<LoadedMap> rotation = Lists.newArrayList();
+  private int position;
+
   public RotationModule() {
     super("rotation");
+    this.depends = new String[] { "repository" };
+  }
+
+  /**
+   * Temporary method to create a temp rotation.
+   */
+  public void loadRotation(RepositoryModule repo) {
+    repo.getLoadedMaps().entrySet().forEach(map ->
+        rotation.add(map.getValue()));
+  }
+
+  public LoadedMap getNext() {
+    return rotation.get(position);
+  }
+
+  /**
+   * Increments the position in the rotation by one, and resets
+   * it to the beginning if it has completed.
+   *
+   * @return The new position.
+   */
+  public int move() {
+    position++;
+    if (position > rotation.size() - 1) {
+      position = 0;
+    }
+    return position;
   }
 
   @ModuleEntry("rotation")

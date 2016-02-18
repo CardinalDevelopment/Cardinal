@@ -23,56 +23,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.repository;
+package in.twizmwaz.cardinal.module.cycle;
 
-import in.twizmwaz.cardinal.module.contributor.Contributor;
-import in.twizmwaz.cardinal.util.Proto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import org.jdom2.Document;
+import org.bukkit.World;
+import org.bukkit.generator.ChunkGenerator;
 
-import java.io.File;
-import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Random;
 
-@Data
-public class LoadedMap {
+public class NullChunkGenerator extends ChunkGenerator {
 
-  private final File directory;
-
-  private final Document document;
-  private final Proto proto;
-
-  private final String gamemode;
-  private final Edition edition;
-  private final String objective;
-  private final Map<Contributor, String> authors;
-  private final Map<Contributor, String> contributors;
-  private final int maxPlayers;
-
-  @AllArgsConstructor
-  @Getter
-  public enum Edition {
-    STANDARD("standard"),
-    RANKED("ranked"),
-    TOURNAMENT("tournament");
-
-    private final String name;
-
-    /**
-     * @param name Name of edition.
-     * @return The edition enum object.
-     */
-    @Nullable
-    public static Edition forName(String name) {
-      for (Edition edition : values()) {
-        if (name.equalsIgnoreCase(edition.getName())) {
-          return edition;
-        }
-      }
-      return null;
-    }
+  @Override
+  public byte[] generate(World world, Random random, int xchord, int zchord) {
+    return new byte[65536];
   }
-
 }

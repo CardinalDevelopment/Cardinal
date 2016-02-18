@@ -66,31 +66,43 @@ public final class ModuleLoader {
     Cardinal.getPluginLogger().info("Loading modules from " + file.getAbsolutePath());
     HashMap<String, String> methods = Maps.newHashMap();
     Map<String, Method> found = Maps.newHashMap();
+    // The Jar to load modules from
     ZipFile zipFile = new ZipFile(file);
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
+    // Basically a for each ZipEntry
     while (entries.hasMoreElements()) {
       ZipEntry entry = entries.nextElement();
+      // If it isn't a class, skip it
       if (entry.isDirectory() || !entry.getName().endsWith(".class")) {
         continue;
       }
       try (InputStream in = zipFile.getInputStream(entry)) {
+        // Parse the class file
         ClassReader reader = new ClassReader(in);
         ClassNode node = new ClassNode();
+        // Skip the parts we aren't concerned wityh
         reader.accept(node, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+        // For each method
         ((List<MethodNode>) node.methods).forEach(method -> {
+          // If it has annotations
           if (method.visibleAnnotations != null) {
             ((List<AnnotationNode>) method.visibleAnnotations).forEach(annotation -> {
+              // And if one of those annotations has our descriptor
               if (annotation.desc.equals(MODULE_DESCRIPTOR)) {
+                // Remember this method, it is important
                 methods.put(node.name.replace('/', '.'), method.name);
               }
             });
           }
         });
       }
+      // Now that we have located ModuleEntries, for each
       methods.forEach((classString, methodString) -> {
         try {
+          // Get the method from the name ASM found
           Class clazz = Class.forName(classString);
           Method method = clazz.getDeclaredMethod(methodString);
+          // And save it for later
           found.put(method.getAnnotation(ModuleEntry.class).value(), method);
         } catch (ClassNotFoundException | NoSuchMethodException ex) {
           Cardinal.getInstance().getLogger().info("ASM found module '"
@@ -112,6 +124,7 @@ public final class ModuleLoader {
     Map<String, Module> results = Maps.newHashMap();
     for (Map.Entry<String, Method> entry : entries.entrySet()) {
       try {
+        // Invoke the entry point and add it to the return map
         results.put(entry.getKey(), (Module) entry.getValue().invoke(null));
       } catch (InvocationTargetException | IllegalAccessException ex) {
         Cardinal.getPluginLogger().warning("Failed to load " + entry.getKey() + ", skipping");

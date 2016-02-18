@@ -25,13 +25,21 @@
 
 package in.twizmwaz.cardinal;
 
+import in.twizmwaz.cardinal.module.Module;
+import in.twizmwaz.cardinal.module.ModuleHandler;
 import in.twizmwaz.cardinal.module.ModuleLoader;
+import in.twizmwaz.cardinal.module.ModuleRegistry;
+import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public final class Cardinal extends JavaPlugin {
 
@@ -39,6 +47,9 @@ public final class Cardinal extends JavaPlugin {
   private static Cardinal instance;
   @Getter
   private ModuleLoader moduleLoader;
+  @Getter
+  @Setter(AccessLevel.PRIVATE)
+  private ModuleHandler moduleHandler;
 
   /**
    * Creates a new Cardinal object.
@@ -53,6 +64,9 @@ public final class Cardinal extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    if (!getDataFolder().exists()) {
+      getDataFolder().mkdir();
+    }
     moduleLoader = new ModuleLoader();
     try {
       moduleLoader.findEntries(getFile());
@@ -62,6 +76,13 @@ public final class Cardinal extends JavaPlugin {
       setEnabled(false);
       return;
     }
+    Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+          ModuleRegistry registry =
+              new ModuleRegistry(moduleLoader.makeModules(moduleLoader.getModuleEntries()));
+          setModuleHandler(new ModuleHandler(registry));
+          Bukkit.getPluginManager().callEvent(new ModuleLoadCompleteEvent(moduleHandler));
+        }
+    );
     this.getLogger().info("Cardinal has loaded");
   }
 
@@ -73,5 +94,10 @@ public final class Cardinal extends JavaPlugin {
   @Nonnull
   public static Logger getPluginLogger() {
     return Cardinal.getInstance().getLogger();
+  }
+
+  @Nullable
+  public static Module getModule(@Nonnull String name) {
+    return instance.moduleHandler.getRegistry().getModule(name);
   }
 }

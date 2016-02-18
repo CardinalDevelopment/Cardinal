@@ -23,56 +23,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.repository;
+package in.twizmwaz.cardinal.module;
 
-import in.twizmwaz.cardinal.module.contributor.Contributor;
-import in.twizmwaz.cardinal.util.Proto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
+import lombok.AccessLevel;
 import lombok.Getter;
-import org.jdom2.Document;
+import org.apache.commons.lang.Validate;
 
-import java.io.File;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Data
-public class LoadedMap {
+public final class ModuleRegistry {
 
-  private final File directory;
+  @Getter(AccessLevel.PACKAGE)
+  private final BiMap<String, Module> modules;
 
-  private final Document document;
-  private final Proto proto;
+  public ModuleRegistry(@Nonnull Map<String, Module> modules) {
+    Validate.notNull(modules);
+    this.modules = new ImmutableBiMap.Builder<String, Module>().putAll(modules).build();
+  }
 
-  private final String gamemode;
-  private final Edition edition;
-  private final String objective;
-  private final Map<Contributor, String> authors;
-  private final Map<Contributor, String> contributors;
-  private final int maxPlayers;
+  /**
+   * @param name Name of the module to be returned,
+   * @return The module.
+   */
+  @Nullable
+  public Module getModule(@Nonnull String name) {
+    Validate.notNull(name);
+    return modules.get(name);
+  }
 
-  @AllArgsConstructor
-  @Getter
-  public enum Edition {
-    STANDARD("standard"),
-    RANKED("ranked"),
-    TOURNAMENT("tournament");
-
-    private final String name;
-
-    /**
-     * @param name Name of edition.
-     * @return The edition enum object.
-     */
-    @Nullable
-    public static Edition forName(String name) {
-      for (Edition edition : values()) {
-        if (name.equalsIgnoreCase(edition.getName())) {
-          return edition;
-        }
+  /**
+   * @param clazz The module class to be found.
+   * @param <T> The module class type.
+   * @return The found module object, if any.
+   */
+  @Nullable
+  @SuppressWarnings("unchecked")
+  public <T extends Module> T getModule(@Nonnull Class<T> clazz) {
+    Validate.notNull(clazz);
+    for (Module module : modules.values()) {
+      if (clazz.isInstance(module)) {
+        return ((T) module);
       }
-      return null;
     }
+    return null;
   }
 
 }
