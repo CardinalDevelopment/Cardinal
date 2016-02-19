@@ -34,6 +34,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+@ModuleEntry
 public class RotationModule extends AbstractModule {
 
   @Getter
@@ -69,10 +70,4 @@ public class RotationModule extends AbstractModule {
     }
     return position;
   }
-
-  @ModuleEntry("rotation")
-  public static RotationModule makeModule() {
-    return new RotationModule();
-  }
-
 }

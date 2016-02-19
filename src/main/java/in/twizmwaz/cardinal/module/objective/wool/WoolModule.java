@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
@@ -47,6 +48,7 @@ import org.jdom2.Element;
 
 import java.util.List;
 
+@ModuleEntry
 public class WoolModule extends AbstractModule {
 
   private List<Wool> wools;

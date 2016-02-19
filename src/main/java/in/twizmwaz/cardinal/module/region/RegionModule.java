@@ -27,12 +27,14 @@ package in.twizmwaz.cardinal.module.region;
 
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 import org.jdom2.Element;
 
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@ModuleEntry
 public class RegionModule extends AbstractModule {
 
   private List<Region> regions;

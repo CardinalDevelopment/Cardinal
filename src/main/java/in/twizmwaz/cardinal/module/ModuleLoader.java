@@ -26,23 +26,21 @@
 package in.twizmwaz.cardinal.module;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.Cardinal;
 import lombok.Getter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.annotation.Nonnull;
@@ -55,17 +53,18 @@ public final class ModuleLoader {
   private static final String MODULE_DESCRIPTOR = Type.getDescriptor(ModuleEntry.class);
 
   @Getter
-  private final Map<String, Method> moduleEntries = Maps.newHashMap();
+  private final Set<Class> moduleEntries = Sets.newHashSet();
 
   /**
    * Loads entries from a specified package.
+   *
    * @param file Jar to load modules from. The jar must already be available on the classpath.
    */
   @SuppressWarnings("unchecked")
   public void findEntries(@Nonnull File file) throws IOException {
     Cardinal.getPluginLogger().info("Loading modules from " + file.getAbsolutePath());
-    HashMap<String, String> methods = Maps.newHashMap();
-    Map<String, Method> found = Maps.newHashMap();
+    Set<String> classStrings = Sets.newHashSet();
+    Set<Class> found = Sets.newHashSet();
     // The Jar to load modules from
     ZipFile zipFile = new ZipFile(file);
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -80,39 +79,36 @@ public final class ModuleLoader {
         // Parse the class file
         ClassReader reader = new ClassReader(in);
         ClassNode node = new ClassNode();
-        // Skip the parts we aren't concerned wityh
-        reader.accept(node, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
-        // For each method
-        ((List<MethodNode>) node.methods).forEach(method -> {
-          // If it has annotations
-          if (method.visibleAnnotations != null) {
-            ((List<AnnotationNode>) method.visibleAnnotations).forEach(annotation -> {
-              // And if one of those annotations has our descriptor
-              if (annotation.desc.equals(MODULE_DESCRIPTOR)) {
-                // Remember this method, it is important
-                methods.put(node.name.replace('/', '.'), method.name);
-              }
-            });
-          }
-        });
-      }
-      // Now that we have located ModuleEntries, for each
-      methods.forEach((classString, methodString) -> {
-        try {
-          // Get the method from the name ASM found
-          Class clazz = Class.forName(classString);
-          Method method = clazz.getDeclaredMethod(methodString);
-          // And save it for later
-          found.put(method.getAnnotation(ModuleEntry.class).value(), method);
-        } catch (ClassNotFoundException | NoSuchMethodException ex) {
-          Cardinal.getInstance().getLogger().info("ASM found module '"
-              + classString + "." + methodString
-              + "' but it could not be located, skipping.");
+        // Skip the parts we aren't concerned with
+        reader.accept(node,
+            ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+        // For each annotation
+        if (node.visibleAnnotations != null) {
+          node.visibleAnnotations.forEach(annotation -> {
+            // If it is our descriptor, save this one
+            if (((AnnotationNode) annotation).desc.equalsIgnoreCase(MODULE_DESCRIPTOR)) {
+              classStrings.add(node.name.replace('/', '.'));
+            }
+          });
         }
-      });
+      }
     }
+    // Now that we have located ModuleEntries, for each
+    classStrings.forEach(classString -> {
+      try {
+        // Get the class from the name ASM found
+        Class clazz = Class.forName(classString);
+        // And save it for later
+        found.add(clazz);
+      } catch (ClassNotFoundException ex) {
+        Cardinal.getPluginLogger().info("ASM found module '"
+            + classString + "' but it could not be located, skipping.");
+      }
+    });
+
+    Cardinal.getPluginLogger().info("Identified " + classStrings.size() + " modules");
     Cardinal.getPluginLogger().info("Found " + found.size() + " modules");
-    moduleEntries.putAll(found);
+    moduleEntries.addAll(found);
   }
 
   /**
@@ -120,18 +116,21 @@ public final class ModuleLoader {
    * @return The completed map of modules.
    */
   @Nonnull
-  public Map<Class, Module> makeModules(@Nonnull Map<String, Method> entries) {
+  @SuppressWarnings("unchecked")
+  public Map<Class, Module> makeModules(@Nonnull Set<Class> entries) {
     Map<Class, Module> results = Maps.newHashMap();
-    for (Map.Entry<String, Method> entry : entries.entrySet()) {
+    entries.forEach(entry -> {
       try {
         // Invoke the entry point and add it to the return map
-        Module invoked = (Module) entry.getValue().invoke(null);
+        Module invoked = (Module) entry.getConstructor().newInstance();
         results.put(invoked.getClass(), invoked);
-      } catch (InvocationTargetException | IllegalAccessException ex) {
-        Cardinal.getPluginLogger().warning("Failed to load " + entry.getKey() + ", skipping");
+      } catch (NoSuchMethodException | InvocationTargetException
+          | IllegalAccessException | InstantiationException ex) {
+        Cardinal.getPluginLogger().warning("Failed to load " + entry.getName() + ", skipping");
         ex.printStackTrace();
       }
-    }
+    });
+    Cardinal.getPluginLogger().info("Built " + results.size() + '/' + entries.size() + " modules");
     return results;
   }
 

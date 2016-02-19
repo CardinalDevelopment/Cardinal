@@ -27,7 +27,6 @@ package in.twizmwaz.cardinal.module.cycle;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
@@ -40,6 +39,7 @@ import org.bukkit.event.EventHandler;
 import java.io.File;
 import java.util.UUID;
 
+@ModuleEntry
 public final class CycleModule extends AbstractModule {
 
   @Getter
@@ -72,10 +72,4 @@ public final class CycleModule extends AbstractModule {
     cycle.run();
     return true;
   }
-
-  @ModuleEntry("cycle")
-  public static Module makeModule() {
-    return new CycleModule();
-  }
-
 }

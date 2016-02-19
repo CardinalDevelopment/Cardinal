@@ -26,7 +26,9 @@
 package in.twizmwaz.cardinal.module.scoreboard;
 
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 
+@ModuleEntry
 public class ScoreboardModule extends AbstractModule {
 
 }

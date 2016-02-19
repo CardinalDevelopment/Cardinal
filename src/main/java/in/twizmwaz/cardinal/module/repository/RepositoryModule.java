@@ -29,7 +29,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.contributor.Contributor;
 import in.twizmwaz.cardinal.util.Proto;
@@ -52,6 +51,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@ModuleEntry
 public class RepositoryModule extends AbstractModule {
 
   @Getter
@@ -140,10 +140,4 @@ public class RepositoryModule extends AbstractModule {
       return null;
     }
   }
-
-  @ModuleEntry("repository")
-  public static Module makeModule() {
-    return new RepositoryModule();
-  }
-
 }

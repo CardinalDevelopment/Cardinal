@@ -27,12 +27,14 @@ package in.twizmwaz.cardinal.module.team;
 
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@ModuleEntry
 public class TeamModule extends AbstractModule {
 
   private List<Team> teams;

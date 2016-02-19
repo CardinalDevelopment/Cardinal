@@ -26,11 +26,11 @@
 package in.twizmwaz.cardinal.module.contributor;
 
 import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 
 import java.util.UUID;
 
+@ModuleEntry
 public class ContributorModule extends AbstractModule {
 
   public Contributor forName(String name) {
@@ -42,10 +42,4 @@ public class ContributorModule extends AbstractModule {
     //TODO
     return null;
   }
-
-  @ModuleEntry("contributor")
-  public static Module makeModule() {
-    return new ContributorModule();
-  }
-
 }
