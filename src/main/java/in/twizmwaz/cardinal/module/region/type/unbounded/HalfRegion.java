@@ -23,22 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import lombok.Getter;
+import org.bukkit.util.Vector;
 
-import java.util.List;
+@Getter
+public class HalfRegion extends UnboundedRegion {
+  //TODO
 
-public abstract class BoundedRegion extends Region {
+  private final Vector normal;
+  private final Vector origin;
 
-  public BoundedRegion(String id) {
+  /**
+   * @param id This region's ID.
+   * @param normal The normal that the plane points towards.
+   * @param origin The origin of the plane.
+   */
+  public HalfRegion(String id, Vector normal, Vector origin) {
     super(id);
+
+    this.normal = normal;
+    this.origin = origin;
   }
 
-  public abstract List<Block> getBlocks();
-
-  public abstract BlockRegion getCenterBlock();
+  @Override
+  public boolean contains(Vector vector) {
+    return false;
+  }
 
 }

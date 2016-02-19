@@ -25,12 +25,40 @@
 
 package in.twizmwaz.cardinal.module.region;
 
+import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import org.jdom2.Element;
+
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class RegionModule extends AbstractModule {
 
+  private List<Region> regions;
+
   public RegionModule() {
     super("region");
+    regions = Lists.newArrayList();
+  }
+
+  /**
+   * @param id The ID of the region that is returned.
+   * @return The region that has the given ID.
+   */
+  @Nullable
+  public Region getRegionById(@Nonnull String id) {
+    for (Region region : regions) {
+      if (region.getId().equalsIgnoreCase(id)) {
+        return region;
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  public Region getRegion(Element element, String... alternateAttributes) {
+    return null;
   }
 
 }

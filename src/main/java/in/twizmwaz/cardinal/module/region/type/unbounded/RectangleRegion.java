@@ -23,22 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import org.bukkit.util.Vector;
 
-import java.util.List;
+public class RectangleRegion extends UnboundedRegion {
 
-public abstract class BoundedRegion extends Region {
+  private Vector min;
+  private Vector max;
 
-  public BoundedRegion(String id) {
+  /**
+   * @param id This region's ID.
+   * @param xMin The minimum x position of this rectangle.
+   * @param zMin The minimum z position of this rectangle.
+   * @param xMax The maximum x position of this rectangle.
+   * @param zMax The maximum z position of this rectangle.
+   */
+  public RectangleRegion(String id, double xMin, double zMin, double xMax, double zMax) {
     super(id);
+
+    min = new Vector(xMin, Double.NEGATIVE_INFINITY, zMin);
+    max = new Vector(xMax, Double.POSITIVE_INFINITY, zMax);
   }
 
-  public abstract List<Block> getBlocks();
-
-  public abstract BlockRegion getCenterBlock();
+  @Override
+  public boolean contains(Vector vector) {
+    return vector.isInAABB(min, max);
+  }
 
 }

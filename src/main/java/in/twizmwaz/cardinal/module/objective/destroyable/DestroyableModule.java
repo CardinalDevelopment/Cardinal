@@ -30,6 +30,8 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
@@ -72,12 +74,23 @@ public class DestroyableModule extends AbstractModule {
                 destroyablesElement);
         boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
 
-        BoundedRegion region = null; //TODO: Get region from id
+        RegionModule regionModule = Cardinal.getModule(RegionModule.class);
+        Region region = regionModule.getRegion(destroyableElement);
         if (region == null) {
-          errors.add(new ModuleError(this,
-                  new String[]{"Invalid region specified for destroyable"}, false));
+          region = regionModule.getRegion(destroyablesElement);
+        }
+        if (region == null) {
+          errors.add(new ModuleError(this, new String[]{"No region specified for destroyable"},
+                  false));
           continue;
         }
+        if (!(region instanceof BoundedRegion)) {
+          errors.add(new ModuleError(this,
+                  new String[]{"Region specified for destroyable must be a bounded region"},
+                  false));
+          continue;
+        }
+        BoundedRegion boundedRegion = (BoundedRegion) region;
 
         List<ImmutablePair<Material, Integer>> materials = Lists.newArrayList();
         String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement,
@@ -93,7 +106,7 @@ public class DestroyableModule extends AbstractModule {
                   false));
           continue;
         }
-        Team owner = new TeamModule().getTeamById(ownerValue); //TODO: Get TeamModule from match
+        Team owner = Cardinal.getModule(TeamModule.class).getTeamById(ownerValue);
         if (owner == null) {
           errors.add(new ModuleError(this, new String[]{"Invalid owner specified for destroyable"},
                   false));
@@ -147,9 +160,9 @@ public class DestroyableModule extends AbstractModule {
         boolean proximityHorizontal = proximityHorizontalValue != null
                 && Numbers.parseBoolean(proximityHorizontalValue);
 
-        Destroyable destroyable = new Destroyable(id, name, required, region, materials, owner,
-                completion, modeChanges, showProgress, repairable, sparks, show, proximityMetric,
-                proximityHorizontal);
+        Destroyable destroyable = new Destroyable(id, name, required, boundedRegion, materials,
+                owner, completion, modeChanges, showProgress, repairable, sparks, show,
+                proximityMetric, proximityHorizontal);
         Bukkit.getPluginManager().registerEvents(destroyable, Cardinal.getInstance());
         destroyables.add(destroyable);
       }

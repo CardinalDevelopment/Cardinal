@@ -23,22 +23,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.bounded;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
+import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
+import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
-public abstract class BoundedRegion extends Region {
+@Getter
+public class CuboidRegion extends BoundedRegion {
 
-  public BoundedRegion(String id) {
+  private final Vector min;
+  private final Vector max;
+
+  /**
+   * @param id The ID of this region.
+   * @param min The minimum vector of this region.
+   * @param max The maximum vector of this region.
+   */
+  public CuboidRegion(String id, Vector min, Vector max) {
     super(id);
+
+    this.min = min;
+    this.max = max;
   }
 
-  public abstract List<Block> getBlocks();
+  @Override
+  public List<Block> getBlocks() {
+    List<Block> blocks = Lists.newArrayList();
+    for (int x = (int) min.getX(); x < max.getX(); x++) {
+      for (int y = (int) min.getY(); y < max.getY(); y++) {
+        for (int z = (int) min.getZ(); z < max.getZ(); z++) {
+          blocks.add(new Location(null, x, y, z).getBlock()); //TODO: Get match world
+        }
+      }
+    }
+    return blocks;
+  }
 
-  public abstract BlockRegion getCenterBlock();
+  @Override
+  public BlockRegion getCenterBlock() {
+    return new BlockRegion(null, min.getMidpoint(max));
+  }
+
+  @Override
+  public boolean contains(Vector vector) {
+    return vector.isInAABB(min, max);
+  }
 
 }

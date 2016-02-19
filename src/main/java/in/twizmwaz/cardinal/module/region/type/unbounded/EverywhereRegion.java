@@ -23,22 +23,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import org.bukkit.util.Vector;
 
-import java.util.List;
+public class EverywhereRegion extends UnboundedRegion {
 
-public abstract class BoundedRegion extends Region {
-
-  public BoundedRegion(String id) {
+  public EverywhereRegion(String id) {
     super(id);
   }
 
-  public abstract List<Block> getBlocks();
-
-  public abstract BlockRegion getCenterBlock();
+  @Override
+  public boolean contains(Vector vector) {
+    return true;
+  }
 
 }

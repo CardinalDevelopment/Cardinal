@@ -30,6 +30,8 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
@@ -68,12 +70,22 @@ public class CoreModule extends AbstractModule {
         String requiredValue = ParseUtil.getFirstAttribute("required", coreElement, coresElement);
         boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
 
-        BoundedRegion region = null; //TODO: Get region from id
+        RegionModule regionModule = Cardinal.getModule(RegionModule.class);
+        Region region = regionModule.getRegion(coreElement);
         if (region == null) {
-          errors.add(new ModuleError(this, new String[]{"Invalid region specified for core"},
+          region = regionModule.getRegion(coresElement);
+        }
+        if (region == null) {
+          errors.add(new ModuleError(this, new String[]{"No region specified for core"},
                   false));
           continue;
         }
+        if (!(region instanceof BoundedRegion)) {
+          errors.add(new ModuleError(this,
+                  new String[]{"Region specified for wool must be a bounded region"}, false));
+          continue;
+        }
+        BoundedRegion boundedRegion = (BoundedRegion) region;
 
         String leakValue = ParseUtil.getFirstAttribute("leak", coreElement, coresElement);
         int leak = 5;
@@ -132,8 +144,8 @@ public class CoreModule extends AbstractModule {
         boolean proximityHorizontal = proximityHorizontalValue != null
                 && Numbers.parseBoolean(proximityHorizontalValue);
 
-        Core core = new Core(id, name, required, region, leak, material, team, modeChanges, show,
-                proximityMetric, proximityHorizontal);
+        Core core = new Core(id, name, required, boundedRegion, leak, material, team, modeChanges,
+                show, proximityMetric, proximityHorizontal);
         Bukkit.getPluginManager().registerEvents(core, Cardinal.getInstance());
         cores.add(core);
       }

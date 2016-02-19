@@ -100,4 +100,10 @@ public final class Cardinal extends JavaPlugin {
   public static Module getModule(@Nonnull String name) {
     return instance.moduleHandler.getRegistry().getModule(name);
   }
+
+  @Nullable
+  public static <T extends Module> T getModule(@Nonnull Class<T> clazz) {
+    return instance.moduleHandler.getRegistry().getModule(clazz);
+  }
+
 }

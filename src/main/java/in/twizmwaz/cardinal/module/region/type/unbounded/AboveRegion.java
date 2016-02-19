@@ -23,22 +23,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import lombok.Getter;
+import org.bukkit.util.Vector;
 
-import java.util.List;
+@Getter
+public class AboveRegion extends UnboundedRegion {
 
-public abstract class BoundedRegion extends Region {
+  private final double xAxis;
+  private final double yAxis;
+  private final double zAxis;
 
-  public BoundedRegion(String id) {
+  /**
+   * @param id The ID of this region.
+   * @param xAxis The x-axis for which the region's area is above.
+   * @param yAxis The y-axis for which the region's area is above.
+   * @param zAxis The z-axis for which the region's area is above.
+   */
+  public AboveRegion(String id, double xAxis, double yAxis, double zAxis) {
     super(id);
+
+    this.xAxis = xAxis;
+    this.yAxis = yAxis;
+    this.zAxis = zAxis;
   }
 
-  public abstract List<Block> getBlocks();
-
-  public abstract BlockRegion getCenterBlock();
+  @Override
+  public boolean contains(Vector vector) {
+    return vector.getX() > xAxis && vector.getY() > yAxis && vector.getZ() > zAxis;
+  }
 
 }

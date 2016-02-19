@@ -23,22 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.scoreboard;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.AbstractModule;
 
-import java.util.List;
+public class ScoreboardModule extends AbstractModule {
 
-public abstract class BoundedRegion extends Region {
-
-  public BoundedRegion(String id) {
-    super(id);
+  public ScoreboardModule() {
+    super("scoreboard");
   }
-
-  public abstract List<Block> getBlocks();
-
-  public abstract BlockRegion getCenterBlock();
 
 }

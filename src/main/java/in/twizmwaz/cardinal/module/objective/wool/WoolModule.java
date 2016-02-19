@@ -31,6 +31,7 @@ import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Numbers;
@@ -89,8 +90,11 @@ public class WoolModule extends AbstractModule {
           continue;
         }
 
-        String monumentValue = ParseUtil.getFirstAttribute("monument", woolElement, woolsElement);
-        Region monument = null; //TODO: Get region from id
+        RegionModule regionModule = Cardinal.getModule(RegionModule.class);
+        Region monument = regionModule.getRegion(woolElement, "monument");
+        if (monument == null) {
+          monument = regionModule.getRegion(woolsElement, "monument");
+        }
         if (monument == null) {
           errors.add(new ModuleError(this, new String[]{"Invalid monument specified for wool"},
                   false));
@@ -105,6 +109,10 @@ public class WoolModule extends AbstractModule {
         boolean show = showValue == null || Numbers.parseBoolean(showValue);
 
         String locationValue = ParseUtil.getFirstAttribute("location", woolElement, woolsElement);
+        if (locationValue == null) {
+          errors.add(new ModuleError(this, new String[]{"No location specified for wool"}, false));
+          continue;
+        }
         String[] coordinates = locationValue.split(",");
         if (coordinates.length != 3) {
           errors.add(new ModuleError(this,
