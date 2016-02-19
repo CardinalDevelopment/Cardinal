@@ -26,6 +26,8 @@
 package in.twizmwaz.cardinal.module.rotation;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
@@ -33,13 +35,14 @@ import in.twizmwaz.cardinal.module.repository.RepositoryModule;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 @ModuleEntry
 public class RotationModule extends AbstractModule {
 
   @Getter
-  private final List<LoadedMap> rotation = Lists.newArrayList();
-  private int position;
+  private final Map<MatchThread, List<LoadedMap>> rotations = Maps.newHashMap();
+  private Map<MatchThread, Integer> positions = Maps.newHashMap();
 
   public RotationModule() {
     this.depends = new Class[] { RepositoryModule.class };
@@ -49,12 +52,12 @@ public class RotationModule extends AbstractModule {
    * Temporary method to create a temp rotation.
    */
   public void loadRotation(RepositoryModule repo) {
-    repo.getLoadedMaps().entrySet().forEach(map ->
-        rotation.add(map.getValue()));
+    List<LoadedMap> rotation = Lists.newArrayList();
+    repo.getLoadedMaps().entrySet().forEach(map -> rotation.add(map.getValue()));
   }
 
-  public LoadedMap getNext() {
-    return rotation.get(position);
+  public LoadedMap getNext(MatchThread thread) {
+    return rotations.get(thread).get(positions.get(thread));
   }
 
   /**
@@ -63,11 +66,11 @@ public class RotationModule extends AbstractModule {
    *
    * @return The new position.
    */
-  public int move() {
-    position++;
-    if (position > rotation.size() - 1) {
-      position = 0;
+  public int move(MatchThread thread) {
+    positions.put(thread, positions.get(thread) + 1);
+    if (positions.get(thread) > rotations.get(thread).size() - 1) {
+      positions.put(thread, 0);
     }
-    return position;
+    return positions.get(thread);
   }
 }

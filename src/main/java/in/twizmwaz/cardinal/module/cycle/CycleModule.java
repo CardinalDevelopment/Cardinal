@@ -25,32 +25,24 @@
 
 package in.twizmwaz.cardinal.module.cycle;
 
+import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 
-import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 @ModuleEntry
 public final class CycleModule extends AbstractModule {
 
   @Getter
-  @Setter(AccessLevel.PACKAGE)
-  private World matchWorld;
-  @Getter
-  @Setter(AccessLevel.PACKAGE)
-  private File matchFile;
-
-  @Getter
-  private CycleRunnable cycle;
+  private final Map<MatchThread, CycleRunnable> nextCycle = Maps.newHashMap();
 
   /**
    * Creates a new cycle object for the initial server cycle.
@@ -59,8 +51,10 @@ public final class CycleModule extends AbstractModule {
    */
   @EventHandler
   public void onModuleLoad(ModuleLoadCompleteEvent event) {
-    cycle = new CycleRunnable(this, UUID.randomUUID(),
-        Cardinal.getModule(RotationModule.class).getNext());
+    CycleRunnable runnable = new CycleRunnable(this, UUID.randomUUID());
+    runnable.setMap(Cardinal.getModule(RotationModule.class)
+        .getNext(Cardinal.getInstance().getMatchThread()));
+    nextCycle.put(Cardinal.getInstance().getMatchThread(), runnable);
   }
 
   /**
@@ -68,8 +62,8 @@ public final class CycleModule extends AbstractModule {
    *
    * @return If the cycle was successful.
    */
-  public boolean cycle() {
-    cycle.run();
+  public boolean cycle(MatchThread thread) {
+    nextCycle.get(thread).run();
     return true;
   }
 }

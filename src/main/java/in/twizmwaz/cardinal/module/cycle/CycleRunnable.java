@@ -27,8 +27,8 @@ package in.twizmwaz.cardinal.module.cycle;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.World;
@@ -38,14 +38,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
-@Setter
 public final class CycleRunnable implements Runnable {
 
   private final CycleModule parent;
   private final UUID uuid;
+  @Setter
   private LoadedMap map;
+  private World world;
+  private File matchFile;
 
   @Override
   public void run() {
@@ -58,8 +60,8 @@ public final class CycleRunnable implements Runnable {
     World world = new WorldCreator(dest.getAbsolutePath()).generator(new NullChunkGenerator())
         .createWorld();
     world.setPVP(true);
-    parent.setMatchWorld(world);
-    parent.setMatchFile(dest);
+    this.world = world;
+    this.matchFile = dest;
   }
 
 }
