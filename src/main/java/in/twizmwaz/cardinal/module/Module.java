@@ -25,40 +25,40 @@
 
 package in.twizmwaz.cardinal.module;
 
-import org.jdom2.Document;
+import in.twizmwaz.cardinal.match.Match;
 
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Represents a Cardinal module.
+ * Represents a Cardinal module. A Cardinal2 module must be able to to load and execute multiple
+ * maps simultaneously.
  */
 public interface Module {
-
-  /**
-   * @return The name of the module, must match the value of {@link ModuleEntry}.
-   */
-  @Nonnull
-  String getName();
 
   /**
    * @return The names of modules to load matches before the given module.
    */
   @Nullable
-  String[] getDepends();
+  Class[] getDepends();
+
 
   /**
-   * Clear the match information from the module, prepare for the next match.
+   * Clears match information from a module.
+   *
+   * @param match Match to be cleared from the module.
    */
-  void clearMatch();
+  void clearMatch(Match match);
 
   /**
-   * @param document Map XML document to load from.
+   * Instructs the module to load information for the match.
+   *
+   * @param match Match for the XML document to load from.
    * @return Returns true if the module loaded without interruption. Returns false for a
    *         match-blocking failure.
    */
-  boolean loadMatch(@Nonnull Document document);
+  boolean loadMatch(@Nonnull Match match);
 
   /**
    * @return Errors, if any, generated when loading the current map.

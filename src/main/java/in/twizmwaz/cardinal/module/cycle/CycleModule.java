@@ -52,10 +52,6 @@ public final class CycleModule extends AbstractModule {
   @Getter
   private CycleRunnable cycle;
 
-  public CycleModule() {
-    super("cycle");
-  }
-
   /**
    * Creates a new cycle object for the initial server cycle.
    *
@@ -64,7 +60,7 @@ public final class CycleModule extends AbstractModule {
   @EventHandler
   public void onModuleLoad(ModuleLoadCompleteEvent event) {
     cycle = new CycleRunnable(this, UUID.randomUUID(),
-        ((RotationModule) Cardinal.getModule("rotation")).getNext());
+        Cardinal.getModule(RotationModule.class).getNext());
   }
 
   /**
@@ -73,7 +69,6 @@ public final class CycleModule extends AbstractModule {
    * @return If the cycle was successful.
    */
   public boolean cycle() {
-    Cardinal.getInstance().getModuleHandler().clearMatch();
     cycle.run();
     return true;
   }

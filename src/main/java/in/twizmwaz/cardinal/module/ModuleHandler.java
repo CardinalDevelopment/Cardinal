@@ -26,10 +26,10 @@
 package in.twizmwaz.cardinal.module;
 
 import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
-import org.jdom2.Document;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,27 +44,28 @@ public class ModuleHandler {
   @Getter
   private final ModuleRegistry registry;
 
-  public void clearMatch() {
-    registry.getModules().entrySet().forEach(entry -> entry.getValue().clearMatch());
+  public void clearMatch(@Nonnull Match match) {
+    Validate.notNull(match);
+    registry.getModules().entrySet().forEach(entry -> entry.getValue().clearMatch(match));
   }
 
   /**
-   * @param document The document modules should load the map from
+   * @param match The match modules should load from
    * @return If the modules loaded successfully.
    */
-  public boolean loadMatch(@Nonnull Document document) {
-    Validate.notNull(document);
+  public boolean loadMatch(@Nonnull Match match) {
+    Validate.notNull(match);
     // Already loaded modules
-    List<String> completed = Lists.newArrayList();
+    List<Class> completed = Lists.newArrayList();
     // As long as all modules are not loaded
     while (completed.size() < registry.getModules().size()) {
       // For each
       for (Module module : registry.getModules().values()) {
         // If all dependent modules are completed but this one isn't
-        if (completed.contains(module.getName())
+        if (!completed.contains(module.getClass())
             && completed.containsAll(Arrays.asList(module.getDepends()))) {
           // Load and return false if it fails
-          if (!module.loadMatch(document)) {
+          if (!module.loadMatch(match)) {
             return false;
           }
         }

@@ -38,7 +38,6 @@ public class RegionModule extends AbstractModule {
   private List<Region> regions;
 
   public RegionModule() {
-    super("region");
     regions = Lists.newArrayList();
   }
 

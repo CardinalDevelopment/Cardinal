@@ -61,7 +61,6 @@ public class RepositoryModule extends AbstractModule {
    * Creates a new module instance.
    */
   public RepositoryModule() {
-    super("repository");
     //TODO: support alternate repos
     File repoRoot = new File(Cardinal.getInstance().getDataFolder().getAbsolutePath() + "/repo");
     loadRepository(repoRoot);

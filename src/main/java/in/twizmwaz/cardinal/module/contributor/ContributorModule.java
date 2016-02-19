@@ -33,10 +33,6 @@ import java.util.UUID;
 
 public class ContributorModule extends AbstractModule {
 
-  public ContributorModule() {
-    super("contributor");
-  }
-
   public Contributor forName(String name) {
     //TODO
     return null;

@@ -23,56 +23,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.rotation;
+package in.twizmwaz.cardinal.match;
 
-import com.google.common.collect.Lists;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.repository.RepositoryModule;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
+/**
+ * A MatchThread is an object representing a linear string of matches.
+ * This has nothing to do with a {@link java.lang.Thread}.
+ */
+public class MatchThread {
 
-public class RotationModule extends AbstractModule {
+  private static int counter = -1;
 
   @Getter
-  private final List<LoadedMap> rotation = Lists.newArrayList();
-  private int position;
+  private final int id;
+  @Getter
+  @Setter
+  private Match currentMatch;
 
-  public RotationModule() {
-    this.depends = new Class[] { RepositoryModule.class };
-  }
-
-  /**
-   * Temporary method to create a temp rotation.
-   */
-  public void loadRotation(RepositoryModule repo) {
-    repo.getLoadedMaps().entrySet().forEach(map ->
-        rotation.add(map.getValue()));
-  }
-
-  public LoadedMap getNext() {
-    return rotation.get(position);
-  }
-
-  /**
-   * Increments the position in the rotation by one, and resets
-   * it to the beginning if it has completed.
-   *
-   * @return The new position.
-   */
-  public int move() {
-    position++;
-    if (position > rotation.size() - 1) {
-      position = 0;
-    }
-    return position;
-  }
-
-  @ModuleEntry("rotation")
-  public static RotationModule makeModule() {
-    return new RotationModule();
+  public MatchThread() {
+    id = counter++;
   }
 
 }

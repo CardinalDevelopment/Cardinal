@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal;
 
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleHandler;
 import in.twizmwaz.cardinal.module.ModuleLoader;
@@ -50,6 +51,8 @@ public final class Cardinal extends JavaPlugin {
   @Getter
   @Setter(AccessLevel.PRIVATE)
   private ModuleHandler moduleHandler;
+  @Getter
+  private MatchThread matchThread;
 
   /**
    * Creates a new Cardinal object.
@@ -94,11 +97,6 @@ public final class Cardinal extends JavaPlugin {
   @Nonnull
   public static Logger getPluginLogger() {
     return Cardinal.getInstance().getLogger();
-  }
-
-  @Nullable
-  public static Module getModule(@Nonnull String name) {
-    return instance.moduleHandler.getRegistry().getModule(name);
   }
 
   @Nullable

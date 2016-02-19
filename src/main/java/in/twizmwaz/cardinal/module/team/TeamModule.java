@@ -25,9 +25,9 @@
 
 package in.twizmwaz.cardinal.module.team;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import org.bukkit.entity.Player;
-import org.jdom2.Document;
 
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -37,17 +37,15 @@ public class TeamModule extends AbstractModule {
 
   private List<Team> teams;
 
-  public TeamModule() {
-    super("team");
-  }
-
   @Override
-  public boolean loadMatch(Document document) {
+  public boolean loadMatch(Match match) {
+    //TODO
     return true;
   }
 
   @Override
-  public void clearMatch() {
+  public void clearMatch(Match match) {
+    //TODO: reimplement
     teams.clear();
   }
 

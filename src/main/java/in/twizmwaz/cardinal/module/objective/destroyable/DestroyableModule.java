@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.objective.destroyable;
 
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
@@ -53,20 +54,21 @@ public class DestroyableModule extends AbstractModule {
   private List<Destroyable> destroyables;
 
   public DestroyableModule() {
-    super("destroyable");
     destroyables = Lists.newArrayList();
   }
 
   @Override
-  public boolean loadMatch(Document document) {
+  public boolean loadMatch(Match match) {
+    //TODO: reimplement
+    Document document = match.getMap().getDocument();
     for (Element destroyablesElement : document.getRootElement().getChildren("destroyables")) {
       for (Element destroyableElement : destroyablesElement.getChildren("destroyable")) {
         String id = ParseUtil.getFirstAttribute("id", destroyableElement, destroyablesElement);
 
         String name = ParseUtil.getFirstAttribute("name", destroyableElement, destroyablesElement);
         if (name == null) {
-          errors.add(new ModuleError(this, new String[]{"No name specified for destroyable"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No name specified for destroyable"}, false));
           continue;
         }
 
@@ -80,12 +82,12 @@ public class DestroyableModule extends AbstractModule {
           region = regionModule.getRegion(destroyablesElement);
         }
         if (region == null) {
-          errors.add(new ModuleError(this, new String[]{"No region specified for destroyable"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No region specified for destroyable"}, false));
           continue;
         }
         if (!(region instanceof BoundedRegion)) {
-          errors.add(new ModuleError(this,
+          errors.add(new ModuleError(this, match.getMap(),
                   new String[]{"Region specified for destroyable must be a bounded region"},
                   false));
           continue;
@@ -102,14 +104,14 @@ public class DestroyableModule extends AbstractModule {
         String ownerValue = ParseUtil.getFirstAttribute("owner", destroyableElement,
                 destroyablesElement);
         if (ownerValue == null) {
-          errors.add(new ModuleError(this, new String[]{"No owner specified for destroyable"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No owner specified for destroyable"}, false));
           continue;
         }
         Team owner = Cardinal.getModule(TeamModule.class).getTeamById(ownerValue);
         if (owner == null) {
-          errors.add(new ModuleError(this, new String[]{"Invalid owner specified for destroyable"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid owner specified for destroyable"}, false));
           continue;
         }
 
@@ -149,7 +151,7 @@ public class DestroyableModule extends AbstractModule {
             proximityMetric =
                     ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
-            errors.add(new ModuleError(this,
+            errors.add(new ModuleError(this, match.getMap(),
                     new String[]{"Invalid proximity metric specified for destroyable"}, false));
             continue;
           }
@@ -171,7 +173,8 @@ public class DestroyableModule extends AbstractModule {
   }
 
   @Override
-  public void clearMatch() {
+  public void clearMatch(Match match) {
+    //TODO: reimplement
     destroyables.forEach(HandlerList::unregisterAll);
     destroyables.clear();
   }

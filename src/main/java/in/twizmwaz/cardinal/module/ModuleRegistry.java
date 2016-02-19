@@ -38,21 +38,11 @@ import javax.annotation.Nullable;
 public final class ModuleRegistry {
 
   @Getter(AccessLevel.PACKAGE)
-  private final BiMap<String, Module> modules;
+  private final BiMap<Class, Module> modules;
 
-  public ModuleRegistry(@Nonnull Map<String, Module> modules) {
+  public ModuleRegistry(@Nonnull Map<Class, Module> modules) {
     Validate.notNull(modules);
-    this.modules = new ImmutableBiMap.Builder<String, Module>().putAll(modules).build();
-  }
-
-  /**
-   * @param name Name of the module to be returned,
-   * @return The module.
-   */
-  @Nullable
-  public Module getModule(@Nonnull String name) {
-    Validate.notNull(name);
-    return modules.get(name);
+    this.modules = new ImmutableBiMap.Builder<Class, Module>().putAll(modules).build();
   }
 
   /**

@@ -29,8 +29,4 @@ import in.twizmwaz.cardinal.module.AbstractModule;
 
 public class ScoreboardModule extends AbstractModule {
 
-  public ScoreboardModule() {
-    super("scoreboard");
-  }
-
 }

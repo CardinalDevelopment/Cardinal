@@ -26,31 +26,24 @@
 package in.twizmwaz.cardinal.module;
 
 import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
-import org.jdom2.Document;
 
 import java.util.List;
 
 public abstract class AbstractModule implements Module {
 
   @Getter
-  protected final String name;
+  protected Class[] depends;
   @Getter
-  protected String[] depends;
-  @Getter
-  protected List<ModuleError> errors;
+  protected List<ModuleError> errors = Lists.newArrayList();
 
-  public AbstractModule(String name) {
-    this.name = name;
-    errors = Lists.newArrayList();
+  @Override
+  public void clearMatch(Match match) {
   }
 
   @Override
-  public void clearMatch() {
-  }
-
-  @Override
-  public boolean loadMatch(Document document) {
+  public boolean loadMatch(Match match) {
     return true;
   }
 

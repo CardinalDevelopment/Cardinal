@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.objective.core;
 
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
@@ -54,12 +55,13 @@ public class CoreModule extends AbstractModule {
   private List<Core> cores;
 
   public CoreModule() {
-    super("core");
     cores = Lists.newArrayList();
   }
 
   @Override
-  public boolean loadMatch(Document document) {
+  public boolean loadMatch(Match match) {
+    //TODO: reimplement
+    Document document = match.getMap().getDocument();
     for (Element coresElement : document.getRootElement().getChildren("cores")) {
       for (Element coreElement : coresElement.getChildren("core")) {
         String id = ParseUtil.getFirstAttribute("id", coreElement, coresElement);
@@ -76,12 +78,12 @@ public class CoreModule extends AbstractModule {
           region = regionModule.getRegion(coresElement);
         }
         if (region == null) {
-          errors.add(new ModuleError(this, new String[]{"No region specified for core"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No region specified for core"}, false));
           continue;
         }
         if (!(region instanceof BoundedRegion)) {
-          errors.add(new ModuleError(this,
+          errors.add(new ModuleError(this, match.getMap(),
                   new String[]{"Region specified for wool must be a bounded region"}, false));
           continue;
         }
@@ -93,7 +95,7 @@ public class CoreModule extends AbstractModule {
           try {
             leak = Numbers.parseInteger(leakValue);
           } catch (NumberFormatException e) {
-            errors.add(new ModuleError(this,
+            errors.add(new ModuleError(this, match.getMap(),
                     new String[]{"Invalid leak distance specified for core"}, false));
             continue;
           }
@@ -105,7 +107,7 @@ public class CoreModule extends AbstractModule {
           try {
             material = Materials.getSingleMaterialPattern(materialValue);
           } catch (NumberFormatException e) {
-            errors.add(new ModuleError(this,
+            errors.add(new ModuleError(this, match.getMap(),
                     new String[]{"Invalid data value of material specified for core"}, false));
             continue;
           }
@@ -113,8 +115,8 @@ public class CoreModule extends AbstractModule {
 
         Team team = null; //TODO: Get team from id
         if (team == null) {
-          errors.add(new ModuleError(this, new String[]{"Invalid team specified for core"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid team specified for core"}, false));
           continue;
         }
 
@@ -133,7 +135,7 @@ public class CoreModule extends AbstractModule {
             proximityMetric =
                     ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
-            errors.add(new ModuleError(this,
+            errors.add(new ModuleError(this, match.getMap(),
                     new String[]{"Invalid proximity metric specified for core"}, false));
             continue;
           }
@@ -154,7 +156,8 @@ public class CoreModule extends AbstractModule {
   }
 
   @Override
-  public void clearMatch() {
+  public void clearMatch(Match match) {
+    //TODO: reimplement
     cores.forEach(HandlerList::unregisterAll);
     cores.clear();
   }

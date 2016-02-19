@@ -25,12 +25,14 @@
 
 package in.twizmwaz.cardinal.module;
 
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import lombok.Data;
 
 @Data
 public final class ModuleError {
 
   private final Module module;
+  private final LoadedMap map;
   private final String[] message;
   private final boolean critical;
 

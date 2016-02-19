@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.objective.wool;
 
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
@@ -51,12 +52,13 @@ public class WoolModule extends AbstractModule {
   private List<Wool> wools;
 
   public WoolModule() {
-    super("wool");
     wools = Lists.newArrayList();
   }
 
   @Override
-  public boolean loadMatch(Document document) {
+  public boolean loadMatch(Match match) {
+    //TODO: reimplement
+    Document document = match.getMap().getDocument();
     for (Element woolsElement : document.getRootElement().getChildren("wools")) {
       for (Element woolElement : woolsElement.getChildren("wool")) {
         String id = ParseUtil.getFirstAttribute("id", woolElement, woolsElement);
@@ -66,27 +68,29 @@ public class WoolModule extends AbstractModule {
 
         String teamValue = ParseUtil.getFirstAttribute("team", woolElement, woolsElement);
         if (teamValue == null) {
-          errors.add(new ModuleError(this, new String[]{"No team specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No team specified for wool"}, false));
           continue;
         }
         Team team = new TeamModule().getTeamById(teamValue); //TODO: Get TeamModule from match
         if (team == null) {
-          errors.add(new ModuleError(this, new String[]{"Invalid team specified for wool"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid team specified for wool"}, false));
           continue;
         }
 
         String colorValue = ParseUtil.getFirstAttribute("color", woolElement, woolsElement);
         if (colorValue == null) {
-          errors.add(new ModuleError(this, new String[]{"No color specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No color specified for wool"}, false));
           continue;
         }
         DyeColor color;
         try {
           color = DyeColor.valueOf(colorValue);
         } catch (IllegalArgumentException e) {
-          errors.add(new ModuleError(this, new String[]{"Invalid color specified for wool"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid color specified for wool"}, false));
           continue;
         }
 
@@ -96,8 +100,8 @@ public class WoolModule extends AbstractModule {
           monument = regionModule.getRegion(woolsElement, "monument");
         }
         if (monument == null) {
-          errors.add(new ModuleError(this, new String[]{"Invalid monument specified for wool"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid monument specified for wool"}, false));
           continue;
         }
 
@@ -110,12 +114,13 @@ public class WoolModule extends AbstractModule {
 
         String locationValue = ParseUtil.getFirstAttribute("location", woolElement, woolsElement);
         if (locationValue == null) {
-          errors.add(new ModuleError(this, new String[]{"No location specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"No location specified for wool"}, false));
           continue;
         }
         String[] coordinates = locationValue.split(",");
         if (coordinates.length != 3) {
-          errors.add(new ModuleError(this,
+          errors.add(new ModuleError(this, match.getMap(),
                   new String[]{"Invalid location format specified for wool"}, false));
           continue;
         }
@@ -125,8 +130,8 @@ public class WoolModule extends AbstractModule {
                   Double.parseDouble(coordinates[1].trim()),
                   Double.parseDouble(coordinates[2].trim()));
         } catch (NumberFormatException e) {
-          errors.add(new ModuleError(this, new String[]{"Invalid location specified for wool"},
-                  false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid location specified for wool"}, false));
           continue;
         }
 
@@ -138,7 +143,7 @@ public class WoolModule extends AbstractModule {
             woolProximityMetric =
                     ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
-            errors.add(new ModuleError(this,
+            errors.add(new ModuleError(this, match.getMap(),
                     new String[]{"Invalid wool proximity metric specified for wool"}, false));
             continue;
           }
@@ -157,7 +162,7 @@ public class WoolModule extends AbstractModule {
             monumentProximityMetric = ProximityMetric.valueOf(
                     Strings.getTechnicalName(monumentProximityMetricValue));
           } catch (IllegalArgumentException e) {
-            errors.add(new ModuleError(this,
+            errors.add(new ModuleError(this, match.getMap(),
                     new String[]{"Invalid monument proximity metric specified for wool"}, false));
             continue;
           }
@@ -180,7 +185,8 @@ public class WoolModule extends AbstractModule {
   }
 
   @Override
-  public void clearMatch() {
+  public void clearMatch(Match match) {
+    //TODO: reimplement
     wools.forEach(HandlerList::unregisterAll);
     wools.clear();
   }

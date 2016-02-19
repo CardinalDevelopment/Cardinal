@@ -120,12 +120,13 @@ public final class ModuleLoader {
    * @return The completed map of modules.
    */
   @Nonnull
-  public Map<String, Module> makeModules(@Nonnull Map<String, Method> entries) {
-    Map<String, Module> results = Maps.newHashMap();
+  public Map<Class, Module> makeModules(@Nonnull Map<String, Method> entries) {
+    Map<Class, Module> results = Maps.newHashMap();
     for (Map.Entry<String, Method> entry : entries.entrySet()) {
       try {
         // Invoke the entry point and add it to the return map
-        results.put(entry.getKey(), (Module) entry.getValue().invoke(null));
+        Module invoked = (Module) entry.getValue().invoke(null);
+        results.put(invoked.getClass(), invoked);
       } catch (InvocationTargetException | IllegalAccessException ex) {
         Cardinal.getPluginLogger().warning("Failed to load " + entry.getKey() + ", skipping");
         ex.printStackTrace();
