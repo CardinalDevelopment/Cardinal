@@ -23,24 +23,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.event;
+package in.twizmwaz.cardinal.module.spawn;
 
-import in.twizmwaz.cardinal.module.ModuleHandler;
-import lombok.Getter;
-import org.bukkit.event.HandlerList;
+import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.MatchThread;
+import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
+import org.bukkit.Bukkit;
 
-@Getter
-public class ModuleLoadCompleteEvent extends ModuleEvent {
+import java.util.Map;
 
-  @Getter
-  private static final HandlerList handlerList = new HandlerList();
+@ModuleEntry
+public class SpawnModule extends AbstractModule {
 
-  public ModuleLoadCompleteEvent(ModuleHandler moduleHandler) {
-    super(moduleHandler);
+  private Map<MatchThread, SpawnHandler> spawnHandlers = Maps.newHashMap();
+
+  /**
+   * Default constructor to create the module.
+   */
+  public SpawnModule() {
+    spawnHandlers.put(Cardinal.getInstance().getMatchThread(),
+        new SpawnHandler(Cardinal.getInstance().getMatchThread()));
+    spawnHandlers.forEach((thread, handler) ->
+        Bukkit.getPluginManager().registerEvents(handler, Cardinal.getInstance()));
   }
 
-  @Override
-  public HandlerList getHandlers() {
-    return handlerList;
-  }
 }

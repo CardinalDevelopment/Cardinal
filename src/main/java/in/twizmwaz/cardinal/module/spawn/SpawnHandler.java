@@ -23,24 +23,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.event;
+package in.twizmwaz.cardinal.module.spawn;
 
-import in.twizmwaz.cardinal.module.ModuleHandler;
+import in.twizmwaz.cardinal.match.MatchThread;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.event.HandlerList;
+import org.bukkit.GameMode;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInitialSpawnEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
-@Getter
-public class ModuleLoadCompleteEvent extends ModuleEvent {
+@AllArgsConstructor
+public class SpawnHandler implements Listener {
 
   @Getter
-  private static final HandlerList handlerList = new HandlerList();
+  private final MatchThread matchThread;
 
-  public ModuleLoadCompleteEvent(ModuleHandler moduleHandler) {
-    super(moduleHandler);
+  /**
+   * Sets player spawn location when the first join.
+   *
+   * @param event The event called.
+   */
+  @EventHandler(priority = EventPriority.LOW)
+  public void onJoin(PlayerInitialSpawnEvent event) {
+    //TODO: actually find the spawn and spawn them there
+    event.getSpawnLocation().setWorld(matchThread.getCurrentMatch().getWorld());
+    event.getSpawnLocation().setX(0);
+    event.getSpawnLocation().setY(32);
+    event.getSpawnLocation().setZ(0);
   }
 
-  @Override
-  public HandlerList getHandlers() {
-    return handlerList;
+  /**
+   * Sets up the player when they first join. Should be replaced with obs module in the future.
+   *
+   * @param event The event called.
+   */
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    event.getPlayer().setGameMode(GameMode.CREATIVE);
+    event.getPlayer().setFlying(true);
   }
+
 }

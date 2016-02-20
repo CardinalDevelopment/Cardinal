@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.Validate;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -51,13 +52,16 @@ public final class CycleRunnable implements Runnable {
 
   @Override
   public void run() {
+    Validate.notNull(map);
+    Cardinal.getPluginLogger().info("Cycling to map " + map.getName());
     File dest = new File(Cardinal.getInstance().getDataFolder(), "matches/" + uuid.toString());
+    dest.mkdir();
     try {
       FileUtils.copyDirectory(map.getDirectory(), dest);
     } catch (IOException ex) {
       ex.printStackTrace();
     }
-    World world = new WorldCreator(dest.getAbsolutePath()).generator(new NullChunkGenerator())
+    World world = new WorldCreator(dest.getPath()).generator(new NullChunkGenerator())
         .createWorld();
     world.setPVP(true);
     this.world = world;

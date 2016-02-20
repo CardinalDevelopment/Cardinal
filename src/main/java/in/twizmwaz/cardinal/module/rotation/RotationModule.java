@@ -27,18 +27,25 @@ package in.twizmwaz.cardinal.module.rotation;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.repository.RepositoryModule;
 import lombok.Getter;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.util.List;
 import java.util.Map;
 
+//TODO: consider a rotation object for each MatchThread, rather than the maps
 @ModuleEntry
-public class RotationModule extends AbstractModule {
+public class RotationModule extends AbstractModule implements Listener {
 
   @Getter
   private final Map<MatchThread, List<LoadedMap>> rotations = Maps.newHashMap();
@@ -46,18 +53,43 @@ public class RotationModule extends AbstractModule {
 
   public RotationModule() {
     this.depends = new Class[] { RepositoryModule.class };
+    Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
+  }
+
+  /**
+   * Creates a temporary rotation.
+   *
+   * @param event The event called.
+   */
+  @EventHandler
+  public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
+    rotations.put(Cardinal.getInstance().getMatchThread(),
+        loadRotation(Cardinal.getModule(RepositoryModule.class)));
+    positions.put(Cardinal.getInstance().getMatchThread(), 0);
   }
 
   /**
    * Temporary method to create a temp rotation.
+   *
+   * @param repo The repository to generate a rotation from.
    */
-  public void loadRotation(RepositoryModule repo) {
+  public List<LoadedMap> loadRotation(RepositoryModule repo) {
+    //TODO: actual rotation parsing
     List<LoadedMap> rotation = Lists.newArrayList();
-    repo.getLoadedMaps().entrySet().forEach(map -> rotation.add(map.getValue()));
+    //repo.getLoadedMaps().forEach((name, map) -> rotation.add(map));
+    rotation.add(repo.getLoadedMaps().get(0));
+    return rotation;
   }
 
+  /**
+   * @param thread The thread to get the rotation for.
+   * @return The next map in the rotation.
+   */
   public LoadedMap getNext(MatchThread thread) {
-    return rotations.get(thread).get(positions.get(thread));
+    List<LoadedMap> maps = rotations.get(thread);
+    int index = positions.get(thread);
+    Validate.notNull(maps.get(index));
+    return maps.get(index);
   }
 
   /**

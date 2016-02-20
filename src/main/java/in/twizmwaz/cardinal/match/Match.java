@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.match;
 
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import lombok.Getter;
+import org.bukkit.World;
 
 import java.util.UUID;
 
@@ -40,6 +41,8 @@ public final class Match {
   private final UUID uuid;
   @Getter
   private final LoadedMap map;
+  @Getter
+  private final World world;
 
   @Getter
   private final int matchNumber;
@@ -51,10 +54,11 @@ public final class Match {
    * @param uuid The unique id of this match.
    * @param map The {@link LoadedMap} this match will occur on.
    */
-  public Match(MatchThread thread, UUID uuid, LoadedMap map) {
+  public Match(MatchThread thread, UUID uuid, LoadedMap map, World world) {
     this.thread = thread;
     this.uuid = uuid;
     this.map = map;
+    this.world = world;
     this.matchNumber = matchCounter++;
   }
 

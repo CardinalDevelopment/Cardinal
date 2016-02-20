@@ -34,6 +34,7 @@ import org.jdom2.Document;
 
 import java.io.File;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Data
@@ -44,6 +45,7 @@ public class LoadedMap {
   private final Document document;
   private final Proto proto;
 
+  private final String name;
   private final String gamemode;
   private final Edition edition;
   private final String objective;
@@ -64,14 +66,17 @@ public class LoadedMap {
      * @param name Name of edition.
      * @return The edition enum object.
      */
-    @Nullable
-    public static Edition forName(String name) {
+    @Nonnull
+    public static Edition forName(@Nullable String name) {
+      if (name == null) {
+        return STANDARD;
+      }
       for (Edition edition : values()) {
         if (name.equalsIgnoreCase(edition.getName())) {
           return edition;
         }
       }
-      return null;
+      return STANDARD;
     }
   }
 

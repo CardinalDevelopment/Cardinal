@@ -81,6 +81,12 @@ public class RepositoryModule extends AbstractModule {
     List<File> maps = Lists.newArrayList();
     maps.addAll(candidates.stream().filter(candidate ->
         checkDirectory(candidate)).collect(Collectors.toList()));
+    Map<String, LoadedMap> loaded = Maps.newHashMap();
+    maps.forEach(map -> {
+      LoadedMap loadedMap = loadMap(map);
+      loaded.put(loadedMap.getName(), loadedMap);
+    });
+    loadedMaps.putAll(loaded);
     Cardinal.getPluginLogger().info("Loaded " + maps.size()
         + " maps from " + file.getAbsolutePath());
   }
@@ -97,26 +103,23 @@ public class RepositoryModule extends AbstractModule {
   private boolean checkDirectory(@Nonnull File file) {
     List<String> requirements = Arrays.asList("map.xml", "region", "level.dat");
     if (file.listFiles() != null) {
-      for (File map : file.listFiles()) {
-        if (map.isFile()) {
-          continue;
-        }
-        if (Arrays.asList(map.list()).containsAll(requirements)) {
-          return true;
-        }
+      if (Arrays.asList(file.list()).containsAll(requirements)) {
+        return true;
       }
     }
     return false;
   }
 
   @Nullable
-  private LoadedMap loadMap(File file) {
+  private LoadedMap loadMap(@Nonnull File file) {
+    System.out.println("Loading map from " + file.getAbsolutePath());
     SAXBuilder builder = new SAXBuilder();
     builder.setJDOMFactory(new LocatedJDOMFactory());
     try {
-      Document doc = builder.build(new FileInputStream(file.getAbsolutePath() + "map.xml"));
+      Document doc = builder.build(new FileInputStream(file.getAbsolutePath() + "/map.xml"));
       Element root = doc.getRootElement();
-      Proto proto = Proto.parseProto(root.getChildText("proto"));
+      Proto proto = Proto.parseProto(root.getAttributeValue("proto"));
+      String name = root.getChildText("name");
       String gamemode = root.getChildText("gamemode");
       LoadedMap.Edition edition = LoadedMap.Edition.forName(root.getChildText("edition"));
       String objective = root.getChildText("objective");
@@ -134,7 +137,8 @@ public class RepositoryModule extends AbstractModule {
       }
 
       return
-          new LoadedMap(file, doc, proto, gamemode, edition, objective, authors, contributors, 0);
+          new LoadedMap(file, doc, proto, name, gamemode,
+              edition, objective, authors, contributors, 0);
     } catch (JDOMException | IOException ex) {
       ex.printStackTrace();
       return null;

@@ -34,6 +34,7 @@ import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -58,6 +59,7 @@ public final class Cardinal extends JavaPlugin {
    * Creates a new Cardinal object.
    */
   public Cardinal() {
+    this.matchThread = new MatchThread();
     if (instance != null) {
       throw new IllegalStateException("The Cardinal object has already been created.");
     }
@@ -67,6 +69,7 @@ public final class Cardinal extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    Validate.notNull(Cardinal.getInstance());
     if (!getDataFolder().exists()) {
       getDataFolder().mkdir();
     }
