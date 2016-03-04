@@ -26,15 +26,18 @@ targetCompatibility = '1.8'
 repositories {
     jcenter()
     maven { url 'https://repo.oc.tc/content/groups/public/' }
+    maven { url 'http://ci.twizmwaz.in/nexus/content/repositories/release/' }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 }
 
 dependencies {
     compile 'org.projectlombok:lombok:1.16.6'
     compile 'tc.oc:sportbukkit:1.8.7-R0.1-SNAPSHOT'
+    compile 'ee.ellytr.command:EllyCommand:1.0.0'
     compile 'org.jdom:jdom2:2.0.6'
     compile 'org.ow2.asm:asm-all:5.0.4'
 
-    testCompile('junit:junit:4.12')
+    testCompile('junit:junit:4.10')
 }
 
 processResources {
@@ -55,6 +58,7 @@ shadowJar {
         relocate 'org.jdom2', 'in.twizmwaz.cardinal.libs.jdom2'
         include(dependency('org.ow2.asm:asm-all:5.0.4'))
         relocate 'org.objectweb.asm', 'in.twizmwaz.cardinal.libs.asm'
+        include(dependency('ee.ellytr.command:EllyCommand:1.0.0'))
     }
 }
 

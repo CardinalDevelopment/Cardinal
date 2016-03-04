@@ -25,6 +25,10 @@
 
 package in.twizmwaz.cardinal;
 
+import ee.ellytr.command.CommandExecutor;
+import ee.ellytr.command.CommandRegistry;
+import ee.ellytr.command.exception.CommandException;
+import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleHandler;
@@ -36,6 +40,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_8_R3.Overridden;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -54,22 +61,31 @@ public final class Cardinal extends JavaPlugin {
   private ModuleHandler moduleHandler;
   @Getter
   private MatchThread matchThread;
+  @Getter
+  private CommandRegistry commandRegistry;
+  @Getter
+  private CommandExecutor commandExecutor;
 
   /**
    * Creates a new Cardinal object.
    */
   public Cardinal() {
-    this.matchThread = new MatchThread();
     if (instance != null) {
-      throw new IllegalStateException("The Cardinal object has already been created.");
+    throw new IllegalStateException("The Cardinal object has already been created.");
     }
     instance = this;
+    this.matchThread = new MatchThread();
+
+    commandRegistry = new CommandRegistry(this);
+    commandRegistry.addClass(CommandCardinal.class);
+    commandExecutor = new CommandExecutor(commandRegistry.getFactory());
 
   }
 
   @Override
   public void onEnable() {
     Validate.notNull(Cardinal.getInstance());
+    commandRegistry.register();
     if (!getDataFolder().exists()) {
       getDataFolder().mkdir();
     }
@@ -95,6 +111,16 @@ public final class Cardinal extends JavaPlugin {
   @Override
   public void onDisable() {
 
+  }
+
+  @Override
+  public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    try {
+      commandExecutor.execute(command.getName(), sender, args);
+    } catch (CommandException ex) {
+      ex.printStackTrace();
+    }
+    return true;
   }
 
   @Nonnull
