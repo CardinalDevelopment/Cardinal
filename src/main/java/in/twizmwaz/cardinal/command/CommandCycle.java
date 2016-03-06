@@ -27,15 +27,15 @@ package in.twizmwaz.cardinal.command;
 
 import ee.ellytr.command.Command;
 import ee.ellytr.command.CommandContext;
+import ee.ellytr.command.Optional;
 import in.twizmwaz.cardinal.Cardinal;
-import net.md_5.bungee.api.ChatColor;
+import in.twizmwaz.cardinal.module.cycle.CycleModule;
 
-public class CommandCardinal {
+public class CommandCycle {
 
-  @Command(aliases = "cardinal", description = "Displays information about Cardinal")
-  public static void cardinal(CommandContext cmd) {
-    cmd.getSender().sendMessage(ChatColor.GREEN + "This server is running Cardinal version "
-        + Cardinal.getInstance().getDescription().getVersion());
+  @Command(aliases = "cycle", description = "Cycles to the next map")
+  public static void cycle(CommandContext cmd, @Optional Integer time) {
+    Cardinal.getModule(CycleModule.class).cycle(Cardinal.getInstance().getMatchThread());
   }
 
 }

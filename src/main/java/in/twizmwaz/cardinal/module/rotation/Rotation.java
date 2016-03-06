@@ -23,19 +23,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.command;
+package in.twizmwaz.cardinal.module.rotation;
 
-import ee.ellytr.command.Command;
-import ee.ellytr.command.CommandContext;
-import in.twizmwaz.cardinal.Cardinal;
-import net.md_5.bungee.api.ChatColor;
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
+import lombok.Getter;
 
-public class CommandCardinal {
+import java.util.List;
+import java.util.ListIterator;
 
-  @Command(aliases = "cardinal", description = "Displays information about Cardinal")
-  public static void cardinal(CommandContext cmd) {
-    cmd.getSender().sendMessage(ChatColor.GREEN + "This server is running Cardinal version "
-        + Cardinal.getInstance().getDescription().getVersion());
+public class Rotation {
+
+  @Getter
+  private final List<LoadedMap> maps;
+  private ListIterator<LoadedMap> iterator;
+
+  Rotation(List<LoadedMap> maps) {
+    this.maps = maps;
+    this.iterator = maps.listIterator();
+  }
+
+  /**
+   * @return The next map, and increments the iterator.
+   */
+  public LoadedMap getNext() {
+    if (iterator.hasNext()) {
+      return iterator.next();
+    } else {
+      iterator = maps.listIterator();
+      return iterator.next();
+    }
+  }
+
+  /**
+   * @return The position of the next map.
+   */
+  public int getNextIndex() {
+    return iterator.nextIndex();
   }
 
 }

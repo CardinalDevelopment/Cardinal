@@ -29,6 +29,7 @@ import ee.ellytr.command.CommandExecutor;
 import ee.ellytr.command.CommandRegistry;
 import ee.ellytr.command.exception.CommandException;
 import in.twizmwaz.cardinal.command.CommandCardinal;
+import in.twizmwaz.cardinal.command.CommandCycle;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleHandler;
@@ -42,7 +43,6 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.Overridden;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -71,13 +71,14 @@ public final class Cardinal extends JavaPlugin {
    */
   public Cardinal() {
     if (instance != null) {
-    throw new IllegalStateException("The Cardinal object has already been created.");
+      throw new IllegalStateException("The Cardinal object has already been created.");
     }
     instance = this;
     this.matchThread = new MatchThread();
 
     commandRegistry = new CommandRegistry(this);
     commandRegistry.addClass(CommandCardinal.class);
+    commandRegistry.addClass(CommandCycle.class);
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());
 
   }

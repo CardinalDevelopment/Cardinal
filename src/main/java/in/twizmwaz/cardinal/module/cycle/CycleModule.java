@@ -34,8 +34,10 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.repository.RepositoryModule;
+import in.twizmwaz.cardinal.module.rotation.RotationModule;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -74,11 +76,20 @@ public final class CycleModule extends AbstractModule implements Listener {
    * @return If the cycle was successful.
    */
   public Match cycle(MatchThread thread) {
+    World old = Cardinal.getInstance().getMatchThread().getCurrentMatch() != null
+        ? Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld() : null;
     CycleRunnable cycle = nextCycle.get(thread);
     cycle.run();
     Match match = new Match(Cardinal.getInstance().getMatchThread(), cycle.getUuid(),
         cycle.getMap(), cycle.getWorld());
     thread.setCurrentMatch(match);
+    CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
+    next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(Cardinal.getInstance().getMatchThread())
+        .getNext());
+    nextCycle.put(thread, next);
+    if (old != null) {
+      Bukkit.unloadWorld(old, true);
+    }
     return match;
   }
 }
