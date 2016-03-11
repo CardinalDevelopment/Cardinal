@@ -23,41 +23,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module;
+package in.twizmwaz.cardinal.module.dependency;
 
-import in.twizmwaz.cardinal.match.Match;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.Validate;
 
-import javax.annotation.Nonnull;
+import java.util.List;
 
-/**
- * Object to control modules.
- */
 @RequiredArgsConstructor
-public class ModuleHandler {
+@Getter
+final class DependencyNode<T> {
 
-  @Getter
-  private final ModuleRegistry registry;
+  private final T value;
+  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
 
-  public void clearMatch(@Nonnull Match match) {
-    Validate.notNull(match);
-    registry.getModules().entrySet().forEach(entry -> entry.getValue().clearMatch(match));
+  void addDependency(DependencyNode<T> node) {
+    dependencies.add(node);
   }
 
-  /**
-   * @param match The match modules should load from
-   * @return If the modules loaded successfully.
-   */
-  public boolean loadMatch(@Nonnull Match match) {
-    Validate.notNull(match);
-    for (Module module : registry.getLoadOrder()) {
-      if (!module.loadMatch(match)) {
-        return false;
-      }
+  void addDependencies(DependencyNode<T>[] nodes) {
+    for (DependencyNode<T> node : nodes) {
+      addDependency(node);
     }
-    return true;
   }
 
 }

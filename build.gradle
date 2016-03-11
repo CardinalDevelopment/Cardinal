@@ -74,8 +74,8 @@ checkstyle {
 apply plugin: 'license'
 
 license {
-    header = project.file('LICENSE')
     include '**/*.java'
+    ignoreFailures = true
 
     mapping {
         java = 'SLASHSTAR_STYLE'

@@ -38,18 +38,23 @@ import javax.annotation.Nullable;
 public interface Module {
 
   /**
-   * @return The names of modules to load matches before the given module.
+   * @return The classes of modules to load matches before this module.
    */
   @Nullable
   Class[] getDepends();
 
+  /**
+   * @return The classes of modules to load matches after this module.
+   */
+  @Nullable
+  Class[] getLoadBefore();
 
   /**
    * Clears match information from a module.
    *
    * @param match Match to be cleared from the module.
    */
-  void clearMatch(Match match);
+  void clearMatch(@Nonnull Match match);
 
   /**
    * Instructs the module to load information for the match.

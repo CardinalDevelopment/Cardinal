@@ -37,6 +37,7 @@ import in.twizmwaz.cardinal.module.repository.RepositoryModule;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class RotationModule extends AbstractModule implements Listener {
    *
    * @param event The event called.
    */
-  @EventHandler
+  @EventHandler(priority = EventPriority.LOWEST)
   public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
     rotations.put(Cardinal.getInstance().getMatchThread(),
         loadRotation(Cardinal.getModule(RepositoryModule.class)));

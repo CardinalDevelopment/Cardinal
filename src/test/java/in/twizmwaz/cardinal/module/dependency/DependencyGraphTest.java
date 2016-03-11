@@ -23,41 +23,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module;
+package in.twizmwaz.cardinal.module.dependency;
 
-import in.twizmwaz.cardinal.match.Match;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.Validate;
+import com.google.common.collect.Lists;
+import org.junit.Assert;
+import org.junit.Test;
 
-import javax.annotation.Nonnull;
+public class DependencyGraphTest {
 
-/**
- * Object to control modules.
- */
-@RequiredArgsConstructor
-public class ModuleHandler {
-
-  @Getter
-  private final ModuleRegistry registry;
-
-  public void clearMatch(@Nonnull Match match) {
-    Validate.notNull(match);
-    registry.getModules().entrySet().forEach(entry -> entry.getValue().clearMatch(match));
+  @Test
+  public void testGraph() {
+    DependencyGraph<String> graph = new DependencyGraph<>();
+    graph.addDependency("b", "a");
+    graph.addDependency("c", "b");
+    Assert.assertTrue(graph.evaluateDependencies().equals(Lists.newArrayList("a", "b", "c")));
   }
 
-  /**
-   * @param match The match modules should load from
-   * @return If the modules loaded successfully.
-   */
-  public boolean loadMatch(@Nonnull Match match) {
-    Validate.notNull(match);
-    for (Module module : registry.getLoadOrder()) {
-      if (!module.loadMatch(match)) {
-        return false;
-      }
-    }
-    return true;
+  @Test(expected = IllegalStateException.class)
+  public void testCircular() {
+    DependencyGraph<String> graph = new DependencyGraph<>();
+    graph.addDependency("b", "a");
+    graph.addDependency("c", "b");
+    graph.addDependency("a", "c");
   }
 
 }

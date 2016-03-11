@@ -30,20 +30,22 @@ import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 
+@Getter
 public abstract class AbstractModule implements Module {
 
-  @Getter
   protected Class[] depends;
-  @Getter
+  protected Class[] loadBefore;
+  @Nonnull
   protected List<ModuleError> errors = Lists.newArrayList();
 
   @Override
-  public void clearMatch(Match match) {
+  public void clearMatch(@Nonnull Match match) {
   }
 
   @Override
-  public boolean loadMatch(Match match) {
+  public boolean loadMatch(@Nonnull Match match) {
     return true;
   }
 

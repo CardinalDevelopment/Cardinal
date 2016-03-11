@@ -27,22 +27,45 @@ package in.twizmwaz.cardinal.module;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import in.twizmwaz.cardinal.module.dependency.DependencyGraph;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.apache.commons.lang.Validate;
 
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@Getter(AccessLevel.PACKAGE)
 public final class ModuleRegistry {
 
-  @Getter(AccessLevel.PACKAGE)
   private final BiMap<Class, Module> modules;
+  private final List<Module> loadOrder;
 
+  /**
+   * Creates a new {@link ModuleRegistry}
+   *
+   * @param modules The modules in the registry to be created.
+   */
   public ModuleRegistry(@Nonnull Map<Class, Module> modules) {
     Validate.notNull(modules);
     this.modules = new ImmutableBiMap.Builder<Class, Module>().putAll(modules).build();
+    DependencyGraph<Module> graph = new DependencyGraph<Module>();
+    this.modules.values().forEach(module -> {
+      graph.add(module);
+      if (module.getDepends() != null) {
+        for (Class dep : module.getDepends()) {
+          graph.addDependency(module, modules.get(dep));
+        }
+      }
+      if (module.getLoadBefore() != null) {
+        for (Class dep : module.getLoadBefore()) {
+          graph.addDependency(modules.get(dep), module);
+        }
+      }
+    });
+    loadOrder = graph.evaluateDependencies();
   }
 
   /**

@@ -52,6 +52,7 @@ public final class CycleModule extends AbstractModule implements Listener {
   private final Map<MatchThread, CycleRunnable> nextCycle = Maps.newHashMap();
 
   public CycleModule() {
+    this.depends = new Class[] {RotationModule.class};
     Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
   }
 
@@ -63,8 +64,7 @@ public final class CycleModule extends AbstractModule implements Listener {
   @EventHandler
   public void onModuleLoad(ModuleLoadCompleteEvent event) {
     CycleRunnable runnable = new CycleRunnable(this, UUID.randomUUID());
-    Iterator<LoadedMap> it =
-        Cardinal.getModule(RepositoryModule.class).getLoadedMaps().values().iterator();
+    Iterator<LoadedMap> it = Cardinal.getModule(RepositoryModule.class).getLoadedMaps().values().iterator();
     runnable.setMap(it.next());
     nextCycle.put(Cardinal.getInstance().getMatchThread(), runnable);
     cycle(Cardinal.getInstance().getMatchThread());
@@ -80,8 +80,7 @@ public final class CycleModule extends AbstractModule implements Listener {
         ? Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld() : null;
     CycleRunnable cycle = nextCycle.get(thread);
     cycle.run();
-    Match match = new Match(Cardinal.getInstance().getMatchThread(), cycle.getUuid(),
-        cycle.getMap(), cycle.getWorld());
+    Match match = new Match(Cardinal.getInstance().getMatchThread(), cycle.getUuid(), cycle.getMap(), cycle.getWorld());
     thread.setCurrentMatch(match);
     CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
     next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(Cardinal.getInstance().getMatchThread())
