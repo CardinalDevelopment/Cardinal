@@ -30,18 +30,18 @@ import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class Destroyable extends Objective implements Listener {
 
   private final String name;
   private final BoundedRegion region;
-  private final List<ImmutablePair<Material, Integer>> materials;
+  private final List<Map.Entry<Material, Integer>> materials;
   private final Team owner;
   private final double completion;
   private final boolean modeChanges;
@@ -58,8 +58,7 @@ public class Destroyable extends Objective implements Listener {
    * @param region The region that contains this destroyable.
    * @param materials The materials that make up this destroyable.
    * @param owner The owner of this destroyable.
-   * @param completion The percentage that this monument needs to be broken to be considered
-   *                   complete.
+   * @param completion The percentage that this monument needs to be broken to be consider complete.
    * @param modeChanges Determines if this destroyable follows mode changes.
    * @param showProgress Determines if the progress of this destroyable is shown on the scoreboard.
    * @param repairable Determines if this destroyable can be repaired.
@@ -70,9 +69,8 @@ public class Destroyable extends Objective implements Listener {
    *                            calculating proximity.
    */
   public Destroyable(String id, String name, boolean required, BoundedRegion region,
-                     List<ImmutablePair<Material, Integer>> materials, Team owner,
-                     double completion, boolean modeChanges, boolean showProgress,
-                     boolean repairable, boolean sparks, boolean show,
+                     List<Map.Entry<Material, Integer>> materials, Team owner, double completion, boolean modeChanges,
+                     boolean showProgress, boolean repairable, boolean sparks, boolean show,
                      ProximityMetric proximityMetric, boolean proximityHorizontal) {
     super(id, required, show);
     this.name = name;

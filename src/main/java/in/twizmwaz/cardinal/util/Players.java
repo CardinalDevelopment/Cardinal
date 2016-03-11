@@ -25,14 +25,13 @@
 
 package in.twizmwaz.cardinal.util;
 
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class Players {
 
@@ -40,8 +39,7 @@ public class Players {
    * @param name The player's name containing modifiers.
    * @return The matched OfflinePlayer based on the modifiers.
    */
-  @Nullable
-  public static OfflinePlayer match(@Nonnull String name) {
+  public static OfflinePlayer match(@NonNull String name) {
     if (name.startsWith("@")) {
       return Bukkit.getOfflinePlayer(name.substring(1));
     } else if (name.startsWith("#")) {
@@ -57,7 +55,7 @@ public class Players {
   /**
    * @param player The player to be reset.
    */
-  public static void reset(@Nonnull Player player) {
+  public static void reset(@NonNull Player player) {
     player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
     player.setExhaustion(0);
     player.setExp(0);

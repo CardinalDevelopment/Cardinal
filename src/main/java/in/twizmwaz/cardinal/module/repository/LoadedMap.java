@@ -30,12 +30,11 @@ import in.twizmwaz.cardinal.util.Proto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jdom2.Document;
 
 import java.io.File;
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @Data
 public class LoadedMap {
@@ -66,8 +65,8 @@ public class LoadedMap {
      * @param name Name of edition.
      * @return The edition enum object.
      */
-    @Nonnull
-    public static Edition forName(@Nullable String name) {
+    @NonNull
+    public static Edition forName(String name) {
       if (name == null) {
         return STANDARD;
       }

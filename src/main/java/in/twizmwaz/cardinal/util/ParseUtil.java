@@ -25,10 +25,8 @@
 
 package in.twizmwaz.cardinal.util;
 
+import lombok.NonNull;
 import org.jdom2.Element;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class ParseUtil {
 
@@ -37,8 +35,7 @@ public class ParseUtil {
    * @param elements The array of elements that are checked for the attribute.
    * @return The value of the first attribute in the elements.
    */
-  @Nullable
-  public static String getFirstAttribute(@Nonnull String attribute, @Nonnull Element... elements) {
+  public static String getFirstAttribute(@NonNull String attribute, @NonNull Element... elements) {
     for (Element element : elements) {
       String value = element.getAttributeValue(attribute);
       if (value != null) {

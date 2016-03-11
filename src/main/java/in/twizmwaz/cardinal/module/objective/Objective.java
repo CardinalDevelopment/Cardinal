@@ -26,10 +26,12 @@
 package in.twizmwaz.cardinal.module.objective;
 
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public abstract class Objective {
 
+  @NonNull
   private final String id;
   private final boolean required;
   private final boolean show;

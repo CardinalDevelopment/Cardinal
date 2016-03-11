@@ -30,7 +30,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Map;
-import javax.annotation.Nullable;
 
 @AllArgsConstructor
 @Getter
@@ -62,8 +61,7 @@ public enum Gamemode {
     }
   }
 
-  @Nullable
-  public static Gamemode byId(@Nullable String name) {
+  public static Gamemode byId(String name) {
     return BY_ID.get(name);
   }
 

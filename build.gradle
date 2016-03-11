@@ -32,7 +32,8 @@ repositories {
 
 dependencies {
     compile 'org.projectlombok:lombok:1.16.6'
-    compile 'tc.oc:sportbukkit:1.8.7-R0.1-SNAPSHOT'
+    compile 'tc.oc:sportbukkit-api:1.9-R0.1-SNAPSHOT'
+    // compile 'tc.oc:sportbukkit:1.9-R0.1-SNAPSHOT' -LEaving this disabled until we need to enable it
     compile 'ee.ellytr.command:EllyCommand:1.0.0'
     compile 'org.jdom:jdom2:2.0.6'
     compile 'org.ow2.asm:asm-all:5.0.4'

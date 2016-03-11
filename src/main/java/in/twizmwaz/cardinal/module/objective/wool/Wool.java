@@ -41,8 +41,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nonnull;
-
 @Getter
 public class Wool extends Objective implements Listener {
 
@@ -126,7 +124,6 @@ public class Wool extends Objective implements Listener {
     }
   }
 
-  @Nonnull
   public String getName() {
     return WordUtils.capitalizeFully(Strings.getSimpleName(color.name())) + " Wool";
   }

@@ -27,10 +27,9 @@ package in.twizmwaz.cardinal.module;
 
 import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
-
-import javax.annotation.Nonnull;
 
 /**
  * Object to control modules.
@@ -41,7 +40,7 @@ public class ModuleHandler {
   @Getter
   private final ModuleRegistry registry;
 
-  public void clearMatch(@Nonnull Match match) {
+  public void clearMatch(@NonNull Match match) {
     Validate.notNull(match);
     registry.getModules().entrySet().forEach(entry -> entry.getValue().clearMatch(match));
   }
@@ -50,7 +49,7 @@ public class ModuleHandler {
    * @param match The match modules should load from
    * @return If the modules loaded successfully.
    */
-  public boolean loadMatch(@Nonnull Match match) {
+  public boolean loadMatch(@NonNull Match match) {
     Validate.notNull(match);
     for (Module module : registry.getLoadOrder()) {
       if (!module.loadMatch(match)) {

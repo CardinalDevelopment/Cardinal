@@ -26,10 +26,9 @@
 package in.twizmwaz.cardinal.module;
 
 import in.twizmwaz.cardinal.match.Match;
+import lombok.NonNull;
 
 import java.util.Collection;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Represents a Cardinal module. A Cardinal2 module must be able to to load and execute multiple
@@ -40,13 +39,11 @@ public interface Module {
   /**
    * @return The classes of modules to load matches before this module.
    */
-  @Nullable
   Class[] getDepends();
 
   /**
    * @return The classes of modules to load matches after this module.
    */
-  @Nullable
   Class[] getLoadBefore();
 
   /**
@@ -54,7 +51,7 @@ public interface Module {
    *
    * @param match Match to be cleared from the module.
    */
-  void clearMatch(@Nonnull Match match);
+  void clearMatch(Match match);
 
   /**
    * Instructs the module to load information for the match.
@@ -63,12 +60,12 @@ public interface Module {
    * @return Returns true if the module loaded without interruption. Returns false for a
    *         match-blocking failure.
    */
-  boolean loadMatch(@Nonnull Match match);
+  boolean loadMatch(Match match);
 
   /**
    * @return Errors, if any, generated when loading the current map.
    */
-  @Nonnull
+  @NonNull
   Collection<ModuleError> getErrors();
 
 }

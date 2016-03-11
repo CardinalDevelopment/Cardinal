@@ -26,11 +26,12 @@
 package in.twizmwaz.cardinal.util;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import lombok.NonNull;
 import org.bukkit.Material;
 
+import java.util.AbstractMap;
 import java.util.List;
-import javax.annotation.Nonnull;
+import java.util.Map;
 
 public class Materials {
 
@@ -38,9 +39,9 @@ public class Materials {
    * @param in The input string that is used to get the material pattern.
    * @return The list of material pairs based on the input string.
    */
-  @Nonnull
-  public static List<ImmutablePair<Material, Integer>> getMaterialPattern(@Nonnull String in) {
-    List<ImmutablePair<Material, Integer>> pattern = Lists.newArrayList();
+  @NonNull
+  public static List<Map.Entry<Material, Integer>> getMaterialPattern(@NonNull String in) {
+    List<Map.Entry<Material, Integer>> pattern = Lists.newArrayList();
     if (in.contains(";")) {
       for (String singlePattern : in.split(";")) {
         pattern.add(getSingleMaterialPattern(singlePattern));
@@ -55,13 +56,13 @@ public class Materials {
    * @param in The input string that is used to get the single material pattern.
    * @return The material pair based on the input string.
    */
-  @Nonnull
-  public static ImmutablePair<Material, Integer> getSingleMaterialPattern(@Nonnull String in) {
+  @NonNull
+  public static Map.Entry<Material, Integer> getSingleMaterialPattern(@NonNull String in) {
     if (in.contains(":")) {
       String[] parts = in.split(":");
-      return new ImmutablePair<>(Material.matchMaterial(parts[0]), Numbers.parseInteger(parts[1]));
+      return new AbstractMap.SimpleEntry<>(Material.matchMaterial(parts[0]), Numbers.parseInteger(parts[1]));
     } else {
-      return new ImmutablePair<>(Material.matchMaterial(in), -1);
+      return new AbstractMap.SimpleEntry<>(Material.matchMaterial(in), -1);
     }
   }
 

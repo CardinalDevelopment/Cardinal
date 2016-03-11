@@ -28,24 +28,24 @@ package in.twizmwaz.cardinal.module;
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 
 @Getter
 public abstract class AbstractModule implements Module {
 
   protected Class[] depends;
   protected Class[] loadBefore;
-  @Nonnull
+  @NonNull
   protected List<ModuleError> errors = Lists.newArrayList();
 
   @Override
-  public void clearMatch(@Nonnull Match match) {
+  public void clearMatch(@NonNull Match match) {
   }
 
   @Override
-  public boolean loadMatch(@Nonnull Match match) {
+  public boolean loadMatch(@NonNull Match match) {
     return true;
   }
 

@@ -31,7 +31,7 @@ import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -39,8 +39,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Map;
 
 @Getter
 public class Core extends Objective implements Listener {
@@ -48,7 +47,7 @@ public class Core extends Objective implements Listener {
   private final String name;
   private final BoundedRegion region;
   private final int leak;
-  private final ImmutablePair<Material, Integer> material;
+  private final Map.Entry<Material, Integer> material;
   private final Team team;
   private final boolean modeChanges;
   private final ProximityMetric proximityMetric;
@@ -73,8 +72,8 @@ public class Core extends Objective implements Listener {
    *                            calculating proximity.
    */
   public Core(String id, String name, boolean required, BoundedRegion region, int leak,
-              ImmutablePair<Material, Integer> material, Team team, boolean modeChanges,
-              boolean show, ProximityMetric proximityMetric, boolean proximityHorizontal) {
+              Map.Entry<Material, Integer> material, Team team, boolean modeChanges, boolean show,
+              ProximityMetric proximityMetric, boolean proximityHorizontal) {
     super(id, required, show);
     this.name = name;
     this.region = region;
@@ -126,19 +125,18 @@ public class Core extends Objective implements Listener {
    * @param block The block that is checked as part of this core.
    * @return If the block has the properties to be considered part of the core.
    */
-  private boolean isPartOf(@Nonnull Block block) {
+  private boolean isPartOf(@NonNull Block block) {
     Material type = block.getType();
-    if (material.getRight() == -1) {
-      return material.getLeft().equals(type);
+    if (material.getValue() == -1) {
+      return material.getKey().equals(type);
     }
     int dataValue = (int) block.getState().getMaterialData().getData();
-    return material.getLeft().equals(type) && dataValue == material.getRight();
+    return material.getKey().equals(type) && dataValue == material.getValue();
   }
 
   /**
    * @return The bottom block of the core inside the specified region.
    */
-  @Nullable
   private Block getBottomBlock() {
     Block bottomBlock = null;
     int bottomY = Integer.MAX_VALUE;

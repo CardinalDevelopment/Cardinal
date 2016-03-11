@@ -41,7 +41,6 @@ import in.twizmwaz.cardinal.util.Materials;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
@@ -49,6 +48,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 
 import java.util.List;
+import java.util.Map;
 
 @ModuleEntry
 public class DestroyableModule extends AbstractModule {
@@ -96,11 +96,11 @@ public class DestroyableModule extends AbstractModule {
         }
         BoundedRegion boundedRegion = (BoundedRegion) region;
 
-        List<ImmutablePair<Material, Integer>> materials = Lists.newArrayList();
+        List<Map.Entry<Material, Integer>> materials = Lists.newArrayList();
         String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement,
                 destroyablesElement);
         if (materialsValue != null) {
-          materials = Materials.getMaterialPattern(materialsValue);
+          materials.addAll(Materials.getMaterialPattern(materialsValue));
         }
 
         String ownerValue = ParseUtil.getFirstAttribute("owner", destroyableElement,

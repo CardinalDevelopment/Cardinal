@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.event;
 
 import in.twizmwaz.cardinal.module.ModuleHandler;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.event.HandlerList;
 
 @Getter
@@ -35,7 +36,7 @@ public class ModuleLoadCompleteEvent extends ModuleEvent {
   @Getter
   private static final HandlerList handlerList = new HandlerList();
 
-  public ModuleLoadCompleteEvent(ModuleHandler moduleHandler) {
+  public ModuleLoadCompleteEvent(@NonNull ModuleHandler moduleHandler) {
     super(moduleHandler);
   }
 

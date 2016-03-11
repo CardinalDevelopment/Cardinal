@@ -28,12 +28,14 @@ package in.twizmwaz.cardinal.module.event;
 import in.twizmwaz.cardinal.module.ModuleHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.event.Event;
 
 @AllArgsConstructor
 @Getter
 public abstract class ModuleEvent extends Event {
 
+  @NonNull
   private final ModuleHandler moduleHandler;
 
 }

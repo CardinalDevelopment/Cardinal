@@ -41,7 +41,6 @@ import in.twizmwaz.cardinal.util.Materials;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
@@ -49,7 +48,9 @@ import org.bukkit.util.Vector;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 @ModuleEntry
 public class CoreModule extends AbstractModule {
@@ -103,7 +104,7 @@ public class CoreModule extends AbstractModule {
           }
         }
 
-        ImmutablePair<Material, Integer> material = new ImmutablePair<>(Material.OBSIDIAN, -1);
+        Map.Entry<Material, Integer> material = new AbstractMap.SimpleEntry<Material, Integer>(Material.OBSIDIAN, -1);
         String materialValue = ParseUtil.getFirstAttribute("material", coreElement, coresElement);
         if (materialValue != null) {
           try {

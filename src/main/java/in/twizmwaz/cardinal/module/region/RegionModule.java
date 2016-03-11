@@ -28,11 +28,10 @@ package in.twizmwaz.cardinal.module.region;
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import lombok.NonNull;
 import org.jdom2.Element;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @ModuleEntry
 public class RegionModule extends AbstractModule {
@@ -47,8 +46,7 @@ public class RegionModule extends AbstractModule {
    * @param id The ID of the region that is returned.
    * @return The region that has the given ID.
    */
-  @Nullable
-  public Region getRegionById(@Nonnull String id) {
+  public Region getRegionById(@NonNull String id) {
     for (Region region : regions) {
       if (region.getId().equalsIgnoreCase(id)) {
         return region;
@@ -57,7 +55,6 @@ public class RegionModule extends AbstractModule {
     return null;
   }
 
-  @Nullable
   public Region getRegion(Element element, String... alternateAttributes) {
     return null;
   }

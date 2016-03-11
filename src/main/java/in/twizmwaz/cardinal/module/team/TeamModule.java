@@ -28,11 +28,10 @@ package in.twizmwaz.cardinal.module.team;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @ModuleEntry
 public class TeamModule extends AbstractModule {
@@ -55,8 +54,7 @@ public class TeamModule extends AbstractModule {
    * @param id The input ID.
    * @return The team that has the input ID.
    */
-  @Nullable
-  public Team getTeamById(@Nonnull String id) {
+  public Team getTeamById(@NonNull String id) {
     for (Team team : teams) {
       if (team.getId().replaceAll(" ", "").equalsIgnoreCase(id.replaceAll(" ", ""))) {
         return team;
@@ -86,8 +84,7 @@ public class TeamModule extends AbstractModule {
    * @param name The input name.
    * @return The team that ha the input name.
    */
-  @Nullable
-  public Team getTeamByName(@Nonnull String name) {
+  public Team getTeamByName(@NonNull String name) {
     for (Team team : teams) {
       if (team.getName().replaceAll(" ", "").toLowerCase().startsWith(
               name.replaceAll(" ", "").toLowerCase())) {
@@ -101,8 +98,7 @@ public class TeamModule extends AbstractModule {
    * @param player The input player.
    * @return The team which the player is on.
    */
-  @Nullable
-  public Team getTeamByPlayer(@Nonnull Player player) {
+  public Team getTeamByPlayer(@NonNull Player player) {
     for (Team team : teams) {
       if (team.contains(player)) {
         return team;

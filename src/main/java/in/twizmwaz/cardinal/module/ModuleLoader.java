@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.Cardinal;
 import lombok.Getter;
+import lombok.NonNull;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -43,7 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import javax.annotation.Nonnull;
 
 /**
  * Object used to load modules from packages.
@@ -61,7 +61,7 @@ public final class ModuleLoader {
    * @param file Jar to load modules from. The jar must already be available on the classpath.
    */
   @SuppressWarnings("unchecked")
-  public void findEntries(@Nonnull File file) throws IOException {
+  public void findEntries(@NonNull File file) throws IOException {
     Cardinal.getPluginLogger().info("Loading modules from " + file.getAbsolutePath());
     Set<String> classStrings = Sets.newHashSet();
     Set<Class> found = Sets.newHashSet();
@@ -115,9 +115,9 @@ public final class ModuleLoader {
    * @param entries Module entries to be loaded.
    * @return The completed map of modules.
    */
-  @Nonnull
+  @NonNull
   @SuppressWarnings("unchecked")
-  public Map<Class, Module> makeModules(@Nonnull Set<Class> entries) {
+  public Map<Class, Module> makeModules(@NonNull Set<Class> entries) {
     Map<Class, Module> results = Maps.newHashMap();
     entries.forEach(entry -> {
       try {

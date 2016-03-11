@@ -38,6 +38,7 @@ import in.twizmwaz.cardinal.module.ModuleRegistry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -47,8 +48,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public final class Cardinal extends JavaPlugin {
 
@@ -124,13 +123,12 @@ public final class Cardinal extends JavaPlugin {
     return true;
   }
 
-  @Nonnull
+  @NonNull
   public static Logger getPluginLogger() {
     return Cardinal.getInstance().getLogger();
   }
 
-  @Nullable
-  public static <T extends Module> T getModule(@Nonnull Class<T> clazz) {
+  public static <T extends Module> T getModule(@NonNull Class<T> clazz) {
     return instance.moduleHandler.getRegistry().getModule(clazz);
   }
 

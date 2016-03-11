@@ -25,12 +25,13 @@
 
 package in.twizmwaz.cardinal.module.cycle;
 
+import com.google.common.io.Files;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -43,7 +44,9 @@ import java.util.UUID;
 @Getter
 public final class CycleRunnable implements Runnable {
 
+  @NonNull
   private final CycleModule parent;
+  @NonNull
   private final UUID uuid;
   @Setter
   private LoadedMap map;
@@ -57,7 +60,7 @@ public final class CycleRunnable implements Runnable {
     File dest = new File(Cardinal.getInstance().getDataFolder(), "matches/" + uuid.toString());
     dest.mkdir();
     try {
-      FileUtils.copyDirectory(map.getDirectory(), dest);
+      copyDirectory(map.getDirectory(), dest);
     } catch (IOException ex) {
       ex.printStackTrace();
     }
@@ -66,6 +69,20 @@ public final class CycleRunnable implements Runnable {
     world.setPVP(true);
     this.world = world;
     this.matchFile = dest;
+  }
+
+  private void copyDirectory(File source , File dest) throws IOException {
+    if (source.isDirectory()) {
+      if (!dest.exists()) {
+        dest.mkdir();
+      }
+      String[] children = source.list();
+      for (String child : children) {
+        copyDirectory(new File(source, child), new File(dest, child));
+      }
+    } else {
+      Files.copy(source, dest);
+    }
   }
 
 }

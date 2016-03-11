@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.util;
 
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Class to represent XML protocols, based on semantic versioning.
@@ -41,7 +42,7 @@ public class Proto {
    * @param in The semantic version string to be parsed.
    * @return The parsed Proto.
    */
-  public static Proto parseProto(String in) {
+  public static Proto parseProto(@NonNull String in) {
     String[] components = in.split("\\.");
     if (components.length != 3) {
       throw new NumberFormatException("A proto must be a semantic version.");
