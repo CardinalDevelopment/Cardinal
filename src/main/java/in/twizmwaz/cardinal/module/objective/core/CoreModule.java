@@ -39,7 +39,7 @@ import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.util.Materials;
+import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
@@ -105,11 +105,11 @@ public class CoreModule extends AbstractModule {
           }
         }
 
-        Map.Entry<Material, Integer> material = new AbstractMap.SimpleEntry<Material, Integer>(Material.OBSIDIAN, -1);
+        MaterialPattern material = new MaterialPattern(new AbstractMap.SimpleEntry<>(Material.OBSIDIAN, MaterialPattern.ANY_DATA_VALUE));
         String materialValue = ParseUtil.getFirstAttribute("material", coreElement, coresElement);
         if (materialValue != null) {
           try {
-            material = Materials.getSingleMaterialPattern(materialValue);
+            material = MaterialPattern.getSingleMaterialPattern(materialValue);
           } catch (NumberFormatException e) {
             errors.add(new ModuleError(this, match.getMap(),
                 new String[]{"Invalid data value of material specified for core"}, false));

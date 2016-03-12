@@ -32,6 +32,7 @@ import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -49,7 +50,7 @@ public class Core extends Objective implements Listener {
   private final String name;
   private final BoundedRegion region;
   private final int leak;
-  private final Map.Entry<Material, Integer> material;
+  private final MaterialPattern material;
   private final Team team;
   private final boolean modeChanges;
   private final ProximityMetric proximityMetric;
@@ -75,8 +76,8 @@ public class Core extends Objective implements Listener {
    *                            calculating proximity.
    */
   public Core(Match match, String id, String name, boolean required, BoundedRegion region, int leak,
-              Map.Entry<Material, Integer> material, Team team, boolean modeChanges, boolean show,
-              ProximityMetric proximityMetric, boolean proximityHorizontal) {
+              MaterialPattern material, Team team, boolean modeChanges,
+              boolean show, ProximityMetric proximityMetric, boolean proximityHorizontal) {
     super(match, id, required, show);
     this.name = name;
     this.region = region;
@@ -130,12 +131,7 @@ public class Core extends Objective implements Listener {
    * @return If the block has the properties to be considered part of the core.
    */
   private boolean isPartOf(@NonNull Block block) {
-    Material type = block.getType();
-    if (material.getValue() == -1) {
-      return material.getKey().equals(type);
-    }
-    int dataValue = (int) block.getState().getMaterialData().getData();
-    return material.getKey().equals(type) && dataValue == material.getValue();
+    return material.contains(block.getType(), (int) block.getState().getMaterialData().getData());
   }
 
   /**

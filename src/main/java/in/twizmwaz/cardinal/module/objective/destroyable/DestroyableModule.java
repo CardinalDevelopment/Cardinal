@@ -38,7 +38,7 @@ import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.util.Materials;
+import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
@@ -93,10 +93,11 @@ public class DestroyableModule extends AbstractModule {
         }
         BoundedRegion boundedRegion = (BoundedRegion) region;
 
-        List<Map.Entry<Material, Integer>> materials = Lists.newArrayList();
-        String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement, destroyablesElement);
+        MaterialPattern materials = new MaterialPattern();
+        String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement,
+                destroyablesElement);
         if (materialsValue != null) {
-          materials.addAll(Materials.getMaterialPattern(materialsValue));
+          materials = MaterialPattern.getMaterialPattern(materialsValue);
         }
 
         String ownerValue = ParseUtil.getFirstAttribute("owner", destroyableElement, destroyablesElement);

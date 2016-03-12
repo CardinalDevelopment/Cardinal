@@ -26,22 +26,70 @@
 package in.twizmwaz.cardinal.util;
 
 import com.google.common.collect.Lists;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
 
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class Materials {
+public class MaterialPattern {
+
+  public static final int ANY_DATA_VALUE = -1;
+
+  @Getter
+  private final List<Map.Entry<Material, Integer>> materials;
+
+  public MaterialPattern(Map.Entry<Material, Integer>... materials) {
+    this.materials = Lists.newArrayList();
+    Collections.addAll(this.materials, materials);
+  }
+
+  public void add(Material type, int dataValue) {
+    materials.add(new AbstractMap.SimpleEntry<>(type, dataValue));
+  }
+
+  public void add(MaterialPattern pattern) {
+    pattern.getMaterials().forEach(material -> add(material.getKey(), material.getValue()));
+  }
+
+  public boolean contains(Material type, int dataValue) {
+    if (materials.isEmpty()) {
+      return true;
+    }
+    for (Map.Entry<Material, Integer> material : materials) {
+      if (material.getKey().equals(type) && (material.getValue() == ANY_DATA_VALUE || material.getValue() == dataValue)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @param in The input string that is used to get the single material pattern.
+   * @return The material pair based on the input string.
+   */
+  @NonNull
+  public static MaterialPattern getSingleMaterialPattern(@NonNull String in) {
+    MaterialPattern pattern = new MaterialPattern();
+    if (in.contains(":")) {
+      String[] parts = in.split(":");
+      pattern.add(Material.matchMaterial(parts[0]), Numbers.parseInteger(parts[1]));
+    } else {
+      pattern.add(Material.matchMaterial(in), ANY_DATA_VALUE);
+    }
+    return pattern;
+  }
 
   /**
    * @param in The input string that is used to get the material pattern.
    * @return The list of material pairs based on the input string.
    */
   @NonNull
-  public static List<Map.Entry<Material, Integer>> getMaterialPattern(@NonNull String in) {
-    List<Map.Entry<Material, Integer>> pattern = Lists.newArrayList();
+  public static MaterialPattern getMaterialPattern(@NonNull String in) {
+    MaterialPattern pattern = new MaterialPattern();
     if (in.contains(";")) {
       for (String singlePattern : in.split(";")) {
         pattern.add(getSingleMaterialPattern(singlePattern));
@@ -50,20 +98,6 @@ public class Materials {
       pattern.add(getSingleMaterialPattern(in));
     }
     return pattern;
-  }
-
-  /**
-   * @param in The input string that is used to get the single material pattern.
-   * @return The material pair based on the input string.
-   */
-  @NonNull
-  public static Map.Entry<Material, Integer> getSingleMaterialPattern(@NonNull String in) {
-    if (in.contains(":")) {
-      String[] parts = in.split(":");
-      return new AbstractMap.SimpleEntry<>(Material.matchMaterial(parts[0]), Numbers.parseInteger(parts[1]));
-    } else {
-      return new AbstractMap.SimpleEntry<>(Material.matchMaterial(in), -1);
-    }
   }
 
 }
