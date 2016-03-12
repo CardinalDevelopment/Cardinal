@@ -105,7 +105,8 @@ public class CoreModule extends AbstractModule {
           }
         }
 
-        MaterialPattern material = new MaterialPattern(new AbstractMap.SimpleEntry<>(Material.OBSIDIAN, MaterialPattern.ANY_DATA_VALUE));
+        MaterialPattern material = new MaterialPattern(new AbstractMap.SimpleEntry<>(Material.OBSIDIAN,
+            MaterialPattern.ANY_DATA_VALUE));
         String materialValue = ParseUtil.getFirstAttribute("material", coreElement, coresElement);
         if (materialValue != null) {
           try {

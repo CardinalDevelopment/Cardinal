@@ -32,11 +32,7 @@ import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.Getter;
-import org.bukkit.Material;
 import org.bukkit.event.Listener;
-
-import java.util.List;
-import java.util.Map;
 
 @Getter
 public class Destroyable extends Objective implements Listener {

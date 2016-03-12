@@ -42,7 +42,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public class Core extends Objective implements Listener {

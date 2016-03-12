@@ -55,12 +55,20 @@ public class MaterialPattern {
     pattern.getMaterials().forEach(material -> add(material.getKey(), material.getValue()));
   }
 
+  /**
+   * Determines if a material and a data value are contained within this material pattern.
+   *
+   * @param type      The material type to check.
+   * @param dataValue The data value to check.
+   * @return If the type and data value are within this material pattern.
+   */
   public boolean contains(Material type, int dataValue) {
     if (materials.isEmpty()) {
       return true;
     }
     for (Map.Entry<Material, Integer> material : materials) {
-      if (material.getKey().equals(type) && (material.getValue() == ANY_DATA_VALUE || material.getValue() == dataValue)) {
+      if (material.getKey().equals(type) && (material.getValue() == ANY_DATA_VALUE
+          || material.getValue() == dataValue)) {
         return true;
       }
     }

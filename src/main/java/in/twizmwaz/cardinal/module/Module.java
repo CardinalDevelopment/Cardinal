@@ -58,7 +58,7 @@ public interface Module {
    *
    * @param match Match for the XML document to load from.
    * @return Returns true if the module loaded without interruption. Returns false for a
-   *         match-blocking failure.
+   * match-blocking failure.
    */
   boolean loadMatch(Match match);
 

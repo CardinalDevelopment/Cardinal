@@ -43,7 +43,6 @@ import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -95,7 +94,7 @@ public class DestroyableModule extends AbstractModule {
 
         MaterialPattern materials = new MaterialPattern();
         String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement,
-                destroyablesElement);
+            destroyablesElement);
         if (materialsValue != null) {
           materials = MaterialPattern.getMaterialPattern(materialsValue);
         }
