@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.objective.destroyable;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
@@ -52,27 +53,28 @@ public class Destroyable extends Objective implements Listener {
   private final boolean proximityHorizontal;
 
   /**
-   * @param id This destroyable's ID.
-   * @param name This destroyable's name.
-   * @param required Determines if this objective is required to win the match.
-   * @param region The region that contains this destroyable.
-   * @param materials The materials that make up this destroyable.
-   * @param owner The owner of this destroyable.
-   * @param completion The percentage that this monument needs to be broken to be consider complete.
-   * @param modeChanges Determines if this destroyable follows mode changes.
-   * @param showProgress Determines if the progress of this destroyable is shown on the scoreboard.
-   * @param repairable Determines if this destroyable can be repaired.
-   * @param sparks Determines if sparks show when part of the destroyable is broken.
-   * @param show Determines if this destroyable is shown on the scoreboard.
-   * @param proximityMetric The proximity metric that determines how proximity is calculated.
+   * @param match               The match the destroyable belongs to.
+   * @param id                  This destroyable's ID.
+   * @param name                This destroyable's name.
+   * @param required            Determines if this objective is required to win the match.
+   * @param region              The region that contains this destroyable.
+   * @param materials           The materials that make up this destroyable.
+   * @param owner               The owner of this destroyable.
+   * @param completion          The percentage that this monument needs to be broken to be consider complete.
+   * @param modeChanges         Determines if this destroyable follows mode changes.
+   * @param showProgress        Determines if the progress of this destroyable is shown on the scoreboard.
+   * @param repairable          Determines if this destroyable can be repaired.
+   * @param sparks              Determines if sparks show when part of the destroyable is broken.
+   * @param show                Determines if this destroyable is shown on the scoreboard.
+   * @param proximityMetric     The proximity metric that determines how proximity is calculated.
    * @param proximityHorizontal Determines if only horizontal distance is considered when
    *                            calculating proximity.
    */
-  public Destroyable(String id, String name, boolean required, BoundedRegion region,
+  public Destroyable(Match match, String id, String name, boolean required, BoundedRegion region,
                      List<Map.Entry<Material, Integer>> materials, Team owner, double completion, boolean modeChanges,
                      boolean showProgress, boolean repairable, boolean sparks, boolean show,
                      ProximityMetric proximityMetric, boolean proximityHorizontal) {
-    super(id, required, show);
+    super(match, id, required, show);
     this.name = name;
     this.region = region;
     this.materials = materials;

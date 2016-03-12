@@ -71,7 +71,7 @@ public final class CycleRunnable implements Runnable {
     this.matchFile = dest;
   }
 
-  private void copyDirectory(File source , File dest) throws IOException {
+  private void copyDirectory(File source, File dest) throws IOException {
     if (source.isDirectory()) {
       if (!dest.exists()) {
         dest.mkdir();

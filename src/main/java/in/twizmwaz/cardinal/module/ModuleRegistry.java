@@ -69,7 +69,7 @@ public final class ModuleRegistry {
 
   /**
    * @param clazz The module class to be found.
-   * @param <T> The module class type.
+   * @param <T>   The module class type.
    * @return The found module object, if any.
    */
   @SuppressWarnings("unchecked")

@@ -45,7 +45,7 @@ public final class DependencyGraph<T> {
   /**
    * Adds a dependency. This method will add the objects to the graph if they are not already present.
    *
-   * @param object The object to hold the dependency.
+   * @param object     The object to hold the dependency.
    * @param dependency The dependency object.
    */
   public void addDependency(T object, T dependency) {
@@ -83,7 +83,7 @@ public final class DependencyGraph<T> {
   }
 
   /**
-   * @param object The object to contain the dependency.
+   * @param object     The object to contain the dependency.
    * @param dependency The dependency object.
    * @return If the dependency exists.
    */

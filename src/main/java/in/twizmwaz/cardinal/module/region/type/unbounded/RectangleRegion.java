@@ -34,7 +34,7 @@ public class RectangleRegion extends UnboundedRegion {
   private Vector max;
 
   /**
-   * @param id This region's ID.
+   * @param id   This region's ID.
    * @param xMin The minimum x position of this rectangle.
    * @param zMin The minimum z position of this rectangle.
    * @param xMax The maximum x position of this rectangle.

@@ -36,9 +36,9 @@ public class CircleRegion extends UnboundedRegion {
   private double radius;
 
   /**
-   * @param id This region's ID.
-   * @param xPos The x position of the circle's center.
-   * @param zPos The z position of the circle's center.
+   * @param id     This region's ID.
+   * @param xPos   The x position of the circle's center.
+   * @param zPos   The z position of the circle's center.
    * @param radius The circle's radius, or distance from center to edge.
    */
   public CircleRegion(String id, double xPos, double zPos, double radius) {
@@ -50,7 +50,7 @@ public class CircleRegion extends UnboundedRegion {
   @Override
   public boolean contains(Vector vector) {
     return Math.hypot(Math.abs(vector.getX() - center.getX()),
-            Math.abs(vector.getZ() - center.getZ())) <= radius;
+        Math.abs(vector.getZ() - center.getZ())) <= radius;
   }
 
 }

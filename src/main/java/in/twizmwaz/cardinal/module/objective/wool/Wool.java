@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.objective.wool;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
@@ -57,28 +58,28 @@ public class Wool extends Objective implements Listener {
   private boolean complete;
 
   /**
-   * @param id This wool's ID.
-   * @param required Determines if this wool is required to win the match.
-   * @param team The team that needs to capture this wool.
-   * @param color The dye color of this wool.
-   * @param monument The location for where the wool is placed when it is captured.
-   * @param craftable Determines if this wool may be crafted with white wool and a dye.
-   * @param show Determines if this wool shows on the scoreboard.
-   * @param location The location of the wool room, used in proximity calculation.
-   * @param woolProximityMetric The proximity metric that determines how to calculate proximity
-   *                            before picking up the wool.
-   * @param woolProximityHorizontal Determines if only horizontal distance is considered when
-   *                                calculating proximity before picking up the wool.
-   * @param monumentProximityMetric The proximity metric that determines how to calculate proximity
-   *                            after picking up the wool.
+   * @param match                       The match the wool belongs to.
+   * @param id                          This wool's ID.
+   * @param required                    Determines if this wool is required to win the match.
+   * @param team                        The team that needs to capture this wool.
+   * @param color                       The dye color of this wool.
+   * @param monument                    The location for where the wool is placed when it is captured.
+   * @param craftable                   Determines if this wool may be crafted with white wool and a dye.
+   * @param show                        Determines if this wool shows on the scoreboard.
+   * @param location                    The location of the wool room, used in proximity calculation.
+   * @param woolProximityMetric         The proximity metric that determines how to calculate proximity
+   *                                    before picking up the wool.
+   * @param woolProximityHorizontal     Determines if only horizontal distance is considered when
+   *                                    calculating proximity before picking up the wool.
+   * @param monumentProximityMetric     The proximity metric that determines how to calculate proximity
+   *                                    after picking up the wool.
    * @param monumentProximityHorizontal Determines if only horizontal distance is considered when
-   *                                calculating proximity after picking up the wool.
+   *                                    calculating proximity after picking up the wool.
    */
-  public Wool(String id, boolean required, Team team, DyeColor color, Region monument,
-              boolean craftable, boolean show, Vector location,
-              ProximityMetric woolProximityMetric, boolean woolProximityHorizontal,
+  public Wool(Match match, String id, boolean required, Team team, DyeColor color, Region monument, boolean craftable,
+              boolean show, Vector location, ProximityMetric woolProximityMetric, boolean woolProximityHorizontal,
               ProximityMetric monumentProximityMetric, boolean monumentProximityHorizontal) {
-    super(id, required, show);
+    super(match, id, required, show);
     this.team = team;
     this.color = color;
     this.monument = monument;
@@ -94,6 +95,7 @@ public class Wool extends Objective implements Listener {
 
   /**
    * Checks if this wool has been captured when a block is placed.
+   *
    * @param event The event.
    */
   @EventHandler
@@ -102,7 +104,7 @@ public class Wool extends Objective implements Listener {
     if (monument.contains(block.getLocation().toVector()) && !complete) {
       if (block.getType().equals(Material.WOOL)) {
         if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor()
-                .equals(color)) {
+            .equals(color)) {
           complete = true;
         } else {
           event.setCancelled(true);
@@ -115,6 +117,7 @@ public class Wool extends Objective implements Listener {
 
   /**
    * Prevents players from breaking blocks that are inside the wool monument.
+   *
    * @param event The event.
    */
   @EventHandler

@@ -52,8 +52,8 @@ public final class Match {
    * Creates a new Match.
    *
    * @param thread The {@link MatchThread} that this match will occur on.
-   * @param uuid The unique id of this match.
-   * @param map The {@link LoadedMap} this match will occur on.
+   * @param uuid   The unique id of this match.
+   * @param map    The {@link LoadedMap} this match will occur on.
    */
   public Match(@NonNull MatchThread thread, @NonNull UUID uuid, @NonNull LoadedMap map, @NonNull World world) {
     this.thread = thread;

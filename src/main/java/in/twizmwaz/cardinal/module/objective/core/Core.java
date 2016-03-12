@@ -26,6 +26,8 @@
 package in.twizmwaz.cardinal.module.objective.core;
 
 import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
@@ -58,23 +60,24 @@ public class Core extends Objective implements Listener {
   private List<Block> lava;
 
   /**
-   * @param id The core's ID, for usage in code and XML.
-   * @param name The core's name, for usage by the user.
-   * @param required Determines if this objective is required to win the match.
-   * @param region The region that contains this core.
-   * @param leak The distance required for the lava to be from the core in order to be leaked.
-   * @param material The material that the core is made out of.
-   * @param team The team that owns this core.
-   * @param modeChanges Determines if this core follows mode changes.
-   * @param show Determines if this core shows on the scoreboard.
-   * @param proximityMetric The proximity metric for proximity tracking of this core.
+   * @param match               The match the core is part of.
+   * @param id                  The core's ID, for usage in code and XML.
+   * @param name                The core's name, for usage by the user.
+   * @param required            Determines if this objective is required to win the match.
+   * @param region              The region that contains this core.
+   * @param leak                The distance required for the lava to be from the core in order to be leaked.
+   * @param material            The material that the core is made out of.
+   * @param team                The team that owns this core.
+   * @param modeChanges         Determines if this core follows mode changes.
+   * @param show                Determines if this core shows on the scoreboard.
+   * @param proximityMetric     The proximity metric for proximity tracking of this core.
    * @param proximityHorizontal Determines if only horizontal distance is considered when
    *                            calculating proximity.
    */
-  public Core(String id, String name, boolean required, BoundedRegion region, int leak,
+  public Core(Match match, String id, String name, boolean required, BoundedRegion region, int leak,
               Map.Entry<Material, Integer> material, Team team, boolean modeChanges, boolean show,
               ProximityMetric proximityMetric, boolean proximityHorizontal) {
-    super(id, required, show);
+    super(match, id, required, show);
     this.name = name;
     this.region = region;
     this.leak = leak;
@@ -99,6 +102,7 @@ public class Core extends Objective implements Listener {
 
   /**
    * Checks if lava has reached the leak distance below this core.
+   *
    * @param event The event.
    */
   @EventHandler
@@ -107,9 +111,9 @@ public class Core extends Objective implements Listener {
     Block to = event.getToBlock();
     Material type = from.getType();
     if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA))
-            && to.getType().equals(Material.AIR)) {
-      if (new CoreModule().getClosestCore(to.getLocation().toVector()).equals(this)
-              && !complete) { //TODO: Get core module from match
+        && to.getType().equals(Material.AIR)) {
+      if (Cardinal.getModule(CoreModule.class).getClosestCore(getMatch(), to.getLocation().toVector()).equals(this)
+          && !complete) {
         Block bottomBlock = getBottomBlock();
         if (bottomBlock != null) {
           int distance = getBottomBlock().getY() - to.getY();

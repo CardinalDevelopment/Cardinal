@@ -25,12 +25,15 @@
 
 package in.twizmwaz.cardinal.module.objective;
 
+import in.twizmwaz.cardinal.match.Match;
 import lombok.Data;
 import lombok.NonNull;
 
 @Data
 public abstract class Objective {
 
+  @NonNull
+  private final Match match;
   @NonNull
   private final String id;
   private final boolean required;

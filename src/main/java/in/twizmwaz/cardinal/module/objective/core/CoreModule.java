@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.objective.core;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -37,6 +38,7 @@ import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Materials;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
@@ -55,15 +57,15 @@ import java.util.Map;
 @ModuleEntry
 public class CoreModule extends AbstractModule {
 
-  private List<Core> cores;
+  private Map<Match, List<Core>> cores = Maps.newHashMap();
 
   public CoreModule() {
-    cores = Lists.newArrayList();
+    this.depends = new Class[]{TeamModule.class, RegionModule.class};
   }
 
   @Override
   public boolean loadMatch(Match match) {
-    //TODO: reimplement
+    List<Core> cores = Lists.newArrayList();
     Document document = match.getMap().getDocument();
     for (Element coresElement : document.getRootElement().getChildren("cores")) {
       for (Element coreElement : coresElement.getChildren("core")) {
@@ -81,13 +83,12 @@ public class CoreModule extends AbstractModule {
           region = regionModule.getRegion(coresElement);
         }
         if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No region specified for core"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for core"}, false));
           continue;
         }
         if (!(region instanceof BoundedRegion)) {
           errors.add(new ModuleError(this, match.getMap(),
-                  new String[]{"Region specified for wool must be a bounded region"}, false));
+              new String[]{"Region specified for wool must be a bounded region"}, false));
           continue;
         }
         BoundedRegion boundedRegion = (BoundedRegion) region;
@@ -99,7 +100,7 @@ public class CoreModule extends AbstractModule {
             leak = Numbers.parseInteger(leakValue);
           } catch (NumberFormatException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                    new String[]{"Invalid leak distance specified for core"}, false));
+                new String[]{"Invalid leak distance specified for core"}, false));
             continue;
           }
         }
@@ -111,68 +112,71 @@ public class CoreModule extends AbstractModule {
             material = Materials.getSingleMaterialPattern(materialValue);
           } catch (NumberFormatException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                    new String[]{"Invalid data value of material specified for core"}, false));
+                new String[]{"Invalid data value of material specified for core"}, false));
             continue;
           }
         }
-
-        Team team = null; //TODO: Get team from id
+        String teamValue = ParseUtil.getFirstAttribute("team", coreElement, coresElement);
+        if (teamValue == null) {
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool"}, false));
+          continue;
+        }
+        Team team = Cardinal.getModule(TeamModule.class).getTeamById(match, teamValue);
         if (team == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid team specified for core"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for core"}, false));
           continue;
         }
 
-        String modeChangesValue = ParseUtil.getFirstAttribute("mode-changes", coreElement,
-                coresElement);
+        String modeChangesValue = ParseUtil.getFirstAttribute("mode-changes", coreElement, coresElement);
         boolean modeChanges = modeChangesValue == null || Numbers.parseBoolean(modeChangesValue);
 
         String showValue = ParseUtil.getFirstAttribute("show", coreElement, coresElement);
         boolean show = showValue == null || Numbers.parseBoolean(showValue);
 
         ProximityMetric proximityMetric = ProximityMetric.CLOSEST_PLAYER;
-        String woolProximityMetricValue = ParseUtil.getFirstAttribute("proximity-metric",
-                coreElement, coresElement);
+        String woolProximityMetricValue = ParseUtil.getFirstAttribute("proximity-metric", coreElement, coresElement);
         if (woolProximityMetricValue != null) {
           try {
             proximityMetric =
-                    ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
+                ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                    new String[]{"Invalid proximity metric specified for core"}, false));
+                new String[]{"Invalid proximity metric specified for core"}, false));
             continue;
           }
         }
 
-        String proximityHorizontalValue = ParseUtil.getFirstAttribute("proximity-horizontal",
-                coreElement, coresElement);
+        String proximityHorizontalValue = ParseUtil.getFirstAttribute("proximity-horizontal", coreElement,
+            coresElement);
         boolean proximityHorizontal = proximityHorizontalValue != null
-                && Numbers.parseBoolean(proximityHorizontalValue);
+            && Numbers.parseBoolean(proximityHorizontalValue);
 
-        Core core = new Core(id, name, required, boundedRegion, leak, material, team, modeChanges,
-                show, proximityMetric, proximityHorizontal);
+        Core core = new Core(match, id, name, required, boundedRegion, leak, material, team, modeChanges, show,
+            proximityMetric, proximityHorizontal);
         Bukkit.getPluginManager().registerEvents(core, Cardinal.getInstance());
         cores.add(core);
       }
     }
+    this.cores.put(match, cores);
     return true;
   }
 
   @Override
   public void clearMatch(Match match) {
-    //TODO: reimplement
+    List<Core> cores = this.cores.get(match);
     cores.forEach(HandlerList::unregisterAll);
     cores.clear();
+    this.cores.remove(match);
   }
 
   /**
    * @param vector The vector that this method bases the closest core off of.
    * @return The core closest to the given vector.
    */
-  public Core getClosestCore(Vector vector) {
+  public Core getClosestCore(Match match, Vector vector) {
     Core closestCore = null;
     double closestDistance = Double.POSITIVE_INFINITY;
-    for (Core core : cores) {
+    for (Core core : this.cores.get(match)) {
       BlockRegion center = core.getRegion().getCenterBlock();
       double distance = vector.distance(center.getVector());
       if (distance < closestDistance) {

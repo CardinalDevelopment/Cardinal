@@ -52,7 +52,7 @@ public final class CycleModule extends AbstractModule implements Listener {
   private final Map<MatchThread, CycleRunnable> nextCycle = Maps.newHashMap();
 
   public CycleModule() {
-    this.depends = new Class[] {RotationModule.class};
+    this.depends = new Class[]{RotationModule.class};
     Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
   }
 

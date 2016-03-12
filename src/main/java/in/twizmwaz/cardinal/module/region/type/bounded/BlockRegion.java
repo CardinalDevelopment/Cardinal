@@ -52,8 +52,8 @@ public class BlockRegion extends BoundedRegion {
   @Override
   public boolean contains(Vector vector) {
     return vector.getBlockX() == getVector().getBlockX()
-            && vector.getBlockY() == getVector().getBlockY()
-            && vector.getBlockZ() == getVector().getBlockZ();
+        && vector.getBlockY() == getVector().getBlockY()
+        && vector.getBlockZ() == getVector().getBlockZ();
   }
 
   @Override

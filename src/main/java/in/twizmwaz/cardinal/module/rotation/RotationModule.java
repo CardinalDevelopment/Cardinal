@@ -50,7 +50,7 @@ public class RotationModule extends AbstractModule implements Listener {
   private final Map<MatchThread, Rotation> rotations = Maps.newHashMap();
 
   public RotationModule() {
-    this.depends = new Class[] { RepositoryModule.class };
+    this.depends = new Class[]{RepositoryModule.class};
     Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
   }
 

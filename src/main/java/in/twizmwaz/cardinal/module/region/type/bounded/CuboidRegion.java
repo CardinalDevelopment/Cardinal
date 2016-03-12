@@ -41,7 +41,7 @@ public class CuboidRegion extends BoundedRegion {
   private final Vector max;
 
   /**
-   * @param id The ID of this region.
+   * @param id  The ID of this region.
    * @param min The minimum vector of this region.
    * @param max The maximum vector of this region.
    */

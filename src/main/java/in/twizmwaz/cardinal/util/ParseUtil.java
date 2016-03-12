@@ -32,7 +32,7 @@ public class ParseUtil {
 
   /**
    * @param attribute The attribute name that is checked from the elements.
-   * @param elements The array of elements that are checked for the attribute.
+   * @param elements  The array of elements that are checked for the attribute.
    * @return The value of the first attribute in the elements.
    */
   public static String getFirstAttribute(@NonNull String attribute, @NonNull Element... elements) {

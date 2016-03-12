@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.objective.destroyable;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -53,29 +54,27 @@ import java.util.Map;
 @ModuleEntry
 public class DestroyableModule extends AbstractModule {
 
-  private List<Destroyable> destroyables;
+  private Map<Match, List<Destroyable>> destroyables = Maps.newHashMap();
 
   public DestroyableModule() {
-    destroyables = Lists.newArrayList();
+    this.depends = new Class[]{TeamModule.class, RegionModule.class};
   }
 
   @Override
   public boolean loadMatch(Match match) {
-    //TODO: reimplement
     Document document = match.getMap().getDocument();
+    List<Destroyable> destroyables = Lists.newArrayList();
     for (Element destroyablesElement : document.getRootElement().getChildren("destroyables")) {
       for (Element destroyableElement : destroyablesElement.getChildren("destroyable")) {
         String id = ParseUtil.getFirstAttribute("id", destroyableElement, destroyablesElement);
 
         String name = ParseUtil.getFirstAttribute("name", destroyableElement, destroyablesElement);
         if (name == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No name specified for destroyable"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No name specified for destroyable"}, false));
           continue;
         }
 
-        String requiredValue = ParseUtil.getFirstAttribute("required", destroyableElement,
-                destroyablesElement);
+        String requiredValue = ParseUtil.getFirstAttribute("required", destroyableElement, destroyablesElement);
         boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
 
         RegionModule regionModule = Cardinal.getModule(RegionModule.class);
@@ -84,33 +83,28 @@ public class DestroyableModule extends AbstractModule {
           region = regionModule.getRegion(destroyablesElement);
         }
         if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No region specified for destroyable"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for destroyable"}, false));
           continue;
         }
         if (!(region instanceof BoundedRegion)) {
           errors.add(new ModuleError(this, match.getMap(),
-                  new String[]{"Region specified for destroyable must be a bounded region"},
-                  false));
+              new String[]{"Region specified for destroyable must be a bounded region"}, false));
           continue;
         }
         BoundedRegion boundedRegion = (BoundedRegion) region;
 
         List<Map.Entry<Material, Integer>> materials = Lists.newArrayList();
-        String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement,
-                destroyablesElement);
+        String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement, destroyablesElement);
         if (materialsValue != null) {
           materials.addAll(Materials.getMaterialPattern(materialsValue));
         }
 
-        String ownerValue = ParseUtil.getFirstAttribute("owner", destroyableElement,
-                destroyablesElement);
+        String ownerValue = ParseUtil.getFirstAttribute("owner", destroyableElement, destroyablesElement);
         if (ownerValue == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No owner specified for destroyable"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No owner specified for destroyable"}, false));
           continue;
         }
-        Team owner = Cardinal.getModule(TeamModule.class).getTeamById(ownerValue);
+        Team owner = Cardinal.getModule(TeamModule.class).getTeamById(match, ownerValue);
         if (owner == null) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{"Invalid owner specified for destroyable"}, false));
@@ -118,67 +112,62 @@ public class DestroyableModule extends AbstractModule {
         }
 
         double completion = 100;
-        String completionValue = ParseUtil.getFirstAttribute("completion", destroyableElement,
-                destroyablesElement);
+        String completionValue = ParseUtil.getFirstAttribute("completion", destroyableElement, destroyablesElement);
         if (completionValue != null) {
           completion = Numbers.parseDouble(completionValue.replaceAll("%", ""));
         }
 
-        String modeChangesValue = ParseUtil.getFirstAttribute("mode-changes", destroyableElement,
-                destroyablesElement);
+        String modeChangesValue = ParseUtil.getFirstAttribute("mode-changes", destroyableElement, destroyablesElement);
         boolean modeChanges = modeChangesValue != null && Numbers.parseBoolean(modeChangesValue);
 
         String showProgressValue = ParseUtil.getFirstAttribute("show-progress", destroyableElement,
-                destroyablesElement);
-        boolean showProgress = showProgressValue != null
-                && Numbers.parseBoolean(showProgressValue);
+            destroyablesElement);
+        boolean showProgress = showProgressValue != null && Numbers.parseBoolean(showProgressValue);
 
-        String repairableValue = ParseUtil.getFirstAttribute("repairable", destroyableElement,
-                destroyablesElement);
+        String repairableValue = ParseUtil.getFirstAttribute("repairable", destroyableElement, destroyablesElement);
         boolean repairable = repairableValue == null || Numbers.parseBoolean(repairableValue);
 
-        String sparksValue = ParseUtil.getFirstAttribute("sparks", destroyableElement,
-                destroyablesElement);
+        String sparksValue = ParseUtil.getFirstAttribute("sparks", destroyableElement, destroyablesElement);
         boolean sparks = sparksValue != null && Numbers.parseBoolean(sparksValue);
 
-        String showValue = ParseUtil.getFirstAttribute("show", destroyableElement,
-                destroyablesElement);
+        String showValue = ParseUtil.getFirstAttribute("show", destroyableElement, destroyablesElement);
         boolean show = showValue == null || Numbers.parseBoolean(showValue);
 
         ProximityMetric proximityMetric = ProximityMetric.CLOSEST_PLAYER;
-        String woolProximityMetricValue = ParseUtil.getFirstAttribute("proximity-metric",
-                destroyableElement, destroyablesElement);
+        String woolProximityMetricValue = ParseUtil.getFirstAttribute("proximity-metric", destroyableElement,
+            destroyablesElement);
         if (woolProximityMetricValue != null) {
           try {
             proximityMetric =
-                    ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
+                ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                    new String[]{"Invalid proximity metric specified for destroyable"}, false));
+                new String[]{"Invalid proximity metric specified for destroyable"}, false));
             continue;
           }
         }
 
-        String proximityHorizontalValue = ParseUtil.getFirstAttribute("proximity-horizontal",
-                destroyableElement, destroyablesElement);
+        String proximityHorizontalValue = ParseUtil.getFirstAttribute("proximity-horizontal", destroyableElement,
+            destroyablesElement);
         boolean proximityHorizontal = proximityHorizontalValue != null
-                && Numbers.parseBoolean(proximityHorizontalValue);
+            && Numbers.parseBoolean(proximityHorizontalValue);
 
-        Destroyable destroyable = new Destroyable(id, name, required, boundedRegion, materials,
-                owner, completion, modeChanges, showProgress, repairable, sparks, show,
-                proximityMetric, proximityHorizontal);
+        Destroyable destroyable = new Destroyable(match, id, name, required, boundedRegion, materials, owner,
+            completion, modeChanges, showProgress, repairable, sparks, show, proximityMetric, proximityHorizontal);
         Bukkit.getPluginManager().registerEvents(destroyable, Cardinal.getInstance());
         destroyables.add(destroyable);
       }
     }
+    this.destroyables.put(match, destroyables);
     return true;
   }
 
   @Override
   public void clearMatch(Match match) {
-    //TODO: reimplement
+    List<Destroyable> destroyables = this.destroyables.get(match);
     destroyables.forEach(HandlerList::unregisterAll);
     destroyables.clear();
+    this.destroyables.remove(match);
   }
 
 }

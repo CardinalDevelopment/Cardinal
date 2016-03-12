@@ -37,7 +37,7 @@ public class HalfRegion extends UnboundedRegion {
   private final Vector origin;
 
   /**
-   * @param id This region's ID.
+   * @param id     This region's ID.
    * @param normal The normal that the plane points towards.
    * @param origin The origin of the plane.
    */

@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.objective.wool;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -47,19 +48,20 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 
 import java.util.List;
+import java.util.Map;
 
 @ModuleEntry
 public class WoolModule extends AbstractModule {
 
-  private List<Wool> wools;
+  private Map<Match, List<Wool>> wools = Maps.newHashMap();
 
   public WoolModule() {
-    wools = Lists.newArrayList();
+    this.depends = new Class[]{TeamModule.class, RegionModule.class};
   }
 
   @Override
   public boolean loadMatch(Match match) {
-    //TODO: reimplement
+    List<Wool> wools = Lists.newArrayList();
     Document document = match.getMap().getDocument();
     for (Element woolsElement : document.getRootElement().getChildren("wools")) {
       for (Element woolElement : woolsElement.getChildren("wool")) {
@@ -70,29 +72,25 @@ public class WoolModule extends AbstractModule {
 
         String teamValue = ParseUtil.getFirstAttribute("team", woolElement, woolsElement);
         if (teamValue == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No team specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool"}, false));
           continue;
         }
-        Team team = new TeamModule().getTeamById(teamValue); //TODO: Get TeamModule from match
+        Team team = Cardinal.getModule(TeamModule.class).getTeamById(match, teamValue);
         if (team == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid team specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for wool"}, false));
           continue;
         }
 
         String colorValue = ParseUtil.getFirstAttribute("color", woolElement, woolsElement);
         if (colorValue == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No color specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No color specified for wool"}, false));
           continue;
         }
         DyeColor color;
         try {
           color = DyeColor.valueOf(colorValue);
         } catch (IllegalArgumentException e) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid color specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid color specified for wool"}, false));
           continue;
         }
 
@@ -107,8 +105,7 @@ public class WoolModule extends AbstractModule {
           continue;
         }
 
-        String craftableValue = ParseUtil.getFirstAttribute("craftable", woolElement,
-                woolsElement);
+        String craftableValue = ParseUtil.getFirstAttribute("craftable", woolElement, woolsElement);
         boolean craftable = craftableValue != null && Numbers.parseBoolean(craftableValue);
 
         String showValue = ParseUtil.getFirstAttribute("show", woolElement, woolsElement);
@@ -116,81 +113,78 @@ public class WoolModule extends AbstractModule {
 
         String locationValue = ParseUtil.getFirstAttribute("location", woolElement, woolsElement);
         if (locationValue == null) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No location specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No location specified for wool"}, false));
           continue;
         }
         String[] coordinates = locationValue.split(",");
         if (coordinates.length != 3) {
           errors.add(new ModuleError(this, match.getMap(),
-                  new String[]{"Invalid location format specified for wool"}, false));
+              new String[]{"Invalid location format specified for wool"}, false));
           continue;
         }
         Vector location;
         try {
           location = new Vector(Double.parseDouble(coordinates[0].trim()),
-                  Double.parseDouble(coordinates[1].trim()),
-                  Double.parseDouble(coordinates[2].trim()));
+              Double.parseDouble(coordinates[1].trim()),
+              Double.parseDouble(coordinates[2].trim()));
         } catch (NumberFormatException e) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid location specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location specified for wool"}, false));
           continue;
         }
 
         ProximityMetric woolProximityMetric = ProximityMetric.CLOSEST_KILL;
         String woolProximityMetricValue = ParseUtil.getFirstAttribute("woolproximity-metric",
-                woolElement, woolsElement);
+            woolElement, woolsElement);
         if (woolProximityMetricValue != null) {
           try {
-            woolProximityMetric =
-                    ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
+            woolProximityMetric = ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                    new String[]{"Invalid wool proximity metric specified for wool"}, false));
+                new String[]{"Invalid wool proximity metric specified for wool"}, false));
             continue;
           }
         }
 
         String woolProximityHorizontalValue =
-                ParseUtil.getFirstAttribute("woolproximity-horizontal", woolElement, woolsElement);
+            ParseUtil.getFirstAttribute("woolproximity-horizontal", woolElement, woolsElement);
         boolean woolProximityHorizontal = woolProximityHorizontalValue != null
-                && Numbers.parseBoolean(woolProximityHorizontalValue);
+            && Numbers.parseBoolean(woolProximityHorizontalValue);
 
         ProximityMetric monumentProximityMetric = ProximityMetric.CLOSEST_BLOCK;
         String monumentProximityMetricValue =
-                ParseUtil.getFirstAttribute("monumentproximity-metric", woolElement, woolsElement);
+            ParseUtil.getFirstAttribute("monumentproximity-metric", woolElement, woolsElement);
         if (monumentProximityMetricValue != null) {
           try {
             monumentProximityMetric = ProximityMetric.valueOf(
-                    Strings.getTechnicalName(monumentProximityMetricValue));
+                Strings.getTechnicalName(monumentProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                    new String[]{"Invalid monument proximity metric specified for wool"}, false));
+                new String[]{"Invalid monument proximity metric specified for wool"}, false));
             continue;
           }
         }
 
         String monumentProximityHorizontalValue =
-                ParseUtil.getFirstAttribute("monumentproximity-horizontal", woolElement,
-                        woolsElement);
+            ParseUtil.getFirstAttribute("monumentproximity-horizontal", woolElement, woolsElement);
         boolean monumentProximityHorizontal = monumentProximityHorizontalValue != null
-                && Numbers.parseBoolean(monumentProximityHorizontalValue);
+            && Numbers.parseBoolean(monumentProximityHorizontalValue);
 
-        Wool wool = new Wool(id, required, team, color, monument, craftable, show, location,
-                woolProximityMetric, woolProximityHorizontal, monumentProximityMetric,
-                monumentProximityHorizontal);
+        Wool wool = new Wool(match, id, required, team, color, monument, craftable, show, location, woolProximityMetric,
+            woolProximityHorizontal, monumentProximityMetric, monumentProximityHorizontal);
         Bukkit.getPluginManager().registerEvents(wool, Cardinal.getInstance());
         wools.add(wool);
       }
     }
+    this.wools.put(match, wools);
     return true;
   }
 
   @Override
   public void clearMatch(Match match) {
-    //TODO: reimplement
+    List<Wool> wools = this.wools.get(match);
     wools.forEach(HandlerList::unregisterAll);
     wools.clear();
+    this.wools.remove(match);
   }
 
 }

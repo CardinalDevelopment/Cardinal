@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.team;
 
+import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -32,11 +33,12 @@ import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 @ModuleEntry
 public class TeamModule extends AbstractModule {
 
-  private List<Team> teams;
+  private Map<Match, List<Team>> teams = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
@@ -46,34 +48,37 @@ public class TeamModule extends AbstractModule {
 
   @Override
   public void clearMatch(Match match) {
-    //TODO: reimplement
-    teams.clear();
+    teams.get(match).clear();
+    teams.remove(match);
   }
 
   /**
    * @param id The input ID.
    * @return The team that has the input ID.
    */
-  public Team getTeamById(@NonNull String id) {
-    for (Team team : teams) {
+  public Team getTeamById(@NonNull Match match, @NonNull String id) {
+    if (teams.get(match) == null) {
+      return null;
+    }
+    for (Team team : teams.get(match)) {
       if (team.getId().replaceAll(" ", "").equalsIgnoreCase(id.replaceAll(" ", ""))) {
         return team;
       }
     }
-    for (Team team : teams) {
+    for (Team team : teams.get(match)) {
       if (team.getId().replaceAll(" ", "").toLowerCase().startsWith(
-              id.replaceAll(" ", "").toLowerCase())) {
+          id.replaceAll(" ", "").toLowerCase())) {
         return team;
       }
     }
-    for (Team team : teams) {
+    for (Team team : teams.get(match)) {
       if (team.getId().replaceAll(" ", "-").equalsIgnoreCase(id.replaceAll(" ", "-"))) {
         return team;
       }
     }
-    for (Team team : teams) {
+    for (Team team : teams.get(match)) {
       if (team.getId().replaceAll(" ", "-").toLowerCase().startsWith(
-              id.replaceAll(" ", "-").toLowerCase())) {
+          id.replaceAll(" ", "-").toLowerCase())) {
         return team;
       }
     }
@@ -84,10 +89,13 @@ public class TeamModule extends AbstractModule {
    * @param name The input name.
    * @return The team that ha the input name.
    */
-  public Team getTeamByName(@NonNull String name) {
-    for (Team team : teams) {
+  public Team getTeamByName(@NonNull Match match, @NonNull String name) {
+    if (teams.get(match) == null) {
+      return null;
+    }
+    for (Team team : teams.get(match)) {
       if (team.getName().replaceAll(" ", "").toLowerCase().startsWith(
-              name.replaceAll(" ", "").toLowerCase())) {
+          name.replaceAll(" ", "").toLowerCase())) {
         return team;
       }
     }
@@ -98,8 +106,11 @@ public class TeamModule extends AbstractModule {
    * @param player The input player.
    * @return The team which the player is on.
    */
-  public Team getTeamByPlayer(@NonNull Player player) {
-    for (Team team : teams) {
+  public Team getTeamByPlayer(@NonNull Match match, @NonNull Player player) {
+    if (teams.get(match) == null) {
+      return null;
+    }
+    for (Team team : teams.get(match)) {
       if (team.contains(player)) {
         return team;
       }
