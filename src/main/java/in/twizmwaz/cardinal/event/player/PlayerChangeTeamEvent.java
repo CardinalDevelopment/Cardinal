@@ -23,36 +23,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.event.player;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
-import org.bukkit.Bukkit;
+import in.twizmwaz.cardinal.module.team.TeamModule;
+import lombok.Getter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
 
-import java.util.Map;
+@Getter
+public class PlayerChangeTeamEvent extends PlayerEvent {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
+  private static final HandlerList handlers = new HandlerList();
+  private final TeamModule oldTeam;
+  private final TeamModule newTeam;
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Bukkit.getPluginManager().registerEvents(scoreboard, Cardinal.getInstance());
-    scoreboards.put(match, scoreboard);
-    return true;
+  /**
+   * Called when a player switches from one team to another.
+   * @param who The player that is switching teams.
+   * @param oldTeam The team that the player is switching from.
+   * @param newTeam The team that the player is switching to.
+   */
+  public PlayerChangeTeamEvent(Player who, TeamModule oldTeam, TeamModule newTeam) {
+    super(who);
+    this.oldTeam = oldTeam;
+    this.newTeam = newTeam;
   }
 
   @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  public HandlerList getHandlers() {
+    return handlers;
   }
 
 }

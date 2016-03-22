@@ -23,36 +23,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.util;
 
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
-import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
+import in.twizmwaz.cardinal.module.channel.ChannelModule;
+import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
 
-import java.util.Map;
+public class Channels {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
-
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Bukkit.getPluginManager().registerEvents(scoreboard, Cardinal.getInstance());
-    scoreboards.put(match, scoreboard);
-    return true;
-  }
-
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  public static GlobalChannel getGlobalChannel() {
+    return Cardinal.getModule(ChannelModule.class).getGlobalChannel();
   }
 
 }

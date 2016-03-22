@@ -25,34 +25,36 @@
 
 package in.twizmwaz.cardinal.module.scoreboard;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
+import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
+import in.twizmwaz.cardinal.module.team.TeamModule;
 import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.Map;
+public class CardinalScoreboard implements Listener {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
+  private final TeamModule team;
+  private final Scoreboard scoreboard;
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Bukkit.getPluginManager().registerEvents(scoreboard, Cardinal.getInstance());
-    scoreboards.put(match, scoreboard);
-    return true;
+  /**
+   * A new scoreboard based on a team.
+   * @param team The team that is tracked by this scoreboard.
+   */
+  protected CardinalScoreboard(TeamModule team) {
+    this.team = team;
+    scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
   }
 
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  /**
+   * Sets the player's scoreboard when they change teams.
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
+    if (event.getNewTeam().equals(team)) {
+      event.getPlayer().setScoreboard(scoreboard);
+    }
   }
 
 }

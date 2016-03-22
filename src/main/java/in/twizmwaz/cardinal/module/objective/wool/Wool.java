@@ -39,7 +39,10 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.util.Vector;
 
 @Getter
@@ -98,14 +101,14 @@ public class Wool extends Objective implements Listener {
    *
    * @param event The event.
    */
-  @EventHandler
+  @EventHandler(ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
     Block block = event.getBlock();
     if (monument.contains(block.getLocation().toVector()) && !complete) {
       if (block.getType().equals(Material.WOOL)) {
-        if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor()
-            .equals(color)) {
+        if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(color)) {
           complete = true;
+          // Channels.getGlobalChannel().sendMessage(new LocalizedComponentBuilder().color(ChatColor.GRAY).build());
         } else {
           event.setCancelled(true);
         }
@@ -120,13 +123,54 @@ public class Wool extends Objective implements Listener {
    *
    * @param event The event.
    */
-  @EventHandler
+  @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
     if (monument.contains(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
 
+  /**
+   * Prevents blocks from forming on the wool monument, such as snow.
+   *
+   * @param event The event.
+   */
+  @EventHandler(ignoreCancelled = true)
+  public void onBlockForm(BlockFormEvent event) {
+    if (monument.contains(event.getBlock().getLocation().toVector())) {
+      event.setCancelled(true);
+    }
+  }
+
+  /**
+   * Prevents blocks from spreading onto the wool monument, such as mushrooms or fire.
+   *
+   * @param event The event.
+   */
+  @EventHandler(ignoreCancelled = true)
+  public void onBlockSpread(BlockSpreadEvent event) {
+    if (monument.contains(event.getBlock().getLocation().toVector())) {
+      event.setCancelled(true);
+    }
+  }
+
+  /**
+   * Prevents entities from changing blocks, such as endermen or falling blocks.
+   *
+   * @param event The event.
+   */
+  @EventHandler(ignoreCancelled = true)
+  public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+    if (monument.contains(event.getBlock().getLocation().toVector())) {
+      event.setCancelled(true);
+    }
+  }
+
+  /**
+   * Returns this wool's name based on the dye color.
+   *
+   * @return This wool's name.
+   */
   public String getName() {
     return WordUtils.capitalizeFully(Strings.getSimpleName(color.name())) + " Wool";
   }

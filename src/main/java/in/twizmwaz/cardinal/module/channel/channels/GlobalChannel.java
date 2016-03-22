@@ -23,36 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.module.channel.channels;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
-import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
+import in.twizmwaz.cardinal.module.channel.AbstractChannel;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Map;
+public class GlobalChannel extends AbstractChannel implements Listener {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
-
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Bukkit.getPluginManager().registerEvents(scoreboard, Cardinal.getInstance());
-    scoreboards.put(match, scoreboard);
-    return true;
+  /**
+   * Adds the player to this channel when they join.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerJoin(PlayerJoinEvent event) {
+    addPlayer(event.getPlayer());
   }
 
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  /**
+   * Removes the player from this channel when they quit.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent event) {
+    removePlayer(event.getPlayer());
   }
 
 }

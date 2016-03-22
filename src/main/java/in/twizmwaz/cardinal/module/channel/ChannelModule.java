@@ -23,36 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.module.channel;
 
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
+import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
+import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
-import java.util.Map;
+public class ChannelModule extends AbstractModule implements Listener {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
+  private GlobalChannel globalChannel;
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Bukkit.getPluginManager().registerEvents(scoreboard, Cardinal.getInstance());
-    scoreboards.put(match, scoreboard);
-    return true;
+  /**
+   * Registers a global channel whenever modules are loaded.
+   * @param event The event.
+   */
+  @EventHandler
+  public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
+    GlobalChannel globalChannel = new GlobalChannel();
+    Bukkit.getPluginManager().registerEvents(globalChannel, Cardinal.getInstance());
+    this.globalChannel = globalChannel;
   }
 
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  public GlobalChannel getGlobalChannel() {
+    return globalChannel;
   }
 
 }

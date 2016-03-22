@@ -23,36 +23,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.module.channel;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
-import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
+import com.google.common.collect.Lists;
+import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.entity.Player;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
+public class AbstractChannel implements Channel {
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
+  private Collection<Player> players = Lists.newArrayList();
 
   @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Bukkit.getPluginManager().registerEvents(scoreboard, Cardinal.getInstance());
-    scoreboards.put(match, scoreboard);
-    return true;
+  public void sendMessage(BaseComponent... components) {
+    for (Player player : players) {
+      List<BaseComponent> toSend = Lists.newArrayList();
+      for (BaseComponent component : components) {
+        //TODO: Support EllyChat
+        /* if (component instanceof LanguageComponent) {
+          toSend.addAll(((LanguageComponent) component).getComponents(player.getLocale()));
+        } */
+        toSend.add(component);
+      }
+      player.sendMessage((BaseComponent[]) toSend.toArray());
+    }
   }
 
   @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  public void sendMessage(String... message) {
+    players.forEach(player -> player.sendMessage(message));
+  }
+
+  @Override
+  public void addPlayer(Player player) {
+    players.add(player);
+  }
+
+  @Override
+  public void removePlayer(Player player) {
+    players.remove(player);
   }
 
 }

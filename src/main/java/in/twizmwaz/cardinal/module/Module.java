@@ -31,8 +31,7 @@ import lombok.NonNull;
 import java.util.Collection;
 
 /**
- * Represents a Cardinal module. A Cardinal2 module must be able to to load and execute multiple
- * maps simultaneously.
+ * Represents a Cardinal module. A Cardinal2 module must be able to to load and execute multiple maps simultaneously.
  */
 public interface Module {
 
@@ -57,8 +56,7 @@ public interface Module {
    * Instructs the module to load information for the match.
    *
    * @param match Match for the XML document to load from.
-   * @return Returns true if the module loaded without interruption. Returns false for a
-   * match-blocking failure.
+   * @return Returns true if the module loaded without interruption. Returns false for a match-blocking failure.
    */
   boolean loadMatch(Match match);
 
