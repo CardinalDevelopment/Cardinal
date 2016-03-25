@@ -25,15 +25,17 @@
 
 package in.twizmwaz.cardinal.module.contributor;
 
+import lombok.Data;
+import org.bukkit.Bukkit;
 
-/**
- * Represents a map contributor.
- */
-public interface Contributor {
+@Data
+public final class ContributorNamer implements Runnable {
 
-  /**
-   * @return The name of the contributor.
-   */
-  String getName();
+  private final IdentifiedContributor contributor;
+
+  @Override
+  public void run() {
+    contributor.setName(Bukkit.getOfflinePlayer(contributor.getUuid()).getName());
+  }
 
 }
