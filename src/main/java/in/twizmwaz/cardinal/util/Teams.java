@@ -23,35 +23,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.util;
 
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
-import org.bukkit.event.HandlerList;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Player;
 
-import java.util.Map;
+import java.util.List;
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
+public class Teams {
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Cardinal.registerEvents(scoreboard);
-    scoreboards.put(match, scoreboard);
-    return true;
+  /**
+   * Shorthand for getting the teams of the current match.
+   *
+   * @return The teams from the current match.
+   */
+  public static List<Team> getTeams() {
+    return Cardinal.getModule(TeamModule.class).getTeams(Cardinal.getInstance().getMatchThread().getCurrentMatch());
   }
 
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  public static ChatColor getTeamColor(@NonNull Player player) {
+    Team team = getTeam(player);
+    return team != null ? team.getColor() : ChatColor.YELLOW;
+  }
+
+  /**
+   * Returns the team that the specified player is on.
+   *
+   * @param player The player.
+   * @return The team that the player is on.
+   */
+  public static Team getTeam(@NonNull Player player) {
+    for (Team team : getTeams()) {
+      if (team.contains(player)) {
+        return team;
+      }
+    }
+    return null;
   }
 
 }

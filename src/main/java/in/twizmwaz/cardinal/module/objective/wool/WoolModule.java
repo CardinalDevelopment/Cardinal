@@ -40,7 +40,6 @@ import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
-import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
@@ -171,7 +170,7 @@ public class WoolModule extends AbstractModule {
 
         Wool wool = new Wool(match, id, required, team, color, monument, craftable, show, location, woolProximityMetric,
             woolProximityHorizontal, monumentProximityMetric, monumentProximityHorizontal);
-        Bukkit.getPluginManager().registerEvents(wool, Cardinal.getInstance());
+        Cardinal.registerEvents(wool);
         wools.add(wool);
       }
     }
@@ -181,10 +180,8 @@ public class WoolModule extends AbstractModule {
 
   @Override
   public void clearMatch(Match match) {
-    List<Wool> wools = this.wools.get(match);
-    wools.forEach(HandlerList::unregisterAll);
-    wools.clear();
-    this.wools.remove(match);
+    wools.get(match).forEach(HandlerList::unregisterAll);
+    wools.remove(match);
   }
 
 }

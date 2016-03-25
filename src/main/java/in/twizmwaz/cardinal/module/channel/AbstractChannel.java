@@ -26,9 +26,13 @@
 package in.twizmwaz.cardinal.module.channel;
 
 import com.google.common.collect.Lists;
+import ee.ellytr.chat.component.LanguageComponent;
+import ee.ellytr.chat.component.NameComponent;
+import in.twizmwaz.cardinal.component.TeamComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,10 +45,14 @@ public class AbstractChannel implements Channel {
     for (Player player : players) {
       List<BaseComponent> toSend = Lists.newArrayList();
       for (BaseComponent component : components) {
-        //TODO: Support EllyChat
-        /* if (component instanceof LanguageComponent) {
-          toSend.addAll(((LanguageComponent) component).getComponents(player.getLocale()));
-        } */
+        String locale = player.getLocale();
+        if (component instanceof LanguageComponent) {
+          toSend.addAll(Arrays.asList(((LanguageComponent) component).getComponents(locale)));
+        } else if (component instanceof NameComponent) {
+          toSend.addAll(Arrays.asList(((NameComponent) component).getComponents(locale)));
+        } else if (component instanceof TeamComponent) {
+          toSend.addAll(Arrays.asList(((TeamComponent) component).getComponents(locale)));
+        }
         toSend.add(component);
       }
       player.sendMessage((BaseComponent[]) toSend.toArray());

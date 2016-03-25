@@ -39,6 +39,7 @@ public class CardinalScoreboard implements Listener {
 
   /**
    * A new scoreboard based on a team.
+   *
    * @param team The team that is tracked by this scoreboard.
    */
   protected CardinalScoreboard(TeamModule team) {
@@ -48,6 +49,7 @@ public class CardinalScoreboard implements Listener {
 
   /**
    * Sets the player's scoreboard when they change teams.
+   *
    * @param event The event.
    */
   @EventHandler

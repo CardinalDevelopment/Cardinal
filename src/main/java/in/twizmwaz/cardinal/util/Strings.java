@@ -25,6 +25,8 @@
 
 package in.twizmwaz.cardinal.util;
 
+import lombok.NonNull;
+
 public class Strings {
 
   public static String getTechnicalName(String in) {
@@ -33,6 +35,19 @@ public class Strings {
 
   public static String getSimpleName(String in) {
     return in.toLowerCase().replaceAll("_", " ");
+  }
+
+  /**
+   * Gets the first word of a string.
+   *
+   * @param str The string.
+   * @return The first word.
+   */
+  public static String getFirstWord(@NonNull String str) {
+    if (!str.contains(" ")) {
+      return str;
+    }
+    return str.split(" ")[0];
   }
 
 }

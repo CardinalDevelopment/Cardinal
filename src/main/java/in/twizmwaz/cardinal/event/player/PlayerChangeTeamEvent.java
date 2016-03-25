@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.event.player;
 
-import in.twizmwaz.cardinal.module.team.TeamModule;
+import in.twizmwaz.cardinal.module.team.Team;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -35,16 +35,17 @@ import org.bukkit.event.player.PlayerEvent;
 public class PlayerChangeTeamEvent extends PlayerEvent {
 
   private static final HandlerList handlers = new HandlerList();
-  private final TeamModule oldTeam;
-  private final TeamModule newTeam;
+  private final Team oldTeam;
+  private final Team newTeam;
 
   /**
    * Called when a player switches from one team to another.
-   * @param who The player that is switching teams.
+   *
+   * @param who     The player that is switching teams.
    * @param oldTeam The team that the player is switching from.
    * @param newTeam The team that the player is switching to.
    */
-  public PlayerChangeTeamEvent(Player who, TeamModule oldTeam, TeamModule newTeam) {
+  public PlayerChangeTeamEvent(Player who, Team oldTeam, Team newTeam) {
     super(who);
     this.oldTeam = oldTeam;
     this.newTeam = newTeam;

@@ -43,7 +43,6 @@ import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
@@ -154,7 +153,7 @@ public class CoreModule extends AbstractModule {
 
         Core core = new Core(match, id, name, required, boundedRegion, leak, material, team, modeChanges, show,
             proximityMetric, proximityHorizontal);
-        Bukkit.getPluginManager().registerEvents(core, Cardinal.getInstance());
+        Cardinal.registerEvents(core);
         cores.add(core);
       }
     }

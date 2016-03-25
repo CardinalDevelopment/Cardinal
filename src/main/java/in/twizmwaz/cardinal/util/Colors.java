@@ -23,35 +23,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.util;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
-import org.bukkit.event.HandlerList;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.DyeColor;
 
-import java.util.Map;
+public class Colors {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
-
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Cardinal.registerEvents(scoreboard);
-    scoreboards.put(match, scoreboard);
-    return true;
-  }
-
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  /**
+   * Converts a {@link DyeColor} into a returned {@link ChatColor}.
+   *
+   * @param color The dye color to convert.
+   * @return The converted chat color.
+   */
+  public static ChatColor convertDyeToChatColor(DyeColor color) {
+    switch (color) {
+      case WHITE:
+        return ChatColor.WHITE;
+      case ORANGE:
+        return ChatColor.GOLD;
+      case MAGENTA:
+        return ChatColor.LIGHT_PURPLE;
+      case LIGHT_BLUE:
+        return ChatColor.BLUE;
+      case YELLOW:
+        return ChatColor.YELLOW;
+      case LIME:
+        return ChatColor.GREEN;
+      case PINK:
+        return ChatColor.RED;
+      case GRAY:
+        return ChatColor.GRAY;
+      case SILVER:
+        return ChatColor.GRAY;
+      case CYAN:
+        return ChatColor.DARK_AQUA;
+      case PURPLE:
+        return ChatColor.DARK_PURPLE;
+      case BLUE:
+        return ChatColor.DARK_BLUE;
+      case BROWN:
+        return ChatColor.GOLD;
+      case GREEN:
+        return ChatColor.DARK_GREEN;
+      case RED:
+        return ChatColor.DARK_RED;
+      case BLACK:
+        return ChatColor.BLACK;
+      default:
+        return ChatColor.RESET;
+    }
   }
 
 }

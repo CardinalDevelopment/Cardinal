@@ -23,35 +23,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.util;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
+import ee.ellytr.chat.component.NameComponent;
+import ee.ellytr.chat.component.NameComponentBuilder;
 import lombok.NonNull;
-import org.bukkit.event.HandlerList;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.ServerOperator;
 
-import java.util.Map;
+public class Components {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
-
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Cardinal.registerEvents(scoreboard);
-    scoreboards.put(match, scoreboard);
-    return true;
+  /**
+   * Gets a name component based on a retrieved builder.
+   *
+   * @param who The user to get the component for.
+   * @return The name component of the user.
+   */
+  public static NameComponent getNameComponent(@NonNull ServerOperator who) {
+    return getNameComponentBuilder(who).build();
   }
 
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  /**
+   * Gets a builder of a {@link NameComponent}.
+   *
+   * @param who The user to get the builder for.
+   * @return The builder of the name component.
+   */
+  public static NameComponentBuilder getNameComponentBuilder(@NonNull ServerOperator who) {
+    NameComponentBuilder builder = new NameComponentBuilder(who);
+    if (who instanceof OfflinePlayer && ((OfflinePlayer) who).isOnline()) {
+      return builder.color(Teams.getTeamColor((Player) who));
+    }
+    return builder;
   }
 
 }

@@ -53,7 +53,7 @@ public final class CycleModule extends AbstractModule implements Listener {
 
   public CycleModule() {
     this.depends = new Class[]{RotationModule.class};
-    Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
+    Cardinal.registerEvents(this);
   }
 
   /**

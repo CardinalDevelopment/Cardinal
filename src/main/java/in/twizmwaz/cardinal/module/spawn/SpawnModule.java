@@ -30,7 +30,6 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
-import org.bukkit.Bukkit;
 
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class SpawnModule extends AbstractModule {
     spawnHandlers.put(Cardinal.getInstance().getMatchThread(),
         new SpawnHandler(Cardinal.getInstance().getMatchThread()));
     spawnHandlers.forEach((thread, handler) ->
-        Bukkit.getPluginManager().registerEvents(handler, Cardinal.getInstance()));
+        Cardinal.registerEvents(handler));
   }
 
 }

@@ -25,31 +25,95 @@
 
 package in.twizmwaz.cardinal.module.channel;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
+import in.twizmwaz.cardinal.module.channel.channels.PlayerChannel;
+import in.twizmwaz.cardinal.module.channel.channels.TeamChannel;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
-import org.bukkit.Bukkit;
+import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.module.team.TeamModule;
+import in.twizmwaz.cardinal.util.Teams;
+import lombok.NonNull;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.List;
+import java.util.Map;
 
 public class ChannelModule extends AbstractModule implements Listener {
 
   private GlobalChannel globalChannel;
+  private Map<Match, List<TeamChannel>> teamChannels = Maps.newHashMap();
+  private Map<Player, PlayerChannel> playerChannels = Maps.newHashMap();
+
+  public ChannelModule() {
+    this.depends = new Class[]{TeamModule.class};
+  }
 
   /**
    * Registers a global channel whenever modules are loaded.
+   *
    * @param event The event.
    */
   @EventHandler
   public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
-    GlobalChannel globalChannel = new GlobalChannel();
-    Bukkit.getPluginManager().registerEvents(globalChannel, Cardinal.getInstance());
-    this.globalChannel = globalChannel;
+    GlobalChannel channel = new GlobalChannel();
+    Cardinal.registerEvents(channel);
+    globalChannel = channel;
+  }
+
+  /**
+   * Adds a new player channel whenever a player joins the server.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerJoin(PlayerJoinEvent event) {
+    Player player = event.getPlayer();
+    playerChannels.put(player, new PlayerChannel(player));
+  }
+
+  /**
+   * Removes the player channel of a player that quits the server.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent event) {
+    playerChannels.remove(event.getPlayer());
+  }
+
+  @Override
+  public boolean loadMatch(@NonNull Match match) {
+    List<TeamChannel> teamChannels = Lists.newArrayList();
+    for (Team team : Teams.getTeams()) {
+      TeamChannel channel = new TeamChannel(team);
+      Cardinal.registerEvents(channel);
+      teamChannels.add(channel);
+    }
+    return true;
+  }
+
+  @Override
+  public void clearMatch(@NonNull Match match) {
+    teamChannels.get(match).forEach(HandlerList::unregisterAll);
+    teamChannels.remove(match);
   }
 
   public GlobalChannel getGlobalChannel() {
     return globalChannel;
+  }
+
+  public PlayerChannel getPlayerChannel(@NonNull Player player) {
+    return playerChannels.get(player);
   }
 
 }

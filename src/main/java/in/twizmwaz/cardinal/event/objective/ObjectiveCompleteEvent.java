@@ -23,35 +23,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard;
+package in.twizmwaz.cardinal.event.objective;
 
-import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import lombok.NonNull;
-import org.bukkit.event.HandlerList;
+import in.twizmwaz.cardinal.event.ObjectiveEvent;
+import in.twizmwaz.cardinal.module.objective.Objective;
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.entity.Player;
 
-import java.util.Map;
+@Getter
+@Setter
+public class ObjectiveCompleteEvent extends ObjectiveEvent {
 
-@ModuleEntry
-public class ScoreboardModule extends AbstractModule {
+  private Player player;
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
-    Cardinal.registerEvents(scoreboard);
-    scoreboards.put(match, scoreboard);
-    return true;
-  }
-
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
-    scoreboards.remove(match);
+  public ObjectiveCompleteEvent(Objective objective, Player player) {
+    super(objective);
+    this.player = player;
   }
 
 }

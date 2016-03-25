@@ -35,7 +35,6 @@ import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.repository.RepositoryModule;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,7 +50,7 @@ public class RotationModule extends AbstractModule implements Listener {
 
   public RotationModule() {
     this.depends = new Class[]{RepositoryModule.class};
-    Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
+    Cardinal.registerEvents(this);
   }
 
   /**

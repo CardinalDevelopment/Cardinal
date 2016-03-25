@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal;
 
+import ee.ellytr.chat.LocaleRegistry;
 import ee.ellytr.command.CommandExecutor;
 import ee.ellytr.command.CommandRegistry;
 import ee.ellytr.command.exception.CommandException;
@@ -44,6 +45,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -79,6 +81,8 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.addClass(CommandCardinal.class);
     commandRegistry.addClass(CommandCycle.class);
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());
+
+    registerLocales();
 
   }
 
@@ -130,6 +134,16 @@ public final class Cardinal extends JavaPlugin {
 
   public static <T extends Module> T getModule(@NonNull Class<T> clazz) {
     return instance.moduleHandler.getRegistry().getModule(clazz);
+  }
+
+  public static void registerEvents(Listener listener) {
+    Bukkit.getPluginManager().registerEvents(listener, getInstance());
+  }
+
+  private void registerLocales() {
+    LocaleRegistry registry = new LocaleRegistry();
+    registry.addLocaleFile("en", getResource("lang/cardinal/en.properties"));
+    registry.register();
   }
 
 }

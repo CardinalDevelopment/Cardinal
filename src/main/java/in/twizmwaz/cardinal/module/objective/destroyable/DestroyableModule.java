@@ -42,7 +42,6 @@ import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
-import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -154,7 +153,7 @@ public class DestroyableModule extends AbstractModule {
 
         Destroyable destroyable = new Destroyable(match, id, name, required, boundedRegion, materials, owner,
             completion, modeChanges, showProgress, repairable, sparks, show, proximityMetric, proximityHorizontal);
-        Bukkit.getPluginManager().registerEvents(destroyable, Cardinal.getInstance());
+        Cardinal.registerEvents(destroyable);
         destroyables.add(destroyable);
       }
     }

@@ -66,8 +66,7 @@ public class TeamModule extends AbstractModule {
       }
     }
     for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "").toLowerCase().startsWith(
-          id.replaceAll(" ", "").toLowerCase())) {
+      if (team.getId().replaceAll(" ", "").toLowerCase().startsWith(id.replaceAll(" ", "").toLowerCase())) {
         return team;
       }
     }
@@ -77,8 +76,7 @@ public class TeamModule extends AbstractModule {
       }
     }
     for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "-").toLowerCase().startsWith(
-          id.replaceAll(" ", "-").toLowerCase())) {
+      if (team.getId().replaceAll(" ", "-").toLowerCase().startsWith(id.replaceAll(" ", "-").toLowerCase())) {
         return team;
       }
     }
@@ -116,6 +114,16 @@ public class TeamModule extends AbstractModule {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns the the team in a match.
+   *
+   * @param match The match that contains the teams.
+   * @return The teams from this match.
+   */
+  public List<Team> getTeams(@NonNull Match match) {
+    return teams.get(match);
   }
 
 }

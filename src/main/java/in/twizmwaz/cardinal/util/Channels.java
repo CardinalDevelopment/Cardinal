@@ -28,11 +28,18 @@ package in.twizmwaz.cardinal.util;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.channel.ChannelModule;
 import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
+import in.twizmwaz.cardinal.module.channel.channels.PlayerChannel;
+import lombok.NonNull;
+import org.bukkit.entity.Player;
 
 public class Channels {
 
   public static GlobalChannel getGlobalChannel() {
     return Cardinal.getModule(ChannelModule.class).getGlobalChannel();
+  }
+
+  public static PlayerChannel getPlayerChannel(@NonNull Player player) {
+    return Cardinal.getModule(ChannelModule.class).getPlayerChannel(player);
   }
 
 }
