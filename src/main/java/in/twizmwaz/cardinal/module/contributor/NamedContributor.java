@@ -25,15 +25,13 @@
 
 package in.twizmwaz.cardinal.module.contributor;
 
+import lombok.Data;
+import lombok.NonNull;
 
-/**
- * Represents a map contributor.
- */
-public interface Contributor {
+@Data
+final class NamedContributor implements Contributor {
 
-  /**
-   * @return The name of the contributor.
-   */
-  String getName();
+  @NonNull
+  private final String name;
 
 }

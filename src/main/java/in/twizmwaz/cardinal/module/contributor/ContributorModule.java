@@ -25,21 +25,60 @@
 
 package in.twizmwaz.cardinal.module.contributor;
 
+import com.google.common.collect.Sets;
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import lombok.NonNull;
+import org.bukkit.Bukkit;
 
+import java.util.Set;
 import java.util.UUID;
 
 @ModuleEntry
 public class ContributorModule extends AbstractModule {
 
-  public Contributor forName(String name) {
-    //TODO
-    return null;
+  private final Set<IdentifiedContributor> identified = Sets.newHashSet();
+  private final Set<NamedContributor> named = Sets.newHashSet();
+
+  /**
+   * Finds or create a contributor for a given {@link String}, useful for groups or other non-players.
+   *
+   * @param name The name of the contributor.
+   * @return The contributor.
+   */
+  public Contributor forName(@NonNull String name) {
+    for (Contributor contributor : identified) {
+      if (contributor.getName().equalsIgnoreCase(name)) {
+        return contributor;
+      }
+    }
+    for (Contributor contributor : named) {
+      if (contributor.getName().equalsIgnoreCase(name)) {
+        return contributor;
+      }
+    }
+    NamedContributor contributor = new NamedContributor(name);
+    named.add(contributor);
+    return contributor;
   }
 
-  public Contributor forUuid(UUID uuid) {
-    //TODO
-    return null;
+  /**
+   * Finds or creates a contributor for a given {@link UUID}, useful for players.
+   *
+   * @param uuid The UUID of the contributor.
+   * @return The contributor.
+   */
+  public Contributor forUuid(@NonNull UUID uuid) {
+    for (IdentifiedContributor contributor : identified) {
+      if (contributor.getUuid().equals(uuid)) {
+        return contributor;
+      }
+    }
+    IdentifiedContributor contributor = new IdentifiedContributor(uuid);
+    Bukkit.getScheduler().runTaskAsynchronously(Cardinal.getInstance(), new ContributorNamer(contributor));
+    identified.add(contributor);
+    return contributor;
   }
+
 }
