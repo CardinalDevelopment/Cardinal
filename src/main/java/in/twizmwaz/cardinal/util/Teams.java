@@ -65,4 +65,19 @@ public class Teams {
     return null;
   }
 
+  /**
+   * Shorthand for getting a team by an ID.
+   *
+   * @param id The ID.
+   * @return The team with the specified ID.
+   */
+  public static Team getTeamById(@NonNull String id) {
+    return Cardinal.getModule(TeamModule.class)
+        .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), id);
+  }
+
+  public static boolean isObservers(@NonNull Team team) {
+    return team.getId().equals("observers");
+  }
+
 }

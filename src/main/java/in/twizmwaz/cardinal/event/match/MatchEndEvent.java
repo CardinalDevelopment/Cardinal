@@ -23,44 +23,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.util;
+package in.twizmwaz.cardinal.event.match;
 
-import java.util.Random;
+import in.twizmwaz.cardinal.event.MatchEvent;
+import in.twizmwaz.cardinal.match.Match;
+import lombok.Getter;
+import lombok.Setter;
 
-public class Numbers {
+@Getter
+@Setter
+public class MatchEndEvent extends MatchEvent {
 
-  /**
-   * @param in The input string.
-   * @return A parsed boolean based on the input string.
-   */
-  public static boolean parseBoolean(String in) {
-    return in.equalsIgnoreCase("on") || in.equalsIgnoreCase("true");
-  }
-
-  /**
-   * @param in The input string.
-   * @return The parsed double based on the input string.
-   */
-  public static double parseDouble(String in) {
-    if (in.equalsIgnoreCase("oo")) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return Double.parseDouble(in);
-  }
-
-  /**
-   * @param in The input string.
-   * @return The parsed integer based on the input string.
-   */
-  public static int parseInteger(String in) {
-    if (in.equalsIgnoreCase("oo")) {
-      return Integer.MAX_VALUE;
-    }
-    return Integer.parseInt(in);
-  }
-
-  public static double getRandom(double min, double max) {
-    return new Random().nextInt((int) (max - min) + 1) + min;
+  public MatchEndEvent(Match match) {
+    super(match);
   }
 
 }

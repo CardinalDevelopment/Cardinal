@@ -23,47 +23,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.spawn;
+package in.twizmwaz.cardinal.event.match;
 
-import in.twizmwaz.cardinal.match.MatchThread;
-import lombok.AllArgsConstructor;
+import in.twizmwaz.cardinal.event.MatchEvent;
+import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
-import org.bukkit.GameMode;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInitialSpawnEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import lombok.Setter;
 
-@AllArgsConstructor
-public class SpawnHandler implements Listener {
+@Getter
+@Setter
+public class MatchStartEvent extends MatchEvent {
 
-  @Getter
-  private final MatchThread matchThread;
-
-  /**
-   * Sets player spawn location when the first join.
-   *
-   * @param event The event called.
-   */
-  @EventHandler(priority = EventPriority.LOW)
-  public void onJoin(PlayerInitialSpawnEvent event) {
-    //TODO: actually find the spawn and spawn them there
-    event.getSpawnLocation().setWorld(matchThread.getCurrentMatch().getWorld());
-    event.getSpawnLocation().setX(0);
-    event.getSpawnLocation().setY(32);
-    event.getSpawnLocation().setZ(0);
-  }
-
-  /**
-   * Sets up the player when they first join. Should be replaced with obs module in the future.
-   *
-   * @param event The event called.
-   */
-  @EventHandler
-  public void onJoin(PlayerJoinEvent event) {
-    event.getPlayer().setGameMode(GameMode.CREATIVE);
-    event.getPlayer().setFlying(true);
+  public MatchStartEvent(Match match) {
+    super(match);
   }
 
 }

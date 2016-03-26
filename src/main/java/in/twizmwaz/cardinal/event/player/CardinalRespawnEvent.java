@@ -23,44 +23,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.util;
+package in.twizmwaz.cardinal.event.player;
 
-import java.util.Random;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
 
-public class Numbers {
+public class CardinalRespawnEvent extends PlayerEvent {
 
-  /**
-   * @param in The input string.
-   * @return A parsed boolean based on the input string.
-   */
-  public static boolean parseBoolean(String in) {
-    return in.equalsIgnoreCase("on") || in.equalsIgnoreCase("true");
+  private static final HandlerList handlers = new HandlerList();
+
+  public CardinalRespawnEvent(Player who) {
+    super(who);
   }
 
-  /**
-   * @param in The input string.
-   * @return The parsed double based on the input string.
-   */
-  public static double parseDouble(String in) {
-    if (in.equalsIgnoreCase("oo")) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return Double.parseDouble(in);
-  }
-
-  /**
-   * @param in The input string.
-   * @return The parsed integer based on the input string.
-   */
-  public static int parseInteger(String in) {
-    if (in.equalsIgnoreCase("oo")) {
-      return Integer.MAX_VALUE;
-    }
-    return Integer.parseInt(in);
-  }
-
-  public static double getRandom(double min, double max) {
-    return new Random().nextInt((int) (max - min) + 1) + min;
+  @Override
+  public HandlerList getHandlers() {
+    return handlers;
   }
 
 }

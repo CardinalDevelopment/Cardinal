@@ -23,44 +23,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.util;
+package in.twizmwaz.cardinal.module.spawn;
 
-import java.util.Random;
+import in.twizmwaz.cardinal.module.region.type.bounded.RandomizableRegion;
+import in.twizmwaz.cardinal.module.team.Team;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-public class Numbers {
+import java.util.List;
 
-  /**
-   * @param in The input string.
-   * @return A parsed boolean based on the input string.
-   */
-  public static boolean parseBoolean(String in) {
-    return in.equalsIgnoreCase("on") || in.equalsIgnoreCase("true");
-  }
+@Getter
+@AllArgsConstructor
+public class Spawn {
 
-  /**
-   * @param in The input string.
-   * @return The parsed double based on the input string.
-   */
-  public static double parseDouble(String in) {
-    if (in.equalsIgnoreCase("oo")) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return Double.parseDouble(in);
-  }
+  private final boolean defaultSpawn;
 
-  /**
-   * @param in The input string.
-   * @return The parsed integer based on the input string.
-   */
-  public static int parseInteger(String in) {
-    if (in.equalsIgnoreCase("oo")) {
-      return Integer.MAX_VALUE;
-    }
-    return Integer.parseInt(in);
-  }
-
-  public static double getRandom(double min, double max) {
-    return new Random().nextInt((int) (max - min) + 1) + min;
-  }
+  private final Team team;
+  private final boolean safe;
+  private final boolean sequential;
+  private final boolean spread;
+  private final boolean exclusive;
+  private final boolean persistent;
+  // private final Kit kit;
+  // private final Filter filter;
+  private final List<RandomizableRegion> regions;
 
 }

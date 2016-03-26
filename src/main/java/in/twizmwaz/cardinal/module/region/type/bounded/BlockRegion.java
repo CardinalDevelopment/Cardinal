@@ -25,7 +25,6 @@
 
 package in.twizmwaz.cardinal.module.region.type.bounded;
 
-import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -33,7 +32,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockRegion extends BoundedRegion {
+public class BlockRegion extends RandomizableRegion {
 
   private final Vector vector;
 
@@ -73,4 +72,8 @@ public class BlockRegion extends BoundedRegion {
     return getLocation().getBlock();
   }
 
+  @Override
+  public Vector getRandomPoint() {
+    return new Vector(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+  }
 }
