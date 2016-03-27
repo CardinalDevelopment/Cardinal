@@ -27,16 +27,20 @@ package in.twizmwaz.cardinal.event.player;
 
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 @Getter
-public class PlayerChangeTeamEvent extends PlayerEvent {
+public class PlayerChangeTeamEvent extends PlayerEvent implements Cancellable {
 
   private static final HandlerList handlers = new HandlerList();
   private final Team oldTeam;
   private final Team newTeam;
+  @Setter
+  private boolean cancelled;
 
   /**
    * Called when a player switches from one team to another.

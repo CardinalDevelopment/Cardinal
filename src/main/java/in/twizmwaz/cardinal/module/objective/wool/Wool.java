@@ -39,7 +39,6 @@ import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Colors;
 import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.Strings;
-import in.twizmwaz.cardinal.util.Teams;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
@@ -131,7 +130,7 @@ public class Wool extends Objective implements Listener {
                 new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
                     Components.getNameComponentBuilder(player).build(),
                     new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                    new TeamComponent(Teams.getTeam(player))).color(ChatColor.GRAY).build());
+                    new TeamComponent(Team.getTeam(player))).color(ChatColor.GRAY).build());
           }
 
           Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));

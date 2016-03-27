@@ -42,7 +42,6 @@ import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
-import in.twizmwaz.cardinal.util.Teams;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -101,7 +100,7 @@ public class SpawnModule extends AbstractModule {
     String teamValue = ParseUtil.getFirstAttribute("team", elements);
     Team team = null;
     if (teamValue != null) {
-      team = Teams.getTeamById(teamValue);
+      team = Team.getTeamById(teamValue);
       if (team == null) {
         errors.add(new ModuleError(this, match.getMap(),
             new String[]{"Invalid team specified for default spawn"}, false));
@@ -162,8 +161,8 @@ public class SpawnModule extends AbstractModule {
   @EventHandler
   public void onMatchStart(MatchStartEvent event) {
     for (Player player : Bukkit.getOnlinePlayers()) {
-      Team team = Teams.getTeam(player);
-      if (team == null || !Teams.isObservers(team)) {
+      Team team = Team.getTeam(player);
+      if (team == null || !Team.isObservers(team)) {
         Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player));
       }
     }
@@ -177,8 +176,8 @@ public class SpawnModule extends AbstractModule {
   @EventHandler
   public void onCardinalRespawn(CardinalRespawnEvent event) {
     Player player = event.getPlayer();
-    Team team = Teams.getTeam(player);
-    if (team == null || !Teams.isObservers(team)) {
+    Team team = Team.getTeam(player);
+    if (team == null || !Team.isObservers(team)) {
       player.setGameMode(GameMode.SURVIVAL);
       // if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
       List<Spawn> spawns = getSpawns(team);

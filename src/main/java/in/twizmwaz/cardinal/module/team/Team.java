@@ -26,18 +26,23 @@
 
 package in.twizmwaz.cardinal.module.team;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
+@Data
 @AllArgsConstructor
-@Getter
-@Setter
-public class Team extends ArrayList<Player> {
+public class Team implements Iterable<Player> {
 
   private final String id;
   private final ChatColor color;
@@ -48,11 +53,106 @@ public class Team extends ArrayList<Player> {
   private final int max;
   private final int maxOverfill;
 
+  private final Set<Player> players = Sets.newHashSet();
+
   private String name;
 
-  @Override
-  public boolean equals(Object object) {
-    return super.equals(object) && object instanceof Team && ((Team) object).getId().equals(id);
+  /**
+   * Attempts to add a player to a team.
+   *
+   * @param player  The player.
+   * @param force   If the join is being forced.
+   * @param message If a join message should be sent to the player.
+   * @return If the attempt was successful.
+   */
+  public boolean addPlayer(Player player, boolean force, boolean message) {
+    //TODO: blitz check
+    if (!force && players.size() >= max) {
+      //TODO: send team full message
+      return false;
+    }
+    PlayerChangeTeamEvent event = new PlayerChangeTeamEvent(player, getTeam(player), this);
+    Bukkit.getServer().getPluginManager().callEvent(event);
+    if (message && event.getNewTeam() != null) {
+      //TODO: join message
+    }
+    if (!event.isCancelled()) {
+      event.getOldTeam().removePlayer(player);
+      players.add(player);
+    }
+    return !event.isCancelled() || force;
   }
 
+  /**
+   * Removes a player form the team.
+   *
+   * @param player The player to be removed from the team.
+   */
+  public void removePlayer(Player player) {
+    players.remove(player);
+  }
+
+  /**
+   * Used to get a snapshot of a list of players on a team.
+   *
+   * @return An immutable set of players.
+   */
+  public Set<Player> getPlayers() {
+    return ImmutableSet.copyOf(players);
+  }
+
+  @Override
+  public Iterator<Player> iterator() {
+    return players.iterator();
+  }
+
+  /**
+   * Shorthand for getting the teams of the current match.
+   *
+   * @return The teams from the current match.
+   */
+  public static Set<Team> getTeams() {
+    return Cardinal.getModule(TeamModule.class).getTeams(Cardinal.getInstance().getMatchThread().getCurrentMatch());
+  }
+
+  public static ChatColor getTeamColor(@NonNull Player player) {
+    Team team = getTeam(player);
+    return team != null ? team.getColor() : ChatColor.YELLOW;
+  }
+
+  /**
+   * Returns the team that the specified player is on.
+   *
+   * @param player The player.
+   * @return The team that the player is on.
+   */
+  public static Team getTeam(@NonNull Player player) {
+    for (Team team : getTeams()) {
+      if (team.getPlayers().contains(player)) {
+        return team;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Shorthand for getting a team by an ID.
+   *
+   * @param id The ID.
+   * @return The team with the specified ID.
+   */
+  public static Team getTeamById(@NonNull String id) {
+    return Cardinal.getModule(TeamModule.class)
+        .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), id);
+  }
+
+  /**
+   * Test if a team is an observer team.
+   *
+   * @param team The team to be tested.
+   * @return If the team is an observer team.
+   */
+  public static boolean isObservers(@NonNull Team team) {
+    return team.getId().equals("observers");
+  }
 }

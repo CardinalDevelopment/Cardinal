@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.util;
 
 import ee.ellytr.chat.component.NameComponent;
 import ee.ellytr.chat.component.NameComponentBuilder;
+import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -53,7 +54,7 @@ public class Components {
   public static NameComponentBuilder getNameComponentBuilder(@NonNull ServerOperator who) {
     NameComponentBuilder builder = new NameComponentBuilder(who);
     if (who instanceof OfflinePlayer && ((OfflinePlayer) who).isOnline()) {
-      return builder.color(Teams.getTeamColor((Player) who));
+      return builder.color(Team.getTeamColor((Player) who));
     }
     return builder;
   }

@@ -36,7 +36,6 @@ import in.twizmwaz.cardinal.module.channel.channels.TeamChannel;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.util.Teams;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -94,7 +93,7 @@ public class ChannelModule extends AbstractModule implements Listener {
   @Override
   public boolean loadMatch(@NonNull Match match) {
     List<TeamChannel> teamChannels = Lists.newArrayList();
-    for (Team team : Teams.getTeams()) {
+    for (Team team : Team.getTeams()) {
       TeamChannel channel = new TeamChannel(team);
       Cardinal.registerEvents(channel);
       teamChannels.add(channel);

@@ -34,7 +34,11 @@ public class Numbers {
    * @return A parsed boolean based on the input string.
    */
   public static boolean parseBoolean(String in) {
-    return in.equalsIgnoreCase("on") || in.equalsIgnoreCase("true");
+    if (in == null) {
+      return false;
+    } else {
+      return in.equalsIgnoreCase("on") || in.equalsIgnoreCase("true");
+    }
   }
 
   /**
@@ -42,10 +46,15 @@ public class Numbers {
    * @return The parsed double based on the input string.
    */
   public static double parseDouble(String in) {
-    if (in.equalsIgnoreCase("oo")) {
+    if (in == null) {
+      return 0;
+    } else if (in.equalsIgnoreCase("oo")) {
       return Double.POSITIVE_INFINITY;
+    } else if (in.equalsIgnoreCase("-oo")) {
+      return Double.MIN_VALUE;
+    } else {
+      return Double.parseDouble(in);
     }
-    return Double.parseDouble(in);
   }
 
   /**
@@ -53,10 +62,15 @@ public class Numbers {
    * @return The parsed integer based on the input string.
    */
   public static int parseInteger(String in) {
-    if (in.equalsIgnoreCase("oo")) {
+    if (in == null) {
+      return 0;
+    } else if (in.equalsIgnoreCase("oo")) {
       return Integer.MAX_VALUE;
+    } else if (in.equalsIgnoreCase("-oo")) {
+      return Integer.MIN_VALUE;
+    } else {
+      return Integer.parseInt(in);
     }
-    return Integer.parseInt(in);
   }
 
   public static double getRandom(double min, double max) {

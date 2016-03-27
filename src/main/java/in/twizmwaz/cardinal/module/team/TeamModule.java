@@ -26,23 +26,64 @@
 package in.twizmwaz.cardinal.module.team;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.util.Numbers;
+import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
+import org.jdom2.Element;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ModuleEntry
 public class TeamModule extends AbstractModule {
 
-  private Map<Match, List<Team>> teams = Maps.newHashMap();
+  private Map<Match, Set<Team>> teams = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
-    //TODO
+    Set<Team> teams = Sets.newHashSet();
+    teams.add(makeObserver());
+    Element element = match.getMap().getDocument().getRootElement().getChild("teams");
+    if (element != null) {
+      element.getChildren().forEach(child -> {
+        String name = child.getText();
+
+        String id = child.getAttributeValue("id");
+        if (id == null) {
+          id = name;
+        }
+
+        ChatColor color = ChatColor.valueOf(child.getAttributeValue("color"));
+
+        ChatColor overHeadColor = ChatColor.valueOf(child.getAttributeValue("overhead-color"));
+        if (overHeadColor == null) {
+          overHeadColor = color;
+        }
+
+        boolean plural = Numbers.parseBoolean(ParseUtil.getFirstAttribute("plural", child, element));
+
+        NameTagVisibility showNameTags = NameTagVisibility.valueOf(
+            ParseUtil.getFirstAttribute("show-name-tags", child, element));
+
+        int min = Numbers.parseInteger(ParseUtil.getFirstAttribute("min", child, element));
+
+        int max = Numbers.parseInteger(ParseUtil.getFirstAttribute("max", child, element));
+
+        int macOverfill = Numbers.parseInteger(ParseUtil.getFirstAttribute("max-overfill", child, element));
+        if (macOverfill == 0) {
+          macOverfill = (int) Math.round(max * 1.25f);
+        }
+
+        teams.add(new Team(id, color, overHeadColor, plural, showNameTags, min, max, macOverfill, name));
+      });
+    }
+    this.teams.put(match, teams);
     return true;
   }
 
@@ -83,6 +124,12 @@ public class TeamModule extends AbstractModule {
     return null;
   }
 
+  private Team makeObserver() {
+    Team obs = new Team("observers", ChatColor.AQUA, ChatColor.AQUA, true, NameTagVisibility.TRUE, 0, Integer.MAX_VALUE,
+        Integer.MAX_VALUE, "Observers");
+    return obs;
+  }
+
   /**
    * @param name The input name.
    * @return The team that ha the input name.
@@ -109,7 +156,7 @@ public class TeamModule extends AbstractModule {
       return null;
     }
     for (Team team : teams.get(match)) {
-      if (team.contains(player)) {
+      if (team.getPlayers().contains(player)) {
         return team;
       }
     }
@@ -122,7 +169,7 @@ public class TeamModule extends AbstractModule {
    * @param match The match that contains the teams.
    * @return The teams from this match.
    */
-  public List<Team> getTeams(@NonNull Match match) {
+  public Set<Team> getTeams(@NonNull Match match) {
     return teams.get(match);
   }
 
