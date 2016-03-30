@@ -53,4 +53,32 @@ public class Proto {
     return new Proto(major, minor, patch);
   }
 
+  /**
+   * @param proto The given proto.
+   * @return If this proto is greater than the given proto.
+   */
+  public boolean greaterThan(@NonNull Proto proto) {
+    return this.major > proto.getMajor()
+            || (this.major == proto.getMajor() && (this.minor > proto.getMinor()
+            || (this.minor == proto.getMinor() && this.patch > proto.getPatch())));
+  }
+
+  public boolean greaterThanOrEqualTo(@NonNull Proto proto) {
+    return this.equals(proto) || this.greaterThan(proto);
+  }
+
+  /**
+   * @param proto The given proto.
+   * @return If this proto is less than the given proto.
+   */
+  public boolean lessThan(@NonNull Proto proto) {
+    return this.major < proto.getMajor()
+            || (this.major == proto.getMajor() && (this.minor < proto.getMinor()
+            || (this.minor == proto.getMinor() && this.patch < proto.getPatch())));
+  }
+
+  public boolean lessThanOrEqualTo(@NonNull Proto proto) {
+    return this.equals(proto) || this.lessThan(proto);
+  }
+
 }
