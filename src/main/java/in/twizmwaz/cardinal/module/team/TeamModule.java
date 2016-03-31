@@ -30,12 +30,14 @@ import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.Map;
 import java.util.Set;
@@ -58,18 +60,35 @@ public class TeamModule extends AbstractModule {
         if (id == null) {
           id = name;
         }
+        System.out.println(id);
 
-        ChatColor color = ChatColor.valueOf(child.getAttributeValue("color"));
+        String colorRaw = child.getAttributeValue("color");
+        ChatColor color;
+        if (colorRaw == null) {
+          Located locatedElement = (Located) child;
+          String[] errorMessage = new String[] { "Color missing for " + name,
+              "Element: " + locatedElement.getLine() + ", " + locatedElement.getColumn()};
+          errors.add(new ModuleError(this, match.getMap(), errorMessage, false));
+          color = ChatColor.WHITE;
+        } else {
+          color = ChatColor.valueOf(colorRaw.replace(" ", "_").toUpperCase());
+        }
 
-        ChatColor overHeadColor = ChatColor.valueOf(child.getAttributeValue("overhead-color"));
-        if (overHeadColor == null) {
+        String overheadRaw = child.getAttributeValue("overhead-color");
+        ChatColor overHeadColor;
+        if (overheadRaw == null) {
           overHeadColor = color;
+        } else {
+          overHeadColor = ChatColor.valueOf(child.getAttributeValue("overhead-color").replace(" ", "_").toUpperCase());
         }
 
         boolean plural = Numbers.parseBoolean(ParseUtil.getFirstAttribute("plural", child, element));
 
-        NameTagVisibility showNameTags = NameTagVisibility.valueOf(
-            ParseUtil.getFirstAttribute("show-name-tags", child, element));
+        String nameTagRaw = ParseUtil.getFirstAttribute("show-name-tags", child, element);
+        NameTagVisibility showNameTags = NameTagVisibility.TRUE;
+        if (nameTagRaw != null) {
+          NameTagVisibility.valueOf(nameTagRaw);
+        }
 
         int min = Numbers.parseInteger(ParseUtil.getFirstAttribute("min", child, element));
 

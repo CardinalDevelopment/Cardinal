@@ -29,13 +29,21 @@ import in.twizmwaz.cardinal.event.MatchEvent;
 import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.event.HandlerList;
 
 @Getter
 @Setter
 public class MatchStartEvent extends MatchEvent {
 
+  @Getter
+  private static final HandlerList handlerList = new HandlerList();
+
   public MatchStartEvent(Match match) {
     super(match);
   }
 
+  @Override
+  public HandlerList getHandlers() {
+    return handlerList;
+  }
 }

@@ -36,7 +36,8 @@ import org.bukkit.event.player.PlayerEvent;
 @Getter
 public class PlayerChangeTeamEvent extends PlayerEvent implements Cancellable {
 
-  private static final HandlerList handlers = new HandlerList();
+  @Getter
+  private static final HandlerList handlerList = new HandlerList();
   private final Team oldTeam;
   private final Team newTeam;
   @Setter
@@ -57,7 +58,7 @@ public class PlayerChangeTeamEvent extends PlayerEvent implements Cancellable {
 
   @Override
   public HandlerList getHandlers() {
-    return handlers;
+    return handlerList;
   }
 
 }

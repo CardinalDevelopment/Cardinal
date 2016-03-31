@@ -82,6 +82,7 @@ public final class CycleModule extends AbstractModule implements Listener {
     cycle.run();
     Match match = new Match(Cardinal.getInstance().getMatchThread(), cycle.getUuid(), cycle.getMap(), cycle.getWorld());
     thread.setCurrentMatch(match);
+    Cardinal.getInstance().getModuleHandler().loadMatch(match);
     CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
     next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(Cardinal.getInstance().getMatchThread())
         .getNext());

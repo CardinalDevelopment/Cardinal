@@ -51,20 +51,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+@Getter
 public final class Cardinal extends JavaPlugin {
 
   @Getter
   private static Cardinal instance;
-  @Getter
+
   private ModuleLoader moduleLoader;
-  @Getter
   @Setter(AccessLevel.PRIVATE)
   private ModuleHandler moduleHandler;
-  @Getter
   private MatchThread matchThread;
-  @Getter
   private CommandRegistry commandRegistry;
-  @Getter
   private CommandExecutor commandExecutor;
 
   /**
