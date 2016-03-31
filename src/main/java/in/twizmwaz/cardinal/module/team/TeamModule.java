@@ -60,7 +60,6 @@ public class TeamModule extends AbstractModule {
         if (id == null) {
           id = name;
         }
-        System.out.println(id);
 
         String colorRaw = child.getAttributeValue("color");
         ChatColor color;

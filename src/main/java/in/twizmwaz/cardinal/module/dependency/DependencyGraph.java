@@ -25,9 +25,11 @@
 
 package in.twizmwaz.cardinal.module.dependency;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -62,23 +64,12 @@ public final class DependencyGraph<T> {
    * @return The ordered list of modules.
    */
   public List<T> evaluateDependencies() {
-    List<DependencyNode<T>> evaluated = Lists.newArrayList();
+    List<DependencyNode<T>> evaluated = Lists.newArrayList(nodes.values());
+    Collections.sort(evaluated, new DependencyComparator<T>());
     List<T> results = Lists.newArrayList();
-    while (!evaluated.containsAll(nodes.values())) {
-      for (DependencyNode<T> node : nodes.values()) {
-        if (evaluated.contains(node)) {
-          continue;
-        } else {
-          for (DependencyNode<T> dep : node.getDependencies()) {
-            if (!evaluated.contains(dep)) {
-              continue;
-            }
-          }
-          results.add(node.getValue());
-          evaluated.add(node);
-        }
-      }
-    }
+    evaluated.forEach(node -> {
+      results.add(node.getValue());
+    });
     return results;
   }
 
