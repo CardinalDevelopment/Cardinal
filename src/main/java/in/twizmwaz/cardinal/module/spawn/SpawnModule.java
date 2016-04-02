@@ -123,7 +123,13 @@ public class SpawnModule extends AbstractModule {
     boolean persistent = persistentValue != null && Numbers.parseBoolean(persistentValue);
 
     List<RandomizableRegion> regions = Lists.newArrayList();
-    for (Element regionElement : elements[0].getChild("regions").getChildren()) {
+    List<Element> working;
+    if (elements[0].getChild("regions") == null) {
+      working = elements[0].getChildren();
+    } else {
+      working = elements[0].getChild("regions").getChildren();
+    }
+    for (Element regionElement : working) {
       Region region = Cardinal.getModule(RegionModule.class).getRegion(regionElement);
       if (region == null) {
         errors.add(new ModuleError(this, match.getMap(),
