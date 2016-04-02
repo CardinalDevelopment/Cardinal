@@ -52,8 +52,13 @@ public class ModuleHandler {
   public boolean loadMatch(@NonNull Match match) {
     Validate.notNull(match);
     for (Module module : registry.getLoadOrder()) {
-      if (!module.loadMatch(match)) {
-        return false;
+      try {
+        if (!module.loadMatch(match)) {
+          return false;
+        }
+      } catch (Throwable throwable) {
+        throwable.printStackTrace();
+        return true;
       }
     }
     return true;
