@@ -32,8 +32,6 @@ import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
-import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.repository.RepositoryModule;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -41,7 +39,6 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -64,8 +61,8 @@ public final class CycleModule extends AbstractModule implements Listener {
   @EventHandler
   public void onModuleLoad(ModuleLoadCompleteEvent event) {
     CycleRunnable runnable = new CycleRunnable(this, UUID.randomUUID());
-    Iterator<LoadedMap> it = Cardinal.getModule(RepositoryModule.class).getLoadedMaps().values().iterator();
-    runnable.setMap(it.next());
+    runnable.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(Cardinal.getInstance().getMatchThread())
+        .getNext());
     nextCycle.put(Cardinal.getInstance().getMatchThread(), runnable);
     cycle(Cardinal.getInstance().getMatchThread());
   }
