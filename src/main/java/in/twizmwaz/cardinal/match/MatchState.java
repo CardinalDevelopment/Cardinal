@@ -23,20 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.match;
 
-import java.util.Comparator;
+public enum MatchState {
 
-public class DependencyComparator<T> implements Comparator<DependencyNode<T>> {
+  WAITING, STARTING, PLAYING, ENDED, CYCLING
 
-  @Override
-  public int compare(DependencyNode<T> first, DependencyNode<T> second) {
-    if (first.getDependencies().contains(second)) {
-      return 1;
-    } else if (second.getDependencies().contains(first)) {
-      return -1;
-    } else {
-      return 0;
-    }
-  }
 }

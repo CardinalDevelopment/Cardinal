@@ -23,56 +23,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region;
+package in.twizmwaz.cardinal.module.region.parser.bounded;
 
-import com.google.common.collect.Lists;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.region.RegionParser;
+import in.twizmwaz.cardinal.module.region.exception.InvalidRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
-import in.twizmwaz.cardinal.module.region.parser.bounded.CuboidParser;
-import in.twizmwaz.cardinal.module.region.type.bounded.CuboidRegion;
-import lombok.NonNull;
+import in.twizmwaz.cardinal.util.Vectors;
+import lombok.Getter;
+import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
-import java.util.List;
+@Getter
+public class CuboidParser extends RegionParser {
 
-@ModuleEntry
-public class RegionModule extends AbstractModule {
-
-  private List<Region> regions;
-
-  public RegionModule() {
-    regions = Lists.newArrayList();
-  }
+  private final Vector min;
+  private final Vector max;
 
   /**
-   * @param id The ID of the region that is returned.
-   * @return The region that has the given ID.
-   */
-  public Region getRegionById(@NonNull String id) {
-    for (Region region : regions) {
-      if (region.getId().equalsIgnoreCase(id)) {
-        return region;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Parses a region from an element.
+   * Parses an element for a cuboid region.
    *
-   * @param element             The element.
-   * @param alternateAttributes Any alternative attributes to look for regions from.
-   * @return The parsed region.
-   * @throws RegionAttributeException Thrown if there are missing or invalid attributes for a region.
+   * @param element The element.
+   * @throws RegionAttributeException Thrown if the min or max attributes are missing or invalid.
    */
-  public Region getRegion(Element element, String... alternateAttributes) throws RegionAttributeException {
-    switch (element.getName()) {
-      case "cuboid":
-        return new CuboidRegion(new CuboidParser(element));
-      default:
-        return null;
+  public CuboidParser(Element element) throws RegionAttributeException {
+    super(element.getAttributeValue("id"));
+
+    String minValue = element.getAttributeValue("min");
+    if (minValue == null) {
+      throw new MissingRegionAttributeException("min");
     }
+    Vector min;
+    try {
+      min = Vectors.getVector(minValue);
+    } catch (NumberFormatException e) {
+      throw new InvalidRegionAttributeException("min");
+    }
+
+    String maxValue = element.getAttributeValue("max");
+    if (maxValue == null) {
+      throw new MissingRegionAttributeException("max");
+    }
+    Vector max;
+    try {
+      max = Vectors.getVector(maxValue);
+    } catch (NumberFormatException e) {
+      throw new InvalidRegionAttributeException("max");
+    }
+
+    this.min = Vector.getMinimum(min, max);
+    this.max = Vector.getMaximum(min, max);
   }
 
 }

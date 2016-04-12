@@ -35,6 +35,8 @@ import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
@@ -43,6 +45,7 @@ import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
@@ -77,9 +80,20 @@ public class CoreModule extends AbstractModule {
         boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
 
         RegionModule regionModule = Cardinal.getModule(RegionModule.class);
-        Region region = regionModule.getRegion(coreElement);
-        if (region == null) {
-          region = regionModule.getRegion(coresElement);
+        Region region;
+        try {
+          region = regionModule.getRegion(coreElement);
+          if (region == null) {
+            region = regionModule.getRegion(coresElement);
+          }
+        } catch (MissingRegionAttributeException e) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Missing attribute \"" + e.getAttribute() + "\" for region for core"}, false));
+          continue;
+        } catch (RegionAttributeException e) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for region for core"}, false));
+          continue;
         }
         if (region == null) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for core"}, false));
@@ -185,6 +199,10 @@ public class CoreModule extends AbstractModule {
       }
     }
     return closestCore;
+  }
+
+  public List<Core> getCores(@NonNull Match match) {
+    return cores.get(match);
   }
 
 }

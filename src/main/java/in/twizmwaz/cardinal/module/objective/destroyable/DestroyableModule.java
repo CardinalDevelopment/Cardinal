@@ -35,6 +35,8 @@ import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
@@ -42,6 +44,7 @@ import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
+import lombok.NonNull;
 import org.bukkit.event.HandlerList;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -76,9 +79,20 @@ public class DestroyableModule extends AbstractModule {
         boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
 
         RegionModule regionModule = Cardinal.getModule(RegionModule.class);
-        Region region = regionModule.getRegion(destroyableElement);
-        if (region == null) {
-          region = regionModule.getRegion(destroyablesElement);
+        Region region;
+        try {
+          region = regionModule.getRegion(destroyableElement);
+          if (region == null) {
+            region = regionModule.getRegion(destroyablesElement);
+          }
+        } catch (MissingRegionAttributeException e) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Missing attribute \"" + e.getAttribute() + "\" for region for destroyable"}, false));
+          continue;
+        } catch (RegionAttributeException e) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for region for destroyable"}, false));
+          continue;
         }
         if (region == null) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for destroyable"}, false));
@@ -167,6 +181,10 @@ public class DestroyableModule extends AbstractModule {
     destroyables.forEach(HandlerList::unregisterAll);
     destroyables.clear();
     this.destroyables.remove(match);
+  }
+
+  public List<Destroyable> getDestroyables(@NonNull Match match) {
+    return destroyables.get(match);
   }
 
 }

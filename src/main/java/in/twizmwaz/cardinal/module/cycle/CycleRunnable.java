@@ -64,8 +64,8 @@ public final class CycleRunnable implements Runnable {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
-    World world = new WorldCreator(dest.getPath()).generator(new NullChunkGenerator())
-        .createWorld();
+    Cardinal.getPluginLogger().info(dest.getPath());
+    World world = new WorldCreator(dest.getPath()).generator(new NullChunkGenerator()).createWorld();
     world.setPVP(true);
     this.world = world;
     this.matchFile = dest;

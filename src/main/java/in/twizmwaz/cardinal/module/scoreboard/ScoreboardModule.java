@@ -25,33 +25,94 @@
 
 package in.twizmwaz.cardinal.module.scoreboard;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
+import in.twizmwaz.cardinal.module.objective.Objective;
+import in.twizmwaz.cardinal.module.objective.core.Core;
+import in.twizmwaz.cardinal.module.objective.core.CoreModule;
+import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
+import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
+import in.twizmwaz.cardinal.module.objective.wool.Wool;
+import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
+import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.event.HandlerList;
 
+import java.util.List;
 import java.util.Map;
 
 @ModuleEntry
 public class ScoreboardModule extends AbstractModule {
 
-  private Map<Match, CardinalScoreboard> scoreboards = Maps.newHashMap();
+  private Map<Match, List<CardinalScoreboard>> scoreboards = Maps.newHashMap();
+
+  public ScoreboardModule() {
+    depends = new Class[]{CoreModule.class, DestroyableModule.class, TeamModule.class, WoolModule.class};
+  }
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
+    scoreboards.put(match, Lists.newArrayList());
+
+    Team.getTeams().forEach(team -> {
+      CardinalScoreboard scoreboard = new CardinalScoreboard(team);
+      Cardinal.registerEvents(scoreboard);
+      scoreboards.get(match).add(scoreboard);
+    });
+
     CardinalScoreboard scoreboard = new CardinalScoreboard(null);
     Cardinal.registerEvents(scoreboard);
-    scoreboards.put(match, scoreboard);
+    scoreboards.get(match).add(scoreboard);
+
     return true;
   }
 
   @Override
   public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(scoreboards.get(match));
+    scoreboards.get(match).forEach(HandlerList::unregisterAll);
     scoreboards.remove(match);
+  }
+
+  /**
+   * Gets the appropriate display title for the scoreboard.
+   *
+   * @return The display title.
+   */
+  @NonNull
+  public String getDisplayTitle() {
+    String displayTitle = null;
+    boolean hasObjectives = false;
+    for (Objective objective : Objective.getObjectives()) {
+      if (objective.isShow()) {
+        hasObjectives = true;
+      }
+    }
+    Class objective = Objective.getSpecificObjective();
+    if (hasObjectives) {
+      if (objective != null) {
+        if (objective.equals(Wool.class)) {
+          displayTitle = "Wools";
+        } else if (objective.equals(Core.class)) {
+          displayTitle = "Cores";
+        } else if (objective.equals(Destroyable.class)) {
+          displayTitle = "Monuments";
+        }
+        //TODO: Implement check for hills
+      } else {
+        displayTitle = "Objectives";
+      }
+    }
+    //TODO: Check for score and blitz modules
+    if (displayTitle == null) {
+      return ChatColor.RED + "Invalid";
+    }
+    return ChatColor.AQUA + displayTitle;
   }
 
 }

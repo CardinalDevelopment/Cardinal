@@ -57,6 +57,11 @@ public class Team implements Iterable<Player> {
 
   private String name;
 
+  @Override
+  public String toString() {
+    return "Team{id=\"" + id + "\"}";
+  }
+
   /**
    * Attempts to add a player to a team.
    *
@@ -77,7 +82,9 @@ public class Team implements Iterable<Player> {
       //TODO: join message
     }
     if (!event.isCancelled()) {
-      event.getOldTeam().removePlayer(player);
+      if (event.getOldTeam() != null) {
+        event.getOldTeam().removePlayer(player);
+      }
       players.add(player);
     }
     return !event.isCancelled() || force;

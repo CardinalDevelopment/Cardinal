@@ -23,34 +23,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.team;
 
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import in.twizmwaz.cardinal.Cardinal;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.List;
+public class TeamHandler implements Listener {
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
-
-  private final T value;
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
-
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
+  /**
+   * Puts the player on the Observers when they join.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerJoin(PlayerJoinEvent event) {
+    Cardinal.getModule(TeamModule.class)
+        .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), "observers")
+        .addPlayer(event.getPlayer(), true, false);
   }
 
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  /**
+   * Removes the player from their team when they leave.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent event) {
+    Player player = event.getPlayer();
+    Cardinal.getModule(TeamModule.class)
+        .getTeamByPlayer(Cardinal.getInstance().getMatchThread().getCurrentMatch(), player).removePlayer(player);
   }
 
 }

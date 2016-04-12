@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.type.bounded;
 
 import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.module.region.parser.bounded.CuboidParser;
 import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -39,6 +40,10 @@ public class CuboidRegion extends RandomizableRegion {
 
   private final Vector min;
   private final Vector max;
+
+  public CuboidRegion(CuboidParser parser) {
+    this(parser.getId(), parser.getMin(), parser.getMax());
+  }
 
   /**
    * @param id  The ID of this region.

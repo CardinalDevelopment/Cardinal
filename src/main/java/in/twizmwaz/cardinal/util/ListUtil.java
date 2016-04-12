@@ -23,34 +23,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
-
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+package in.twizmwaz.cardinal.util;
 
 import java.util.List;
+import java.util.Random;
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+public class ListUtil {
 
-  private final T value;
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
-
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
-
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  public static <T> T getRandom(List<T> list) {
+    return list.get(new Random().nextInt(list.size()));
   }
 
 }

@@ -25,16 +25,27 @@
 
 package in.twizmwaz.cardinal.module.scoreboard;
 
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
-import in.twizmwaz.cardinal.module.team.TeamModule;
+import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.module.objective.Objective;
+import in.twizmwaz.cardinal.module.objective.core.Core;
+import in.twizmwaz.cardinal.module.objective.core.CoreModule;
+import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
+import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
+import in.twizmwaz.cardinal.module.objective.wool.Wool;
+import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
+import in.twizmwaz.cardinal.module.team.Team;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 
 public class CardinalScoreboard implements Listener {
 
-  private final TeamModule team;
+  private final Team team;
   private final Scoreboard scoreboard;
 
   /**
@@ -42,9 +53,16 @@ public class CardinalScoreboard implements Listener {
    *
    * @param team The team that is tracked by this scoreboard.
    */
-  protected CardinalScoreboard(TeamModule team) {
+  protected CardinalScoreboard(Team team) {
     this.team = team;
     scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+
+    org.bukkit.scoreboard.Objective objective = scoreboard.registerNewObjective("objectives", "dummy");
+    objective.setDisplayName(Cardinal.getModule(ScoreboardModule.class).getDisplayTitle());
+    objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+    Team.getTeams().forEach(this::updateTeam);
+    Objective.getObjectives().forEach(this::updateObjective);
   }
 
   /**
@@ -57,6 +75,71 @@ public class CardinalScoreboard implements Listener {
     if (event.getNewTeam().equals(team)) {
       event.getPlayer().setScoreboard(scoreboard);
     }
+  }
+
+  private void updateTeam(@NonNull Team team) {
+    getObjective().getScore(team.getColor() + team.getName()).setScore(getTeamSlot(team));
+  }
+
+  private void updateObjective(@NonNull Objective objective) {
+    getObjective().getScore(objective.getId()).setScore(getObjectiveSlot(objective));
+  }
+
+  @NonNull
+  private org.bukkit.scoreboard.Objective getObjective() {
+    return scoreboard.getObjective("objectives");
+  }
+
+  private int getTeamSlot(Team team) {
+    int slot = 0;
+    for (Team eachTeam : Team.getTeams()) {
+      Match match = Cardinal.getInstance().getMatchThread().getCurrentMatch();
+      for (Core ignored : Cardinal.getModule(CoreModule.class).getCores(match)) {
+        slot++;
+      }
+      for (Destroyable ignored : Cardinal.getModule(DestroyableModule.class).getDestroyables(match)) {
+        slot++;
+      }
+      for (Wool ignored : Cardinal.getModule(WoolModule.class).getWools(match)) {
+        slot++;
+      }
+
+      if (team.equals(eachTeam)) {
+        return slot;
+      }
+      slot++;
+    }
+    return slot;
+  }
+
+  private int getObjectiveSlot(Objective objective) {
+    int slot = 0;
+    for (Team ignored : Team.getTeams()) {
+      Match match = Cardinal.getInstance().getMatchThread().getCurrentMatch();
+      for (Core core : Cardinal.getModule(CoreModule.class).getCores(match)) {
+        if (objective.equals(core)) {
+          return slot;
+        }
+        slot++;
+      }
+
+      for (Destroyable destroyable : Cardinal.getModule(DestroyableModule.class).getDestroyables(match)) {
+        if (objective.equals(destroyable)) {
+          return slot;
+        }
+        slot++;
+      }
+
+      for (Wool wool : Cardinal.getModule(WoolModule.class).getWools(match)) {
+        if (objective.equals(wool)) {
+          return slot;
+        }
+        slot++;
+      }
+
+      slot++;
+    }
+    return slot;
   }
 
 }

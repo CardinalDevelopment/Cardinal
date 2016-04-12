@@ -37,9 +37,12 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.type.bounded.RandomizableRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
+import in.twizmwaz.cardinal.util.ListUtil;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
@@ -47,6 +50,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInitialSpawnEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
@@ -55,7 +61,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @ModuleEntry
-public class SpawnModule extends AbstractModule {
+public class SpawnModule extends AbstractModule implements Listener {
 
   private Map<Match, List<Spawn>> spawns = Maps.newHashMap();
 
@@ -64,6 +70,7 @@ public class SpawnModule extends AbstractModule {
    */
   public SpawnModule() {
     this.depends = new Class[]{TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class};
+    Cardinal.registerEvents(this);
   }
 
   @Override
@@ -74,7 +81,7 @@ public class SpawnModule extends AbstractModule {
     for (Element spawnsElement : document.getRootElement().getChildren("spawns")) {
       Element defaultElement = spawnsElement.getChild("default");
       if (defaultElement != null) {
-        Spawn defaultSpawn = getDefaultSpawn(match, defaultElement, spawnsElement);
+        Spawn defaultSpawn = parseDefaultSpawn(match, defaultElement, spawnsElement);
         if (defaultSpawn != null) {
           spawns.add(defaultSpawn);
           defaultPresent = true;
@@ -96,17 +103,7 @@ public class SpawnModule extends AbstractModule {
    * @param elements The given elements.
    * @return The created default spawn.
    */
-  private Spawn getDefaultSpawn(Match match, Element... elements) {
-    String teamValue = ParseUtil.getFirstAttribute("team", elements);
-    Team team = null;
-    if (teamValue != null) {
-      team = Team.getTeamById(teamValue);
-      if (team == null) {
-        errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Invalid team specified for default spawn"}, false));
-      }
-    }
-
+  private Spawn parseDefaultSpawn(Match match, Element... elements) {
     String safeValue = ParseUtil.getFirstAttribute("safe", elements);
     boolean safe = safeValue != null && Numbers.parseBoolean(safeValue);
 
@@ -130,7 +127,18 @@ public class SpawnModule extends AbstractModule {
       working = elements[0].getChild("regions").getChildren();
     }
     for (Element regionElement : working) {
-      Region region = Cardinal.getModule(RegionModule.class).getRegion(regionElement);
+      Region region;
+      try {
+        region = Cardinal.getModule(RegionModule.class).getRegion(regionElement);
+      } catch (MissingRegionAttributeException e) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{"Missing attribute \"" + e.getAttribute() + "\" for region for default spawn"}, false));
+        continue;
+      } catch (RegionAttributeException e) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for region for default spawn"}, false));
+        continue;
+      }
       if (region == null) {
         errors.add(new ModuleError(this, match.getMap(),
             new String[]{"Invalid region specified for default spawn"}, false));
@@ -144,7 +152,24 @@ public class SpawnModule extends AbstractModule {
       regions.add((RandomizableRegion) region);
     }
 
-    return new Spawn(true, team, safe, sequential, spread, exclusive, persistent, regions);
+    return new Spawn(true, null, safe, sequential, spread, exclusive, persistent, regions);
+  }
+
+  /**
+   * Spawns the player in the appropriate default spawn location.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onPlayerInitialSpawn(PlayerInitialSpawnEvent event) {
+    List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
+    event.setSpawnLocation(ListUtil.getRandom(regions).getRandomPoint().toLocation(
+        Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+  }
+
+  @EventHandler
+  public void onPlayerJoin(PlayerJoinEvent event) {
+    Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(event.getPlayer()));
   }
 
   /**
@@ -154,9 +179,9 @@ public class SpawnModule extends AbstractModule {
    */
   @EventHandler
   public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
-    // if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning() || event.getFrom() == null) {
-    Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(event.getPlayer()));
-    // }
+    if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
+      Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(event.getPlayer()));
+    }
   }
 
   /**
@@ -185,21 +210,21 @@ public class SpawnModule extends AbstractModule {
     Team team = Team.getTeam(player);
     if (team == null || !Team.isObservers(team)) {
       player.setGameMode(GameMode.SURVIVAL);
-      // if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
-      List<Spawn> spawns = getSpawns(team);
-      List<RandomizableRegion> regions = spawns.get(spawns.size()).getRegions();
-      player.teleport(regions.get(regions.size()).getRandomPoint().toLocation(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
-      // } else {
-      // List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
-      // player.teleport(regions.get(regions.size()).getRandomPoint().toLocation(
-      // Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
-      // }
+      if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
+        List<Spawn> spawns = getSpawns(team);
+        List<RandomizableRegion> regions = ListUtil.getRandom(spawns).getRegions();
+        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
+            Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+      } else {
+        List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
+        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
+            Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+      }
     } else {
       player.setGameMode(GameMode.CREATIVE);
 
-      List<RandomizableRegion> regions = getDefaultMatchSpawn().getRegions();
-      player.teleport(regions.get(regions.size()).getRandomPoint().toLocation(
+      List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
+      player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
           Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
     }
   }
@@ -209,12 +234,14 @@ public class SpawnModule extends AbstractModule {
    *
    * @return The default spawn.
    */
-  private Spawn getDefaultMatchSpawn() {
+  @NonNull
+  private Spawn getDefaultSpawn() {
     for (Spawn spawn : spawns.get(Cardinal.getInstance().getMatchThread().getCurrentMatch())) {
       if (spawn.isDefaultSpawn()) {
         return spawn;
       }
     }
+    // This should never happen as the match will not load without a default spawn.
     return null;
   }
 

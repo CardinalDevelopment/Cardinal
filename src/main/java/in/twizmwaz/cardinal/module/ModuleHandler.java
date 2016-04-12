@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module;
 
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
 import lombok.NonNull;
@@ -52,6 +53,7 @@ public class ModuleHandler {
   public boolean loadMatch(@NonNull Match match) {
     Validate.notNull(match);
     for (Module module : registry.getLoadOrder()) {
+      Cardinal.getInstance().getLogger().info("Loading module \"" + module.getClass().getSimpleName() + "\"...");
       try {
         if (!module.loadMatch(match)) {
           return false;

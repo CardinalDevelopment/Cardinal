@@ -48,6 +48,8 @@ public final class Match {
   @Getter
   private final int matchNumber;
 
+  private MatchState state;
+
   /**
    * Creates a new Match.
    *
@@ -61,6 +63,12 @@ public final class Match {
     this.map = map;
     this.world = world;
     this.matchNumber = matchCounter++;
+
+    state = MatchState.WAITING;
+  }
+
+  public boolean isRunning() {
+    return state.equals(MatchState.PLAYING);
   }
 
 }

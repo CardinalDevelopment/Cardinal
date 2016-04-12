@@ -35,11 +35,14 @@ import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
+import lombok.NonNull;
 import org.bukkit.DyeColor;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
@@ -94,9 +97,20 @@ public class WoolModule extends AbstractModule {
         }
 
         RegionModule regionModule = Cardinal.getModule(RegionModule.class);
-        Region monument = regionModule.getRegion(woolElement, "monument");
-        if (monument == null) {
-          monument = regionModule.getRegion(woolsElement, "monument");
+        Region monument;
+        try {
+          monument = regionModule.getRegion(woolElement, "monument");
+          if (monument == null) {
+            monument = regionModule.getRegion(woolsElement, "monument");
+          }
+        } catch (MissingRegionAttributeException e) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Missing attribute \"" + e.getAttribute() + "\" for monument for wool"}, false));
+          continue;
+        } catch (RegionAttributeException e) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for monument for wool"}, false));
+          continue;
         }
         if (monument == null) {
           errors.add(new ModuleError(this, match.getMap(),
@@ -182,6 +196,10 @@ public class WoolModule extends AbstractModule {
   public void clearMatch(Match match) {
     wools.get(match).forEach(HandlerList::unregisterAll);
     wools.remove(match);
+  }
+
+  public List<Wool> getWools(@NonNull Match match) {
+    return wools.get(match);
   }
 
 }

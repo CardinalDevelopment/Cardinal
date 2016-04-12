@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.team;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -36,6 +37,7 @@ import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
@@ -46,6 +48,7 @@ import java.util.Set;
 public class TeamModule extends AbstractModule {
 
   private Map<Match, Set<Team>> teams = Maps.newHashMap();
+  private Map<Match, TeamHandler> teamHandlers = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
@@ -65,7 +68,7 @@ public class TeamModule extends AbstractModule {
         ChatColor color;
         if (colorRaw == null) {
           Located locatedElement = (Located) child;
-          String[] errorMessage = new String[] { "Color missing for " + name,
+          String[] errorMessage = new String[]{"Color missing for " + name,
               "Element: " + locatedElement.getLine() + ", " + locatedElement.getColumn()};
           errors.add(new ModuleError(this, match.getMap(), errorMessage, false));
           color = ChatColor.WHITE;
@@ -95,13 +98,18 @@ public class TeamModule extends AbstractModule {
 
         int macOverfill = Numbers.parseInteger(ParseUtil.getFirstAttribute("max-overfill", child, element));
         if (macOverfill == 0) {
-          macOverfill = (int) Math.round(max * 1.25f);
+          macOverfill = Math.round(max * 1.25f);
         }
 
         teams.add(new Team(id, color, overHeadColor, plural, showNameTags, min, max, macOverfill, name));
       });
     }
     this.teams.put(match, teams);
+
+    TeamHandler teamHandler = new TeamHandler();
+    Cardinal.registerEvents(teamHandler);
+    teamHandlers.put(match, teamHandler);
+
     return true;
   }
 
@@ -109,6 +117,9 @@ public class TeamModule extends AbstractModule {
   public void clearMatch(Match match) {
     teams.get(match).clear();
     teams.remove(match);
+
+    HandlerList.unregisterAll(teamHandlers.get(match));
+    teamHandlers.remove(match);
   }
 
   /**

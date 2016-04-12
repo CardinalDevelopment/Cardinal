@@ -23,34 +23,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.util;
 
 import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+public class Vectors {
 
-  private final T value;
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
-
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
+  public static Vector getVector(String str) {
+    List<Double> coordinates = getCoordinates(str);
+    return new Vector(coordinates.get(0), coordinates.get(1), coordinates.get(2));
   }
 
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
+  /**
+   * Gets a list of coordinates based on a string.
+   *
+   * @param str The string.
+   * @return The list of coordinates.
+   */
+  public static List<Double> getCoordinates(String str) {
+    List<Double> coordinates = Lists.newArrayList();
+
+    String[] rawCoords = str.split(",");
+    for (String coordinate : rawCoords) {
+      coordinates.add(Numbers.parseDouble(coordinate.trim()));
     }
-  }
 
-  @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+    return coordinates;
   }
 
 }
