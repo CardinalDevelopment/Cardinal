@@ -120,7 +120,7 @@ public class Wool extends Objective implements Listener {
   public void onBlockPlace(BlockPlaceEvent event) {
     Block block = event.getBlock();
     Player player = event.getPlayer();
-    if (monument.contains(block.getLocation().toVector()) && !complete) {
+    if (monument.evaluate(block.getLocation().toVector()) && !complete) {
       if (block.getType().equals(Material.WOOL)) {
         if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(color)) {
           complete = true;
@@ -162,7 +162,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
-    if (monument.contains(event.getBlock().getLocation().toVector())) {
+    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
@@ -174,7 +174,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockForm(BlockFormEvent event) {
-    if (monument.contains(event.getBlock().getLocation().toVector())) {
+    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
@@ -186,7 +186,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockSpread(BlockSpreadEvent event) {
-    if (monument.contains(event.getBlock().getLocation().toVector())) {
+    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
@@ -198,7 +198,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-    if (monument.contains(event.getBlock().getLocation().toVector())) {
+    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
@@ -211,13 +211,13 @@ public class Wool extends Objective implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onBlockPistonExtend(BlockPistonExtendEvent event) {
     Block block = event.getBlock();
-    if (monument.contains(event.getBlock().getRelative(event.getDirection()).getLocation().toVector())) {
+    if (monument.evaluate(event.getBlock().getRelative(event.getDirection()).getLocation().toVector())) {
       //Cancels the event if the piston's arm extends into the monument
       event.setCancelled(true);
     } else {
       //Cancels the event if any of the pushed blocks extend into the monument
-      event.getBlocks().stream().filter(extended -> monument.contains(extended.getLocation().toVector())
-          || monument.contains(block.getRelative(event.getDirection()).getLocation().toVector()))
+      event.getBlocks().stream().filter(extended -> monument.evaluate(extended.getLocation().toVector())
+          || monument.evaluate(block.getRelative(event.getDirection()).getLocation().toVector()))
           .forEach(extended -> event.setCancelled(true));
     }
   }
@@ -230,8 +230,8 @@ public class Wool extends Objective implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onBlockPistonRetract(BlockPistonRetractEvent event) {
     //Cancels the event if any of the pulled blocks retract from the monument
-    event.getBlocks().stream().filter(block -> monument.contains(block.getLocation().toVector())
-        || monument.contains(block.getRelative(event.getDirection()).getLocation().toVector()))
+    event.getBlocks().stream().filter(block -> monument.evaluate(block.getLocation().toVector())
+        || monument.evaluate(block.getRelative(event.getDirection()).getLocation().toVector()))
         .forEach(block -> event.setCancelled(true));
   }
 

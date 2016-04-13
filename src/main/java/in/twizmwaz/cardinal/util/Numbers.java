@@ -77,4 +77,8 @@ public class Numbers {
     return new Random().nextInt((int) (max - min) + 1) + min;
   }
 
+  public static boolean isDecimal(String str) {
+    return str.matches("-?\\d+(\\.\\d+)?");
+  }
+
 }

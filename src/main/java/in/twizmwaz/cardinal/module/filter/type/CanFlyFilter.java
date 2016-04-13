@@ -23,12 +23,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.exception;
+package in.twizmwaz.cardinal.module.filter.type;
 
-public class MissingRegionAttributeException extends RegionAttributeException {
+import in.twizmwaz.cardinal.module.filter.Filter;
+import org.bukkit.entity.Player;
 
-  public MissingRegionAttributeException(String attribute) {
-    super(attribute);
+public class CanFlyFilter implements Filter<Player> {
+
+  @Override
+  public boolean evaluate(Player evaluating) {
+    return evaluating.getAllowFlight();
   }
-
 }

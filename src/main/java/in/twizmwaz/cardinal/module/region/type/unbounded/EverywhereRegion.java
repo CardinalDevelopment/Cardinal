@@ -28,14 +28,10 @@ package in.twizmwaz.cardinal.module.region.type.unbounded;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
 import org.bukkit.util.Vector;
 
-public class EverywhereRegion extends UnboundedRegion {
-
-  public EverywhereRegion(String id) {
-    super(id);
-  }
+public class EverywhereRegion implements UnboundedRegion {
 
   @Override
-  public boolean contains(Vector vector) {
+  public boolean evaluate(Vector vector) {
     return true;
   }
 

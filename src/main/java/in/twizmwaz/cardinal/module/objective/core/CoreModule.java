@@ -34,9 +34,8 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
@@ -82,21 +81,17 @@ public class CoreModule extends AbstractModule {
         RegionModule regionModule = Cardinal.getModule(RegionModule.class);
         Region region;
         try {
-          region = regionModule.getRegion(coreElement);
+          region = regionModule.getRegion(match, coreElement);
           if (region == null) {
-            region = regionModule.getRegion(coresElement);
+            region = regionModule.getRegion(match, coresElement);
           }
-        } catch (MissingRegionAttributeException e) {
+        } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Missing attribute \"" + e.getAttribute() + "\" for region for core"}, false));
-          continue;
-        } catch (RegionAttributeException e) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for region for core"}, false));
+              new String[]{ParseUtil.getRegionError(e, "region", "core")}, false));
           continue;
         }
         if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for core"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid region specified for core"}, false));
           continue;
         }
         if (!(region instanceof BoundedRegion)) {

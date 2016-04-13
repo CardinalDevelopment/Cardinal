@@ -25,33 +25,24 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
+import in.twizmwaz.cardinal.module.region.parser.unbounded.BelowParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import org.bukkit.util.Vector;
 
-@Getter
-public class BelowRegion extends UnboundedRegion {
+@AllArgsConstructor
+public class BelowRegion implements UnboundedRegion {
 
   private final double xAxis;
   private final double yAxis;
   private final double zAxis;
 
-  /**
-   * @param id    The ID of this region.
-   * @param xAxis The x-axis for which the region's area is below.
-   * @param yAxis The y-axis for which the region's area is below.
-   * @param zAxis The z-axis for which the region's area is below.
-   */
-  public BelowRegion(String id, double xAxis, double yAxis, double zAxis) {
-    super(id);
-
-    this.xAxis = xAxis;
-    this.yAxis = yAxis;
-    this.zAxis = zAxis;
+  public BelowRegion(BelowParser parser) {
+    this(parser.getXAxis(), parser.getYAxis(), parser.getZAxis());
   }
 
   @Override
-  public boolean contains(Vector vector) {
+  public boolean evaluate(Vector vector) {
     return vector.getX() < xAxis && vector.getY() < yAxis && vector.getZ() < zAxis;
   }
 

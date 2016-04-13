@@ -25,14 +25,8 @@
 
 package in.twizmwaz.cardinal.module.region;
 
-import lombok.Data;
+import in.twizmwaz.cardinal.module.filter.Filter;
 import org.bukkit.util.Vector;
 
-@Data
-public abstract class Region {
-
-  private final String id;
-
-  public abstract boolean contains(Vector vector);
-
+public interface Region extends Filter<Vector> {
 }

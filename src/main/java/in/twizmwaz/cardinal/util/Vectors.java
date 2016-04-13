@@ -32,8 +32,17 @@ import java.util.List;
 
 public class Vectors {
 
+  /**
+   * Gets a vector based on coordinates from a given string.
+   *
+   * @param str The string.
+   * @return The vector.
+   */
   public static Vector getVector(String str) {
     List<Double> coordinates = getCoordinates(str);
+    if (coordinates == null || coordinates.size() != 3) {
+      return null;
+    }
     return new Vector(coordinates.get(0), coordinates.get(1), coordinates.get(2));
   }
 
@@ -48,6 +57,9 @@ public class Vectors {
 
     String[] rawCoords = str.split(",");
     for (String coordinate : rawCoords) {
+      if (!Numbers.isDecimal(coordinate.trim())) {
+        return null;
+      }
       coordinates.add(Numbers.parseDouble(coordinate.trim()));
     }
 

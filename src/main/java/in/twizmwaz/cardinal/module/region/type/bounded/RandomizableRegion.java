@@ -29,12 +29,8 @@ import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import org.bukkit.util.Vector;
 
 
-public abstract class RandomizableRegion extends BoundedRegion {
+public interface RandomizableRegion extends BoundedRegion {
 
-  public RandomizableRegion(String id) {
-    super(id);
-  }
-
-  public abstract Vector getRandomPoint();
+  Vector getRandomPoint();
 
 }

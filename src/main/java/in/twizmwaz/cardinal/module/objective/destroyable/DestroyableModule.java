@@ -34,9 +34,8 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
@@ -81,21 +80,18 @@ public class DestroyableModule extends AbstractModule {
         RegionModule regionModule = Cardinal.getModule(RegionModule.class);
         Region region;
         try {
-          region = regionModule.getRegion(destroyableElement);
+          region = regionModule.getRegion(match, destroyableElement);
           if (region == null) {
-            region = regionModule.getRegion(destroyablesElement);
+            region = regionModule.getRegion(match, destroyablesElement);
           }
-        } catch (MissingRegionAttributeException e) {
+        } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Missing attribute \"" + e.getAttribute() + "\" for region for destroyable"}, false));
-          continue;
-        } catch (RegionAttributeException e) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for region for destroyable"}, false));
+              new String[]{ParseUtil.getRegionError(e, "region", "destroyable")}, false));
           continue;
         }
         if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for destroyable"}, false));
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Invalid region specified for destroyable"}, false));
           continue;
         }
         if (!(region instanceof BoundedRegion)) {

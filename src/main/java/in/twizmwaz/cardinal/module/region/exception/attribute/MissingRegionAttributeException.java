@@ -23,11 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.exception;
+package in.twizmwaz.cardinal.module.region.exception.attribute;
 
-public class InvalidRegionAttributeException extends RegionAttributeException {
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 
-  public InvalidRegionAttributeException(String attribute) {
+public class MissingRegionAttributeException extends RegionAttributeException {
+
+  public MissingRegionAttributeException(String attribute) {
     super(attribute);
   }
 

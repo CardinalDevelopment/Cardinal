@@ -31,14 +31,10 @@ import org.bukkit.block.Block;
 
 import java.util.List;
 
-public abstract class BoundedRegion extends Region {
+public interface BoundedRegion extends Region {
 
-  public BoundedRegion(String id) {
-    super(id);
-  }
+  List<Block> getBlocks();
 
-  public abstract List<Block> getBlocks();
-
-  public abstract BlockRegion getCenterBlock();
+  BlockRegion getCenterBlock();
 
 }

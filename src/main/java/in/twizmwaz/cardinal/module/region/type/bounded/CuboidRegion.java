@@ -28,33 +28,21 @@ package in.twizmwaz.cardinal.module.region.type.bounded;
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.module.region.parser.bounded.CuboidParser;
 import in.twizmwaz.cardinal.util.Numbers;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 
-@Getter
-public class CuboidRegion extends RandomizableRegion {
+@AllArgsConstructor
+public class CuboidRegion implements RandomizableRegion {
 
   private final Vector min;
   private final Vector max;
 
   public CuboidRegion(CuboidParser parser) {
-    this(parser.getId(), parser.getMin(), parser.getMax());
-  }
-
-  /**
-   * @param id  The ID of this region.
-   * @param min The minimum vector of this region.
-   * @param max The maximum vector of this region.
-   */
-  public CuboidRegion(String id, Vector min, Vector max) {
-    super(id);
-
-    this.min = min;
-    this.max = max;
+    this(parser.getMin(), parser.getMax());
   }
 
   @Override
@@ -72,11 +60,11 @@ public class CuboidRegion extends RandomizableRegion {
 
   @Override
   public BlockRegion getCenterBlock() {
-    return new BlockRegion(null, min.getMidpoint(max));
+    return new BlockRegion(min.getMidpoint(max));
   }
 
   @Override
-  public boolean contains(Vector vector) {
+  public boolean evaluate(Vector vector) {
     return vector.isInAABB(min, max);
   }
 

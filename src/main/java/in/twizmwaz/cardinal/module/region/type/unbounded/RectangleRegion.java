@@ -25,30 +25,33 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
+import in.twizmwaz.cardinal.module.region.parser.unbounded.RectangleParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
 import org.bukkit.util.Vector;
 
-public class RectangleRegion extends UnboundedRegion {
+public class RectangleRegion implements UnboundedRegion {
 
-  private Vector min;
-  private Vector max;
+  private final Vector min;
+  private final Vector max;
+
+  public RectangleRegion(RectangleParser parser) {
+    this(parser.getMin(), parser.getMax());
+  }
 
   /**
-   * @param id   This region's ID.
-   * @param xMin The minimum x position of this rectangle.
-   * @param zMin The minimum z position of this rectangle.
-   * @param xMax The maximum x position of this rectangle.
-   * @param zMax The maximum z position of this rectangle.
+   * @param min The rectangle's minimum bound.
+   * @param max The rectangle's maximum bound.
    */
-  public RectangleRegion(String id, double xMin, double zMin, double xMax, double zMax) {
-    super(id);
+  public RectangleRegion(Vector min, Vector max) {
+    this.min = Vector.getMinimum(min, max);
+    this.min.setY(Double.NEGATIVE_INFINITY);
 
-    min = new Vector(xMin, Double.NEGATIVE_INFINITY, zMin);
-    max = new Vector(xMax, Double.POSITIVE_INFINITY, zMax);
+    this.max = Vector.getMaximum(min, max);
+    this.max.setY(Double.POSITIVE_INFINITY);
   }
 
   @Override
-  public boolean contains(Vector vector) {
+  public boolean evaluate(Vector vector) {
     return vector.isInAABB(min, max);
   }
 

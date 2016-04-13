@@ -25,32 +25,24 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
+import in.twizmwaz.cardinal.module.region.parser.unbounded.CircleParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import org.bukkit.util.Vector;
 
-@Getter
-public class CircleRegion extends UnboundedRegion {
+@AllArgsConstructor
+public class CircleRegion implements UnboundedRegion {
 
-  private Vector center;
-  private double radius;
+  private final Vector center;
+  private final double radius;
 
-  /**
-   * @param id     This region's ID.
-   * @param xPos   The x position of the circle's center.
-   * @param zPos   The z position of the circle's center.
-   * @param radius The circle's radius, or distance from center to edge.
-   */
-  public CircleRegion(String id, double xPos, double zPos, double radius) {
-    super(id);
-
-    center = new Vector(xPos, 0, zPos);
+  public CircleRegion(CircleParser parser) {
+    this(parser.getCenter(), parser.getRadius());
   }
 
   @Override
-  public boolean contains(Vector vector) {
-    return Math.hypot(Math.abs(vector.getX() - center.getX()),
-        Math.abs(vector.getZ() - center.getZ())) <= radius;
+  public boolean evaluate(Vector vector) {
+    return Math.hypot(Math.abs(vector.getX() - center.getX()), Math.abs(vector.getZ() - center.getZ())) <= radius;
   }
 
 }

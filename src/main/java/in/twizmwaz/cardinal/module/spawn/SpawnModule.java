@@ -36,9 +36,8 @@ import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.type.bounded.RandomizableRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
@@ -129,14 +128,10 @@ public class SpawnModule extends AbstractModule implements Listener {
     for (Element regionElement : working) {
       Region region;
       try {
-        region = Cardinal.getModule(RegionModule.class).getRegion(regionElement);
-      } catch (MissingRegionAttributeException e) {
+        region = Cardinal.getModule(RegionModule.class).getRegion(match, regionElement);
+      } catch (RegionException e) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Missing attribute \"" + e.getAttribute() + "\" for region for default spawn"}, false));
-        continue;
-      } catch (RegionAttributeException e) {
-        errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Invalid attribute \"" + e.getAttribute() + "\" for region for default spawn"}, false));
+            new String[]{ParseUtil.getRegionError(e, "region", "default spawn")}, false));
         continue;
       }
       if (region == null) {

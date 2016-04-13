@@ -25,13 +25,5 @@
 
 package in.twizmwaz.cardinal.module.region;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
-public abstract class RegionParser {
-
-  private final String id;
-
+public interface RegionParser {
 }

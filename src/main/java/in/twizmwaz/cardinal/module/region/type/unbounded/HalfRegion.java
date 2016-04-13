@@ -25,31 +25,24 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
+import in.twizmwaz.cardinal.module.region.parser.unbounded.HalfParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import org.bukkit.util.Vector;
 
-@Getter
-public class HalfRegion extends UnboundedRegion {
+@AllArgsConstructor
+public class HalfRegion implements UnboundedRegion {
   //TODO
 
   private final Vector normal;
   private final Vector origin;
 
-  /**
-   * @param id     This region's ID.
-   * @param normal The normal that the plane points towards.
-   * @param origin The origin of the plane.
-   */
-  public HalfRegion(String id, Vector normal, Vector origin) {
-    super(id);
-
-    this.normal = normal;
-    this.origin = origin;
+  public HalfRegion(HalfParser parser) {
+    this(parser.getNormal(), parser.getOrigin());
   }
 
   @Override
-  public boolean contains(Vector vector) {
+  public boolean evaluate(Vector vector) {
     return false;
   }
 

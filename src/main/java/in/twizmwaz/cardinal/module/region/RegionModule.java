@@ -25,37 +25,44 @@
 
 package in.twizmwaz.cardinal.module.region;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
+import in.twizmwaz.cardinal.module.region.parser.bounded.BlockParser;
 import in.twizmwaz.cardinal.module.region.parser.bounded.CuboidParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.AboveParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.BelowParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.CircleParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.HalfParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.RectangleParser;
+import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
 import in.twizmwaz.cardinal.module.region.type.bounded.CuboidRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.AboveRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.BelowRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.CircleRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.EmptyRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.EverywhereRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.HalfRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.NowhereRegion;
+import in.twizmwaz.cardinal.module.region.type.unbounded.RectangleRegion;
 import lombok.NonNull;
 import org.jdom2.Element;
 
-import java.util.List;
+import java.util.Map;
 
 @ModuleEntry
 public class RegionModule extends AbstractModule {
 
-  private List<Region> regions;
-
-  public RegionModule() {
-    regions = Lists.newArrayList();
-  }
+  private Map<Match, Map<String, Region>> regions = Maps.newHashMap();
 
   /**
    * @param id The ID of the region that is returned.
    * @return The region that has the given ID.
    */
-  public Region getRegionById(@NonNull String id) {
-    for (Region region : regions) {
-      if (region.getId().equalsIgnoreCase(id)) {
-        return region;
-      }
-    }
-    return null;
+  public Region getRegionById(@NonNull Match match, @NonNull String id) {
+    return regions.get(match).get(id);
   }
 
   /**
@@ -66,13 +73,54 @@ public class RegionModule extends AbstractModule {
    * @return The parsed region.
    * @throws RegionAttributeException Thrown if there are missing or invalid attributes for a region.
    */
-  public Region getRegion(Element element, String... alternateAttributes) throws RegionAttributeException {
+  public Region getRegion(Match match, Element element, String... alternateAttributes) throws RegionException {
     switch (element.getName()) {
       case "cuboid":
         return new CuboidRegion(new CuboidParser(element));
-      default:
+      case "cylinder":
+        //TODO
         return null;
+      case "block":
+        return new BlockRegion(new BlockParser(element));
+      case "sphere":
+        //TODO
+        return null;
+      case "rectangle":
+        return new RectangleRegion(new RectangleParser(element));
+      case "circle":
+        return new CircleRegion(new CircleParser(element));
+      case "half":
+        return new HalfRegion(new HalfParser(element));
+      case "below":
+        return new BelowRegion(new BelowParser(element));
+      case "above":
+        return new AboveRegion(new AboveParser(element));
+      case "empty":
+        return new EmptyRegion();
+      case "nowhere":
+        return new NowhereRegion();
+      case "everywhere":
+        return new EverywhereRegion();
+      default:
+        for (String alternateAttribute : alternateAttributes) {
+          String regionValue = element.getAttributeValue(alternateAttribute);
+          if (regionValue != null) {
+            Region region = getRegionById(match, regionValue);
+            if (region != null) {
+              return region;
+            }
+          }
+        }
+
+        String regionValue = element.getAttributeValue("id");
+        if (regionValue != null) {
+          Region region = getRegionById(match, regionValue);
+          if (region != null) {
+            return region;
+          }
+        }
     }
+    return null;
   }
 
 }

@@ -25,6 +25,8 @@
 
 package in.twizmwaz.cardinal.module.region.type.bounded;
 
+import in.twizmwaz.cardinal.module.region.parser.bounded.BlockParser;
+import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -32,13 +34,13 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockRegion extends RandomizableRegion {
+@AllArgsConstructor
+public class BlockRegion implements RandomizableRegion {
 
   private final Vector vector;
 
-  public BlockRegion(String name, Vector vector) {
-    super(name);
-    this.vector = vector;
+  public BlockRegion(BlockParser parser) {
+    this(parser.getVector());
   }
 
   @Override
@@ -49,7 +51,7 @@ public class BlockRegion extends RandomizableRegion {
   }
 
   @Override
-  public boolean contains(Vector vector) {
+  public boolean evaluate(Vector vector) {
     return vector.getBlockX() == getVector().getBlockX()
         && vector.getBlockY() == getVector().getBlockY()
         && vector.getBlockZ() == getVector().getBlockZ();

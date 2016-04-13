@@ -25,12 +25,13 @@
 
 package in.twizmwaz.cardinal.module.region.exception;
 
+import in.twizmwaz.cardinal.module.region.RegionException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public abstract class RegionAttributeException extends Exception {
+public class RegionAttributeException extends RegionException {
 
   private final String attribute;
 

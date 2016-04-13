@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -53,6 +54,10 @@ public class MaterialPattern {
 
   public void add(MaterialPattern pattern) {
     pattern.getMaterials().forEach(material -> add(material.getKey(), material.getValue()));
+  }
+
+  public boolean contains(ItemStack item) {
+    return contains(item.getType(), item.getDurability());
   }
 
   /**
@@ -84,9 +89,17 @@ public class MaterialPattern {
     MaterialPattern pattern = new MaterialPattern();
     if (in.contains(":")) {
       String[] parts = in.split(":");
-      pattern.add(Material.matchMaterial(parts[0]), Numbers.parseInteger(parts[1]));
+      Material type = Material.matchMaterial(parts[0]);
+      if (type == null) {
+        throw new IllegalArgumentException();
+      }
+      pattern.add(type, Numbers.parseInteger(parts[1]));
     } else {
-      pattern.add(Material.matchMaterial(in), ANY_DATA_VALUE);
+      Material type = Material.matchMaterial(in);
+      if (type == null) {
+        throw new IllegalArgumentException();
+      }
+      pattern.add(type, ANY_DATA_VALUE);
     }
     return pattern;
   }

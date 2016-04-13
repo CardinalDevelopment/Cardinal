@@ -25,17 +25,18 @@
 
 package in.twizmwaz.cardinal.module.region.parser.bounded;
 
+import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.InvalidRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class CuboidParser extends RegionParser {
+public class CuboidParser implements RegionParser {
 
   private final Vector min;
   private final Vector max;
@@ -46,17 +47,13 @@ public class CuboidParser extends RegionParser {
    * @param element The element.
    * @throws RegionAttributeException Thrown if the min or max attributes are missing or invalid.
    */
-  public CuboidParser(Element element) throws RegionAttributeException {
-    super(element.getAttributeValue("id"));
-
+  public CuboidParser(Element element) throws RegionException {
     String minValue = element.getAttributeValue("min");
     if (minValue == null) {
       throw new MissingRegionAttributeException("min");
     }
-    Vector min;
-    try {
-      min = Vectors.getVector(minValue);
-    } catch (NumberFormatException e) {
+    Vector min = Vectors.getVector(minValue);
+    if (min == null) {
       throw new InvalidRegionAttributeException("min");
     }
 
@@ -64,10 +61,8 @@ public class CuboidParser extends RegionParser {
     if (maxValue == null) {
       throw new MissingRegionAttributeException("max");
     }
-    Vector max;
-    try {
-      max = Vectors.getVector(maxValue);
-    } catch (NumberFormatException e) {
+    Vector max = Vectors.getVector(maxValue);
+    if (max == null) {
       throw new InvalidRegionAttributeException("max");
     }
 
