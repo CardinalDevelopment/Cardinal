@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.bounded;
 
-import in.twizmwaz.cardinal.module.region.parser.bounded.BlockParser;
+import in.twizmwaz.cardinal.module.region.parser.bounded.BlockRegionParser;
 import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -39,7 +39,7 @@ public class BlockRegion implements RandomizableRegion {
 
   private final Vector vector;
 
-  public BlockRegion(BlockParser parser) {
+  public BlockRegion(BlockRegionParser parser) {
     this(parser.getVector());
   }
 

@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.AboveParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.AboveRegionParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
 import lombok.AllArgsConstructor;
 import org.bukkit.util.Vector;
@@ -37,7 +37,7 @@ public class AboveRegion implements UnboundedRegion {
   private final double yAxis;
   private final double zAxis;
 
-  public AboveRegion(AboveParser parser) {
+  public AboveRegion(AboveRegionParser parser) {
     this(parser.getXAxis(), parser.getYAxis(), parser.getZAxis());
   }
 

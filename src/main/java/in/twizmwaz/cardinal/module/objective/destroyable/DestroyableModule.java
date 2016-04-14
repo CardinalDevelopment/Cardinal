@@ -86,7 +86,7 @@ public class DestroyableModule extends AbstractModule {
           }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{ParseUtil.getRegionError(e, "region", "destroyable")}, false));
+              new String[]{RegionModule.getRegionError(e, "region", "destroyable")}, false));
           continue;
         }
         if (region == null) {

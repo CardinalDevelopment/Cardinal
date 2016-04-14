@@ -25,13 +25,6 @@
 
 package in.twizmwaz.cardinal.util;
 
-import in.twizmwaz.cardinal.module.region.RegionException;
-import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.RegionPropertyException;
-import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.property.InvalidRegionPropertyException;
-import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import lombok.NonNull;
 import org.jdom2.Element;
 
@@ -50,33 +43,6 @@ public class ParseUtil {
       }
     }
     return null;
-  }
-
-  /**
-   * Gets an appropriate error message for a failed region parsing.
-   *
-   * @param e      The exception thrown when parsing.
-   * @param name   The name of the expected region.
-   * @param parent The module that attempted to retrieve the region.
-   * @return The error message.
-   */
-  public static String getRegionError(RegionException e, String name, String parent) {
-    if (e instanceof RegionAttributeException) {
-      RegionAttributeException exception = (RegionAttributeException) e;
-      if (exception instanceof MissingRegionAttributeException) {
-        return "Missing attribute \"" + exception.getAttribute() + "\" for " + name + " for " + parent;
-      } else if (exception instanceof InvalidRegionAttributeException) {
-        return "Invalid attribute \"" + exception.getAttribute() + "\" for " + name + " for " + parent;
-      }
-    } else if (e instanceof RegionPropertyException) {
-      RegionPropertyException exception = (RegionPropertyException) e;
-      if (exception instanceof MissingRegionPropertyException) {
-        return "Missing property \"" + exception.getProperty() + "\" for " + name + " for " + parent;
-      } else if (exception instanceof InvalidRegionPropertyException) {
-        return "Invalid property \"" + exception.getProperty() + "\" for " + name + " for " + parent;
-      }
-    }
-    return "Could not parse " + name + " for " + parent;
   }
 
 }

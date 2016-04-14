@@ -131,7 +131,7 @@ public class SpawnModule extends AbstractModule implements Listener {
         region = Cardinal.getModule(RegionModule.class).getRegion(match, regionElement);
       } catch (RegionException e) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{ParseUtil.getRegionError(e, "region", "default spawn")}, false));
+            new String[]{RegionModule.getRegionError(e, "region", "default spawn")}, false));
         continue;
       }
       if (region == null) {

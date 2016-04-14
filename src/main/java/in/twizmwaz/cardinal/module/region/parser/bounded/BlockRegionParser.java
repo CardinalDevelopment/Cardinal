@@ -23,55 +23,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.unbounded;
+package in.twizmwaz.cardinal.module.region.parser.bounded;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Numbers;
+import in.twizmwaz.cardinal.module.region.exception.property.InvalidRegionPropertyException;
+import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
+import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
+import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class AboveParser implements RegionParser {
+public class BlockRegionParser implements RegionParser {
 
-  private final double xAxis;
-  private final double yAxis;
-  private final double zAxis;
+  private Vector vector;
 
   /**
-   * Parses an element for an above region.
+   * Parses an element for a block region.
    *
    * @param element The element.
    */
-  public AboveParser(Element element) throws RegionException {
-    String xAxisValue = element.getAttributeValue("x");
-    if (xAxisValue == null) {
-      throw new MissingRegionAttributeException("x");
+  public BlockRegionParser(Element element) throws RegionException {
+    String text = element.getText();
+    if (text == null) {
+      throw new MissingRegionPropertyException("location");
     }
-    if (!Numbers.isDecimal(xAxisValue)) {
-      throw new InvalidRegionAttributeException("x");
+    Vector vector = Vectors.getVector(text);
+    if (vector == null) {
+      throw new InvalidRegionPropertyException("location");
     }
-    xAxis = Numbers.parseDouble(xAxisValue);
-
-    String yAxisValue = element.getAttributeValue("y");
-    if (yAxisValue == null) {
-      throw new MissingRegionAttributeException("y");
-    }
-    if (!Numbers.isDecimal(yAxisValue)) {
-      throw new InvalidRegionAttributeException("y");
-    }
-    yAxis = Numbers.parseDouble(yAxisValue);
-
-    String zAxisValue = element.getAttributeValue("z");
-    if (zAxisValue == null) {
-      throw new MissingRegionAttributeException("z");
-    }
-    if (!Numbers.isDecimal(zAxisValue)) {
-      throw new InvalidRegionAttributeException("z");
-    }
-    zAxis = Numbers.parseDouble(zAxisValue);
+    this.vector = vector;
   }
 
 }

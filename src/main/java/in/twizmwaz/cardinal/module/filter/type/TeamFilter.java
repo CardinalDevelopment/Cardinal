@@ -23,27 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.filter.type;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.HalfRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.team.Team;
 import lombok.AllArgsConstructor;
-import org.bukkit.util.Vector;
+import org.bukkit.entity.Player;
 
 @AllArgsConstructor
-public class HalfRegion implements UnboundedRegion {
-  //TODO
+public class TeamFilter implements Filter<Player> {
 
-  private final Vector normal;
-  private final Vector origin;
-
-  public HalfRegion(HalfRegionParser parser) {
-    this(parser.getNormal(), parser.getOrigin());
-  }
+  private final Team team;
 
   @Override
-  public boolean evaluate(Vector vector) {
-    return false;
+  public boolean evaluate(Player evaluating) {
+    Team team = Team.getTeam(evaluating);
+    return team != null && this.team.equals(team);
   }
 
 }

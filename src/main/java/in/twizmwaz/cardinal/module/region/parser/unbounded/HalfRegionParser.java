@@ -23,37 +23,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.bounded;
+package in.twizmwaz.cardinal.module.region.parser.unbounded;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.property.InvalidRegionPropertyException;
-import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
+import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class BlockParser implements RegionParser {
+public class HalfRegionParser implements RegionParser {
 
-  private Vector vector;
+  private final Vector normal;
+  private final Vector origin;
 
   /**
-   * Parses an element for a block region.
+   * Parses an element for a half region.
    *
    * @param element The element.
+   * @throws RegionException Thrown if the normal or origin attributes are missing or invalid.
    */
-  public BlockParser(Element element) throws RegionException {
-    String text = element.getText();
-    if (text == null) {
-      throw new MissingRegionPropertyException("location");
+  public HalfRegionParser(Element element) throws RegionException {
+    String normalValue = element.getAttributeValue("normal");
+    if (normalValue == null) {
+      throw new MissingRegionAttributeException("normal");
     }
-    Vector vector = Vectors.getVector(text);
-    if (vector == null) {
-      throw new InvalidRegionPropertyException("location");
+    Vector normal = Vectors.getVector(normalValue);
+    if (normal == null) {
+      throw new InvalidRegionAttributeException("normal");
     }
-    this.vector = vector;
+    this.normal = normal;
+
+    String originValue = element.getAttributeValue("origin");
+    if (originValue == null) {
+      throw new MissingRegionAttributeException("origin");
+    }
+    Vector origin = Vectors.getVector(originValue);
+    if (origin == null) {
+      throw new InvalidRegionAttributeException("origin");
+    }
+    this.origin = origin;
   }
 
 }

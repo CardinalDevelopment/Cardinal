@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.RectangleParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.RectangleRegionParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
 import org.bukkit.util.Vector;
 
@@ -34,7 +34,7 @@ public class RectangleRegion implements UnboundedRegion {
   private final Vector min;
   private final Vector max;
 
-  public RectangleRegion(RectangleParser parser) {
+  public RectangleRegion(RectangleRegionParser parser) {
     this(parser.getMin(), parser.getMax());
   }
 

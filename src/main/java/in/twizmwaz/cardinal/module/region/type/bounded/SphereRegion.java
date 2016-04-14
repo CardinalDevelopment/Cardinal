@@ -23,27 +23,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type.bounded;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.HalfRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.parser.bounded.SphereRegionParser;
+import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
 import lombok.AllArgsConstructor;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
-public class HalfRegion implements UnboundedRegion {
-  //TODO
+public class SphereRegion implements BoundedRegion {
 
-  private final Vector normal;
   private final Vector origin;
+  private final double radius;
 
-  public HalfRegion(HalfRegionParser parser) {
-    this(parser.getNormal(), parser.getOrigin());
+  public SphereRegion(SphereRegionParser parser) {
+    this(parser.getOrigin(), parser.getRadius());
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
-    return false;
+  public List<Block> getBlocks() {
+    CuboidRegion bound = new CuboidRegion(
+        new Vector(origin.getX() - radius, origin.getY() - radius, origin.getZ() - radius),
+        new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius));
+    return bound.getBlocks().stream().filter(block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5)))
+        .collect(Collectors.toList());
   }
 
+  @Override
+  public BlockRegion getCenterBlock() {
+    return new BlockRegion(origin);
+  }
+
+  @Override
+  public boolean evaluate(Vector evaluating) {
+    return evaluating.isInSphere(origin, radius);
+  }
 }

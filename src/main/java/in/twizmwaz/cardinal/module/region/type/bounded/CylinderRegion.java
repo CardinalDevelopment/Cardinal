@@ -25,52 +25,52 @@
 
 package in.twizmwaz.cardinal.module.region.type.bounded;
 
-import com.google.common.collect.Lists;
-import in.twizmwaz.cardinal.module.region.parser.bounded.CuboidRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.bounded.CylinderRegionParser;
 import in.twizmwaz.cardinal.util.Numbers;
 import lombok.AllArgsConstructor;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class CuboidRegion implements RandomizableRegion {
+public class CylinderRegion implements RandomizableRegion {
 
-  private final Vector min;
-  private final Vector max;
+  private final Vector base;
+  private final double radius;
+  private final double height;
 
-  public CuboidRegion(CuboidRegionParser parser) {
-    this(parser.getMin(), parser.getMax());
-  }
-
-  @Override
-  public List<Block> getBlocks() {
-    List<Block> blocks = Lists.newArrayList();
-    for (int x = (int) min.getX(); x < max.getX(); x++) {
-      for (int y = (int) min.getY(); y < max.getY(); y++) {
-        for (int z = (int) min.getZ(); z < max.getZ(); z++) {
-          blocks.add(new Location(null, x, y, z).getBlock()); //TODO: Get match world
-        }
-      }
-    }
-    return blocks;
-  }
-
-  @Override
-  public BlockRegion getCenterBlock() {
-    return new BlockRegion(min.getMidpoint(max));
-  }
-
-  @Override
-  public boolean evaluate(Vector vector) {
-    return vector.isInAABB(min, max);
+  public CylinderRegion(CylinderRegionParser parser) {
+    this(parser.getBase(), parser.getRadius(), parser.getHeight());
   }
 
   @Override
   public Vector getRandomPoint() {
-    return new Vector(Numbers.getRandom(min.getX(), max.getX()), Numbers.getRandom(min.getY(), max.getY()),
-        Numbers.getRandom(min.getZ(), max.getZ()));
+    double a = Numbers.getRandom(0, radius);
+    double b = Numbers.getRandom(0, height);
+    double c = Numbers.getRandom(0, 2 * Math.PI);
+
+    return new Vector(base.getX() + a * Math.cos(c), base.getY() + b, base.getZ() + a * Math.sin(c));
   }
+
+  @Override
+  public List<Block> getBlocks() {
+    CuboidRegion bound = new CuboidRegion(new Vector(base.getX() - radius, base.getY(), base.getZ() - radius),
+        new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius));
+    return bound.getBlocks().stream().filter(block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5)))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public BlockRegion getCenterBlock() {
+    return new BlockRegion(new Vector(base.getX(), base.getY() + (0.5 * height), base.getZ()));
+  }
+
+  @Override
+  public boolean evaluate(Vector evaluating) {
+    return Math.hypot(Math.abs(evaluating.getX() - base.getX()), Math.abs(evaluating.getZ() - base.getZ())) <= radius
+        && base.getY() <= evaluating.getY() && evaluating.getY() <= base.getY() + height;
+  }
+
 }

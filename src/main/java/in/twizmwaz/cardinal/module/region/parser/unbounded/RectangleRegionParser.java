@@ -29,7 +29,6 @@ import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
@@ -38,36 +37,36 @@ import org.jdom2.Element;
 import java.util.List;
 
 @Getter
-public class CircleParser implements RegionParser {
+public class RectangleRegionParser implements RegionParser {
 
-  private final Vector center;
-  private final double radius;
+  private final Vector min;
+  private final Vector max;
 
   /**
-   * Parses an element for a circle region.
+   * Parses an element for a rectangle region.
    *
    * @param element The element.
-   * @throws RegionException Thrown if the center or radius attributes are missing or invalid.
    */
-  public CircleParser(Element element) throws RegionException {
-    String centerValue = element.getAttributeValue("center");
-    if (centerValue == null) {
-      throw new MissingRegionAttributeException("center");
+  public RectangleRegionParser(Element element) throws RegionException {
+    String minValue = element.getAttributeValue("min");
+    if (minValue == null) {
+      throw new MissingRegionAttributeException("min");
     }
-    List<Double> coords = Vectors.getCoordinates(centerValue);
+    List<Double> coords = Vectors.getCoordinates(minValue);
     if (coords == null || coords.size() != 2) {
-      throw new InvalidRegionAttributeException("center");
+      throw new InvalidRegionAttributeException("min");
     }
-    center = new Vector(coords.get(0), 0, coords.get(1));
+    min = new Vector(coords.get(0), Double.NEGATIVE_INFINITY, coords.get(1));
 
-    String radiusValue = element.getAttributeValue("radius");
-    if (radiusValue == null) {
-      throw new MissingRegionAttributeException("radius");
+    String maxValue = element.getAttributeValue("max");
+    if (maxValue == null) {
+      throw new MissingRegionAttributeException("max");
     }
-    if (!Numbers.isDecimal(radiusValue)) {
-      throw new InvalidRegionAttributeException("radius");
+    coords = Vectors.getCoordinates(maxValue);
+    if (coords == null || coords.size() != 2) {
+      throw new InvalidRegionAttributeException("max");
     }
-    radius = Numbers.parseDouble(radiusValue);
+    max = new Vector(coords.get(0), Double.POSITIVE_INFINITY, coords.get(1));
   }
 
 }

@@ -87,7 +87,7 @@ public class CoreModule extends AbstractModule {
           }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{ParseUtil.getRegionError(e, "region", "core")}, false));
+              new String[]{RegionModule.getRegionError(e, "region", "core")}, false));
           continue;
         }
         if (region == null) {

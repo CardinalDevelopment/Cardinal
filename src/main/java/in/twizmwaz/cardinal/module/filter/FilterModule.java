@@ -30,6 +30,7 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.filter.exception.FilterPropertyException;
 import in.twizmwaz.cardinal.module.filter.exception.property.InvalidFilterPropertyException;
 import in.twizmwaz.cardinal.module.filter.exception.property.MissingFilterPropertyException;
 import in.twizmwaz.cardinal.module.filter.parser.EntityFilterParser;
@@ -45,7 +46,12 @@ import in.twizmwaz.cardinal.module.filter.type.ObjectiveFilter;
 import in.twizmwaz.cardinal.module.filter.type.RandomFilter;
 import in.twizmwaz.cardinal.module.filter.type.SingletonFilter;
 import in.twizmwaz.cardinal.module.filter.type.SprintingFilter;
+import in.twizmwaz.cardinal.module.filter.type.TeamFilter;
 import in.twizmwaz.cardinal.module.filter.type.WalkingFilter;
+import in.twizmwaz.cardinal.module.objective.core.CoreModule;
+import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
+import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
+import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
 import org.jdom2.Element;
 
@@ -55,27 +61,21 @@ public class FilterModule extends AbstractModule {
 
   private Map<Match, Map<String, Filter>> filters = Maps.newHashMap();
 
+  public FilterModule() {
+    depends = new Class[]{CoreModule.class, DestroyableModule.class, TeamModule.class, WoolModule.class};
+  }
+
   @Override
   public boolean loadMatch(@NonNull Match match) {
-    Map<String, Filter> filters = Maps.newHashMap();
-
-    for (Element filtersElement : match.getMap().getDocument().getRootElement().getChildren("type")) {
+    for (Element filtersElement : match.getMap().getDocument().getRootElement().getChildren("filters")) {
       for (Element filterElement : filtersElement.getChildren()) {
         try {
           getFilter(match, filterElement);
-        } catch (MissingFilterPropertyException e) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"No " + e.getProperty() + " property specified for filter"}, false));
-        } catch (InvalidFilterPropertyException e) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid " + e.getProperty() + " property specified for filter"}, false));
         } catch (FilterException e) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Could not parse filter"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{getFilterError(e, "filter", null)}, false));
         }
       }
     }
-
-    this.filters.put(match, filters);
     return true;
   }
 
@@ -98,18 +98,19 @@ public class FilterModule extends AbstractModule {
    * @throws FilterException Thrown if the filter cannot be parsed due to missing or invalid information.
    */
   public Filter getFilter(Match match, Element element, String... alternateAttributes) throws FilterException {
+    String id = element.getAttributeValue("id");
     switch (element.getName()) {
       case "team": {
         TeamFilterParser parser = new TeamFilterParser(element);
-        return new SingletonFilter<>(parser.getTeam());
+        return checkFilter(match, id, new TeamFilter(parser.getTeam()));
       }
       case "material": {
         MaterialFilterParser parser = new MaterialFilterParser(element);
-        return new SingletonFilter<>(parser.getPattern());
+        return checkFilter(match, id, new SingletonFilter<>(parser.getPattern()));
       }
       case "spawn": {
         SpawnFilterParser parser = new SpawnFilterParser(element);
-        return new SingletonFilter<>(parser.getSpawnReason());
+        return checkFilter(match, id, new SingletonFilter<>(parser.getSpawnReason()));
       }
       case "mob": {
         //TODO
@@ -117,7 +118,7 @@ public class FilterModule extends AbstractModule {
       }
       case "entity": {
         EntityFilterParser parser = new EntityFilterParser(element);
-        return new SingletonFilter<>(parser.getEntityType());
+        return checkFilter(match, id, new SingletonFilter<>(parser.getEntityType()));
       }
       case "kill-streak":
         //TODO: Track killstreaks
@@ -127,26 +128,26 @@ public class FilterModule extends AbstractModule {
         return null;
       case "random": {
         RandomFilterParser parser = new RandomFilterParser(element);
-        return new RandomFilter(parser);
+        return checkFilter(match, id, new RandomFilter(parser));
       }
       case "crouching": {
-        return new CrouchingFilter();
+        return checkFilter(match, id, new CrouchingFilter());
       }
       case "walking": {
-        return new WalkingFilter();
+        return checkFilter(match, id, new WalkingFilter());
       }
       case "sprinting": {
-        return new SprintingFilter();
+        return checkFilter(match, id, new SprintingFilter());
       }
       case "flying": {
-        return new FlyingFilter();
+        return checkFilter(match, id, new FlyingFilter());
       }
       case "can-fly": {
-        return new CanFlyFilter();
+        return checkFilter(match, id, new CanFlyFilter());
       }
       case "objective": {
         ObjectiveFilterParser parser = new ObjectiveFilterParser(element);
-        return new ObjectiveFilter(parser.getObjective());
+        return checkFilter(match, id, new ObjectiveFilter(parser.getObjective()));
       }
       case "carrying": {
         //TODO
@@ -166,7 +167,7 @@ public class FilterModule extends AbstractModule {
           if (filterValue != null) {
             Filter filter = getFilterById(filterValue);
             if (filter != null) {
-              return filter;
+              return checkFilter(match, id, filter);
             }
           }
         }
@@ -175,11 +176,40 @@ public class FilterModule extends AbstractModule {
         if (filterValue != null) {
           Filter filter = getFilterById(filterValue);
           if (filter != null) {
-            return filter;
+            return checkFilter(match, id, filter);
           }
         }
     }
     return null;
+  }
+
+  private Filter checkFilter(Match match, String id, Filter filter) {
+    if (id != null) {
+      filters.get(match).put(id, filter);
+    }
+    return filter;
+  }
+
+  /**
+   * Gets an appropriate error message for a failed filter parsing.
+   *
+   * @param e      The exception thrown when parsing.
+   * @param name   The name of the expected filter.
+   * @param parent The module that attempted to retrieve the filter.
+   * @return The error message.
+   */
+  public static String getFilterError(FilterException e, String name, String parent) {
+    if (e instanceof FilterPropertyException) {
+      FilterPropertyException exception = (FilterPropertyException) e;
+      if (exception instanceof MissingFilterPropertyException) {
+        return "Missing property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
+            + (parent != null ? " for " + parent : "");
+      } else if (exception instanceof InvalidFilterPropertyException) {
+        return "Invalid property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
+            + (parent != null ? " for " + parent : "");
+      }
+    }
+    return "Could not parse " + name + (parent != null ? " for " + parent : "");
   }
 
 }

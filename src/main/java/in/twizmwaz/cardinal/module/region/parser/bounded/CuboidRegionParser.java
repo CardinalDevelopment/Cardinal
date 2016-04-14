@@ -23,10 +23,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.unbounded;
+package in.twizmwaz.cardinal.module.region.parser.bounded;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.util.Vectors;
@@ -35,37 +36,38 @@ import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class HalfParser implements RegionParser {
+public class CuboidRegionParser implements RegionParser {
 
-  private final Vector normal;
-  private final Vector origin;
+  private final Vector min;
+  private final Vector max;
 
   /**
-   * Parses an element for a half region.
+   * Parses an element for a cuboid region.
    *
    * @param element The element.
-   * @throws RegionException Thrown if the normal or origin attributes are missing or invalid.
+   * @throws RegionAttributeException Thrown if the min or max attributes are missing or invalid.
    */
-  public HalfParser(Element element) throws RegionException {
-    String normalValue = element.getAttributeValue("normal");
-    if (normalValue == null) {
-      throw new MissingRegionAttributeException("normal");
+  public CuboidRegionParser(Element element) throws RegionException {
+    String minValue = element.getAttributeValue("min");
+    if (minValue == null) {
+      throw new MissingRegionAttributeException("min");
     }
-    Vector normal = Vectors.getVector(normalValue);
-    if (normal == null) {
-      throw new InvalidRegionAttributeException("normal");
+    Vector min = Vectors.getVector(minValue);
+    if (min == null) {
+      throw new InvalidRegionAttributeException("min");
     }
-    this.normal = normal;
 
-    String originValue = element.getAttributeValue("origin");
-    if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
+    String maxValue = element.getAttributeValue("max");
+    if (maxValue == null) {
+      throw new MissingRegionAttributeException("max");
     }
-    Vector origin = Vectors.getVector(originValue);
-    if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
+    Vector max = Vectors.getVector(maxValue);
+    if (max == null) {
+      throw new InvalidRegionAttributeException("max");
     }
-    this.origin = origin;
+
+    this.min = Vector.getMinimum(min, max);
+    this.max = Vector.getMaximum(min, max);
   }
 
 }

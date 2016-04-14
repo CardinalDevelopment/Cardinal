@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.unbounded;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.CircleParser;
+import in.twizmwaz.cardinal.module.region.parser.unbounded.CircleRegionParser;
 import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
 import lombok.AllArgsConstructor;
 import org.bukkit.util.Vector;
@@ -36,7 +36,7 @@ public class CircleRegion implements UnboundedRegion {
   private final Vector center;
   private final double radius;
 
-  public CircleRegion(CircleParser parser) {
+  public CircleRegion(CircleRegionParser parser) {
     this(parser.getCenter(), parser.getRadius());
   }
 
