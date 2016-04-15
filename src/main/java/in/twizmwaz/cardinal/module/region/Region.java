@@ -29,4 +29,7 @@ import in.twizmwaz.cardinal.module.filter.Filter;
 import org.bukkit.util.Vector;
 
 public interface Region extends Filter<Vector> {
+
+    RegionBounds getBounds();
+
 }

@@ -38,7 +38,7 @@ import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.type.bounded.RandomizableRegion;
+import in.twizmwaz.cardinal.module.region.type.RandomizableRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.ListUtil;

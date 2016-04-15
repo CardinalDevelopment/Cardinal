@@ -23,51 +23,59 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.bounded;
+package in.twizmwaz.cardinal.module.region.parser;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class CuboidRegionParser implements RegionParser {
+public class CylinderRegionParser implements RegionParser {
 
-  private final Vector min;
-  private final Vector max;
+  private final Vector base;
+  private final double radius;
+  private final double height;
 
   /**
-   * Parses an element for a cuboid region.
+   * Parses an element for a cylinder region.
    *
    * @param element The element.
-   * @throws RegionAttributeException Thrown if the min or max attributes are missing or invalid.
+   * @throws RegionException Thrown if the base, radius, or height attributes are missing or invalid.
    */
-  public CuboidRegionParser(Element element) throws RegionException {
-    String minValue = element.getAttributeValue("min");
-    if (minValue == null) {
-      throw new MissingRegionAttributeException("min");
+  public CylinderRegionParser(Element element) throws RegionException {
+    String baseValue = element.getAttributeValue("base");
+    if (baseValue == null) {
+      throw new MissingRegionAttributeException("base");
     }
-    Vector min = Vectors.getVector(minValue);
-    if (min == null) {
-      throw new InvalidRegionAttributeException("min");
+    Vector base = Vectors.getVector(baseValue);
+    if (base == null) {
+      throw new InvalidRegionAttributeException("base");
     }
+    this.base = base;
 
-    String maxValue = element.getAttributeValue("max");
-    if (maxValue == null) {
-      throw new MissingRegionAttributeException("max");
+    String radiusValue = element.getAttributeValue("radius");
+    if (radiusValue == null) {
+      throw new MissingRegionAttributeException("radius");
     }
-    Vector max = Vectors.getVector(maxValue);
-    if (max == null) {
-      throw new InvalidRegionAttributeException("max");
+    if (!Numbers.isDecimal("radius")) {
+      throw new InvalidRegionAttributeException("radius");
     }
+    radius = Numbers.parseDouble("radius");
 
-    this.min = Vector.getMinimum(min, max);
-    this.max = Vector.getMaximum(min, max);
+    String heightValue = element.getAttributeValue("height");
+    if (heightValue == null) {
+      throw new MissingRegionAttributeException("height");
+    }
+    if (!Numbers.isDecimal("height")) {
+      throw new InvalidRegionAttributeException("height");
+    }
+    height = Numbers.parseDouble("height");
   }
 
 }

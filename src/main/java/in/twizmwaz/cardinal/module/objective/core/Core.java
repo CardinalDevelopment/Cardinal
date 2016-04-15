@@ -39,7 +39,7 @@ import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
-import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
+import in.twizmwaz.cardinal.module.region.type.BlockBoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Components;
@@ -64,7 +64,7 @@ import java.util.stream.Collectors;
 public class Core extends Objective implements Listener {
 
   private final String name;
-  private final BoundedRegion region;
+  private final BlockBoundedRegion region;
   private final int leak;
   private final MaterialPattern material;
   private final Team team;
@@ -94,7 +94,7 @@ public class Core extends Objective implements Listener {
    * @param proximityHorizontal Determines if only horizontal distance is considered when
    *                            calculating proximity.
    */
-  public Core(Match match, String id, String name, boolean required, BoundedRegion region, int leak,
+  public Core(Match match, String id, String name, boolean required, BlockBoundedRegion region, int leak,
               MaterialPattern material, Team team, boolean modeChanges,
               boolean show, ProximityMetric proximityMetric, boolean proximityHorizontal) {
     super(match, id, required, show);

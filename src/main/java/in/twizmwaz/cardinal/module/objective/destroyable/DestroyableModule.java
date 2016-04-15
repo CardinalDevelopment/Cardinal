@@ -36,7 +36,7 @@ import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
+import in.twizmwaz.cardinal.module.region.type.BlockBoundedRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.MaterialPattern;
@@ -94,12 +94,12 @@ public class DestroyableModule extends AbstractModule {
               new String[]{"Invalid region specified for destroyable"}, false));
           continue;
         }
-        if (!(region instanceof BoundedRegion)) {
+        if (!region.getBounds().isBounded()) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{"Region specified for destroyable must be a bounded region"}, false));
           continue;
         }
-        BoundedRegion boundedRegion = (BoundedRegion) region;
+        BlockBoundedRegion boundedRegion = new BlockBoundedRegion(region);
 
         MaterialPattern materials = new MaterialPattern();
         String materialsValue = ParseUtil.getFirstAttribute("materials", destroyableElement,

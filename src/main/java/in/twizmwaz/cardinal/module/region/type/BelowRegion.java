@@ -23,14 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.bounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.BelowRegionParser;
+import in.twizmwaz.cardinal.util.Vectors;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
+@AllArgsConstructor
+public class BelowRegion implements Region {
 
-public interface RandomizableRegion extends BoundedRegion {
+  private final Vector max;
+  @Getter
+  private final RegionBounds bounds;
 
-  Vector getRandomPoint();
+  public BelowRegion(Vector max) {
+    this(max, new RegionBounds(Vectors.min(), max));
+  }
+
+  public BelowRegion(BelowRegionParser parser) {
+    this(parser.getMax());
+  }
+
+  @Override
+  public boolean evaluate(Vector vector) {
+    return max.isGreater(vector);
+  }
 
 }

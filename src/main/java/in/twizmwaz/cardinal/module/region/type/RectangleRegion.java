@@ -26,15 +26,39 @@
 package in.twizmwaz.cardinal.module.region.type;
 
 import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.RectangleRegionParser;
+import lombok.Getter;
+import org.bukkit.util.Vector;
 
-import java.util.List;
+public class RectangleRegion implements Region {
 
-public interface BoundedRegion extends Region {
+  private final Vector min;
+  private final Vector max;
+  @Getter
+  private final RegionBounds bounds;
 
-  List<Block> getBlocks();
+  public RectangleRegion(RectangleRegionParser parser) {
+    this(parser.getMin(), parser.getMax());
+  }
 
-  BlockRegion getCenterBlock();
+  /**
+   * @param min The rectangle's minimum bound.
+   * @param max The rectangle's maximum bound.
+   */
+  public RectangleRegion(Vector min, Vector max) {
+    this.min = Vector.getMinimum(min, max);
+    this.min.setY(Double.NEGATIVE_INFINITY);
+
+    this.max = Vector.getMaximum(min, max);
+    this.max.setY(Double.POSITIVE_INFINITY);
+
+    this.bounds = new RegionBounds(min, max);
+  }
+
+  @Override
+  public boolean evaluate(Vector vector) {
+    return vector.isInAABB(min, max);
+  }
 
 }

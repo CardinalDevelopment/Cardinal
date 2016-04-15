@@ -23,43 +23,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.bounded;
+package in.twizmwaz.cardinal.module.region.parser;
 
-import in.twizmwaz.cardinal.module.region.parser.bounded.SphereRegionParser;
-import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
-import lombok.AllArgsConstructor;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.RegionException;
+import in.twizmwaz.cardinal.module.region.RegionParser;
+import in.twizmwaz.cardinal.module.region.exception.property.InvalidRegionPropertyException;
+import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
+import in.twizmwaz.cardinal.util.Vectors;
+import lombok.Getter;
 import org.bukkit.util.Vector;
+import org.jdom2.Element;
 
-import java.util.List;
-import java.util.stream.Collectors;
+@Getter
+public class BlockRegionParser implements RegionParser {
 
-@AllArgsConstructor
-public class SphereRegion implements BoundedRegion {
+  private Vector vector;
 
-  private final Vector origin;
-  private final double radius;
-
-  public SphereRegion(SphereRegionParser parser) {
-    this(parser.getOrigin(), parser.getRadius());
+  /**
+   * Parses an element for a block region.
+   *
+   * @param element The element.
+   */
+  public BlockRegionParser(Element element) throws RegionException {
+    String text = element.getText();
+    if (text == null) {
+      throw new MissingRegionPropertyException("location");
+    }
+    Vector vector = Vectors.getVector(text);
+    if (vector == null) {
+      throw new InvalidRegionPropertyException("location");
+    }
+    this.vector = vector;
   }
 
-  @Override
-  public List<Block> getBlocks() {
-    CuboidRegion bound = new CuboidRegion(
-        new Vector(origin.getX() - radius, origin.getY() - radius, origin.getZ() - radius),
-        new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius));
-    return bound.getBlocks().stream().filter(block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5)))
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public BlockRegion getCenterBlock() {
-    return new BlockRegion(origin);
-  }
-
-  @Override
-  public boolean evaluate(Vector evaluating) {
-    return evaluating.isInSphere(origin, radius);
-  }
 }

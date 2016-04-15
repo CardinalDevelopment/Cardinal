@@ -23,16 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
 import org.bukkit.util.Vector;
 
-public class EverywhereRegion implements UnboundedRegion {
+public class EmptyRegion implements Region {
 
   @Override
   public boolean evaluate(Vector vector) {
-    return true;
+    return false;
+  }
+
+  @Override
+  public RegionBounds getBounds() {
+    return RegionBounds.empty();
   }
 
 }

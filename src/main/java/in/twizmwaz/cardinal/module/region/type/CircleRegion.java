@@ -23,36 +23,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.RectangleRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.CircleRegionParser;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
-public class RectangleRegion implements UnboundedRegion {
+@AllArgsConstructor
+public class CircleRegion implements Region {
 
-  private final Vector min;
-  private final Vector max;
+  private final Vector center;
+  private final double radius;
+  @Getter
+  private final RegionBounds bounds;
 
-  public RectangleRegion(RectangleRegionParser parser) {
-    this(parser.getMin(), parser.getMax());
+  public CircleRegion(Vector center, double radius) {
+    this(center, radius, new RegionBounds(
+        new Vector(center.getX() - radius, Double.NEGATIVE_INFINITY, center.getZ() - radius),
+        new Vector(center.getX() + radius, Double.POSITIVE_INFINITY, center.getZ() + radius)));
   }
 
-  /**
-   * @param min The rectangle's minimum bound.
-   * @param max The rectangle's maximum bound.
-   */
-  public RectangleRegion(Vector min, Vector max) {
-    this.min = Vector.getMinimum(min, max);
-    this.min.setY(Double.NEGATIVE_INFINITY);
-
-    this.max = Vector.getMaximum(min, max);
-    this.max.setY(Double.POSITIVE_INFINITY);
+  public CircleRegion(CircleRegionParser parser) {
+    this(parser.getCenter(), parser.getRadius());
   }
 
   @Override
   public boolean evaluate(Vector vector) {
-    return vector.isInAABB(min, max);
+    return Math.hypot(Math.abs(vector.getX() - center.getX()), Math.abs(vector.getZ() - center.getZ())) <= radius;
   }
 
 }

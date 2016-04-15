@@ -23,27 +23,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.exception.operation;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.AboveRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.RegionException;
 import lombok.AllArgsConstructor;
-import org.bukkit.util.Vector;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
-public class AboveRegion implements UnboundedRegion {
+public class RegionOperationException extends RegionException {
 
-  private final double xAxis;
-  private final double yAxis;
-  private final double zAxis;
-
-  public AboveRegion(AboveRegionParser parser) {
-    this(parser.getXAxis(), parser.getYAxis(), parser.getZAxis());
-  }
-
-  @Override
-  public boolean evaluate(Vector vector) {
-    return vector.getX() > xAxis && vector.getY() > yAxis && vector.getZ() > zAxis;
-  }
+  String message;
 
 }

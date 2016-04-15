@@ -23,37 +23,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.bounded;
+package in.twizmwaz.cardinal.module.region.parser;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.property.InvalidRegionPropertyException;
-import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
+import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
-@Getter
-public class BlockRegionParser implements RegionParser {
+import java.util.List;
 
-  private Vector vector;
+@Getter
+public class CircleRegionParser implements RegionParser {
+
+  private final Vector center;
+  private final double radius;
 
   /**
-   * Parses an element for a block region.
+   * Parses an element for a circle region.
    *
    * @param element The element.
+   * @throws RegionException Thrown if the center or radius attributes are missing or invalid.
    */
-  public BlockRegionParser(Element element) throws RegionException {
-    String text = element.getText();
-    if (text == null) {
-      throw new MissingRegionPropertyException("location");
+  public CircleRegionParser(Element element) throws RegionException {
+    String centerValue = element.getAttributeValue("center");
+    if (centerValue == null) {
+      throw new MissingRegionAttributeException("center");
     }
-    Vector vector = Vectors.getVector(text);
-    if (vector == null) {
-      throw new InvalidRegionPropertyException("location");
+    List<Double> coords = Vectors.getCoordinates(centerValue);
+    if (coords == null || coords.size() != 2) {
+      throw new InvalidRegionAttributeException("center");
     }
-    this.vector = vector;
+    center = new Vector(coords.get(0), 0, coords.get(1));
+
+    String radiusValue = element.getAttributeValue("radius");
+    if (radiusValue == null) {
+      throw new MissingRegionAttributeException("radius");
+    }
+    if (!Numbers.isDecimal(radiusValue)) {
+      throw new InvalidRegionAttributeException("radius");
+    }
+    radius = Numbers.parseDouble(radiusValue);
   }
 
 }

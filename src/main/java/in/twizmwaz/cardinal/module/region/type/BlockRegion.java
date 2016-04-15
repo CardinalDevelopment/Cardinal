@@ -23,27 +23,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.HalfRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.BlockRegionParser;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 @AllArgsConstructor
-public class HalfRegion implements UnboundedRegion {
-  //TODO
+public class BlockRegion implements RandomizableRegion {
 
-  private final Vector normal;
-  private final Vector origin;
+  private final Vector vector;
+  @Getter
+  private final RegionBounds bounds;
 
-  public HalfRegion(HalfRegionParser parser) {
-    this(parser.getNormal(), parser.getOrigin());
+  public BlockRegion(Vector vector) {
+    this(vector, new RegionBounds(vector, vector.clone().add(0.5, 0.5, 0.5)));
+  }
+
+  public BlockRegion(BlockRegionParser parser) {
+    this(parser.getVector());
   }
 
   @Override
   public boolean evaluate(Vector vector) {
-    return false;
+    return vector.getBlockX() == getVector().getBlockX()
+        && vector.getBlockY() == getVector().getBlockY()
+        && vector.getBlockZ() == getVector().getBlockZ();
+  }
+
+  public Vector getVector() {
+    return vector.clone().add(0.5, 0.5, 0.5);
+  }
+
+  public Location getLocation() {
+    return getVector().toLocation(null); //TODO: Get match world
+  }
+
+  public Block getBlock() {
+    return getLocation().getBlock();
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    return new Vector(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
   }
 
 }

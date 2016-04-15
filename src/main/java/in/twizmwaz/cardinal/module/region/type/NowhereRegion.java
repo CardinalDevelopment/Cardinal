@@ -23,59 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.bounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.parser.bounded.BlockRegionParser;
-import lombok.AllArgsConstructor;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@AllArgsConstructor
-public class BlockRegion implements RandomizableRegion {
-
-  private final Vector vector;
-
-  public BlockRegion(BlockRegionParser parser) {
-    this(parser.getVector());
-  }
-
-  @Override
-  public List<Block> getBlocks() {
-    List<Block> blocks = new ArrayList<>();
-    blocks.add(getBlock());
-    return blocks;
-  }
+public class NowhereRegion implements Region {
 
   @Override
   public boolean evaluate(Vector vector) {
-    return vector.getBlockX() == getVector().getBlockX()
-        && vector.getBlockY() == getVector().getBlockY()
-        && vector.getBlockZ() == getVector().getBlockZ();
+    return false;
   }
 
   @Override
-  public BlockRegion getCenterBlock() {
-    return this;
+  public RegionBounds getBounds() {
+    return RegionBounds.empty();
   }
 
-  public Vector getVector() {
-    return vector.clone().add(0.5, 0.5, 0.5);
-  }
-
-  public Location getLocation() {
-    return getVector().toLocation(null); //TODO: Get match world
-  }
-
-  public Block getBlock() {
-    return getLocation().getBlock();
-  }
-
-  @Override
-  public Vector getRandomPoint() {
-    return new Vector(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-  }
 }

@@ -23,16 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.Region;
 import org.bukkit.util.Vector;
 
-public class NowhereRegion implements UnboundedRegion {
 
-  @Override
-  public boolean evaluate(Vector vector) {
-    return false;
-  }
+public interface RandomizableRegion extends Region {
+
+  Vector getRandomPoint();
 
 }

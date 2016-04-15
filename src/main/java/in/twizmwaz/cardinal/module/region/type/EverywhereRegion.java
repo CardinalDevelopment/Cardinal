@@ -26,6 +26,19 @@
 package in.twizmwaz.cardinal.module.region.type;
 
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import org.bukkit.util.Vector;
 
-public interface UnboundedRegion extends Region {
+public class EverywhereRegion implements Region {
+
+  @Override
+  public boolean evaluate(Vector vector) {
+    return true;
+  }
+
+  @Override
+  public RegionBounds getBounds() {
+    return RegionBounds.unbounded();
+  }
+
 }

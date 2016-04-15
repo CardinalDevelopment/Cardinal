@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.spawn;
 
-import in.twizmwaz.cardinal.module.region.type.bounded.RandomizableRegion;
+import in.twizmwaz.cardinal.module.region.type.RandomizableRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

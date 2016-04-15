@@ -23,55 +23,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.unbounded;
+package in.twizmwaz.cardinal.module.region.parser;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
+import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Numbers;
+import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
+import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class BelowRegionParser implements RegionParser {
+public class CuboidRegionParser implements RegionParser {
 
-  private final double xAxis;
-  private final double yAxis;
-  private final double zAxis;
+  private final Vector min;
+  private final Vector max;
 
   /**
-   * Parses an element for a below region.
+   * Parses an element for a cuboid region.
    *
    * @param element The element.
+   * @throws RegionAttributeException Thrown if the min or max attributes are missing or invalid.
    */
-  public BelowRegionParser(Element element) throws RegionException {
-    String xAxisValue = element.getAttributeValue("x");
-    if (xAxisValue == null) {
-      throw new MissingRegionAttributeException("x");
+  public CuboidRegionParser(Element element) throws RegionException {
+    String minValue = element.getAttributeValue("min");
+    if (minValue == null) {
+      throw new MissingRegionAttributeException("min");
     }
-    if (!Numbers.isDecimal(xAxisValue)) {
-      throw new InvalidRegionAttributeException("x");
+    Vector min = Vectors.getVector(minValue);
+    if (min == null) {
+      throw new InvalidRegionAttributeException("min");
     }
-    xAxis = Numbers.parseDouble(xAxisValue);
 
-    String yAxisValue = element.getAttributeValue("y");
-    if (yAxisValue == null) {
-      throw new MissingRegionAttributeException("y");
+    String maxValue = element.getAttributeValue("max");
+    if (maxValue == null) {
+      throw new MissingRegionAttributeException("max");
     }
-    if (!Numbers.isDecimal(yAxisValue)) {
-      throw new InvalidRegionAttributeException("y");
+    Vector max = Vectors.getVector(maxValue);
+    if (max == null) {
+      throw new InvalidRegionAttributeException("max");
     }
-    yAxis = Numbers.parseDouble(yAxisValue);
 
-    String zAxisValue = element.getAttributeValue("z");
-    if (zAxisValue == null) {
-      throw new MissingRegionAttributeException("z");
-    }
-    if (!Numbers.isDecimal(zAxisValue)) {
-      throw new InvalidRegionAttributeException("z");
-    }
-    zAxis = Numbers.parseDouble(zAxisValue);
+    this.min = Vector.getMinimum(min, max);
+    this.max = Vector.getMaximum(min, max);
   }
 
 }

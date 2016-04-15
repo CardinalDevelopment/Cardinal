@@ -23,16 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.bounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.parser.bounded.CylinderRegionParser;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.CylinderRegionParser;
 import in.twizmwaz.cardinal.util.Numbers;
 import lombok.AllArgsConstructor;
-import org.bukkit.block.Block;
+import lombok.Getter;
 import org.bukkit.util.Vector;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class CylinderRegion implements RandomizableRegion {
@@ -40,6 +38,14 @@ public class CylinderRegion implements RandomizableRegion {
   private final Vector base;
   private final double radius;
   private final double height;
+  @Getter
+  private final RegionBounds bounds;
+
+  public CylinderRegion(Vector base, double radius, double height) {
+    this(base, radius, height, new RegionBounds(
+        new Vector(base.getX() - radius, base.getY(), base.getZ() - radius),
+        new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius)));
+  }
 
   public CylinderRegion(CylinderRegionParser parser) {
     this(parser.getBase(), parser.getRadius(), parser.getHeight());
@@ -52,19 +58,6 @@ public class CylinderRegion implements RandomizableRegion {
     double c = Numbers.getRandom(0, 2 * Math.PI);
 
     return new Vector(base.getX() + a * Math.cos(c), base.getY() + b, base.getZ() + a * Math.sin(c));
-  }
-
-  @Override
-  public List<Block> getBlocks() {
-    CuboidRegion bound = new CuboidRegion(new Vector(base.getX() - radius, base.getY(), base.getZ() - radius),
-        new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius));
-    return bound.getBlocks().stream().filter(block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5)))
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public BlockRegion getCenterBlock() {
-    return new BlockRegion(new Vector(base.getX(), base.getY() + (0.5 * height), base.getZ()));
   }
 
   @Override

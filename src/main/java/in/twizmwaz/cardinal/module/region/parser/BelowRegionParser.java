@@ -23,49 +23,44 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.unbounded;
+package in.twizmwaz.cardinal.module.region.parser;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class HalfRegionParser implements RegionParser {
+public class BelowRegionParser implements RegionParser {
 
-  private final Vector normal;
-  private final Vector origin;
+  private final Vector max;
 
   /**
-   * Parses an element for a half region.
+   * Parses an element for a below region.
    *
    * @param element The element.
-   * @throws RegionException Thrown if the normal or origin attributes are missing or invalid.
    */
-  public HalfRegionParser(Element element) throws RegionException {
-    String normalValue = element.getAttributeValue("normal");
-    if (normalValue == null) {
-      throw new MissingRegionAttributeException("normal");
-    }
-    Vector normal = Vectors.getVector(normalValue);
-    if (normal == null) {
-      throw new InvalidRegionAttributeException("normal");
-    }
-    this.normal = normal;
+  public BelowRegionParser(Element element) throws RegionException {
+    String xAxisValue = element.getAttributeValue("x");
+    if (xAxisValue != null && !Numbers.isDecimal(xAxisValue))
+      throw new InvalidRegionAttributeException("x");
 
-    String originValue = element.getAttributeValue("origin");
-    if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
-    }
-    Vector origin = Vectors.getVector(originValue);
-    if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
-    }
-    this.origin = origin;
+    String yAxisValue = element.getAttributeValue("y");
+    if (yAxisValue != null && !Numbers.isDecimal(yAxisValue))
+      throw new InvalidRegionAttributeException("y");
+
+    String zAxisValue = element.getAttributeValue("z");
+    if (zAxisValue != null && !Numbers.isDecimal(zAxisValue))
+      throw new InvalidRegionAttributeException("z");
+
+    Double
+            x = Numbers.parseDouble(element.getAttributeValue("x"), Double.POSITIVE_INFINITY),
+            y = Numbers.parseDouble(element.getAttributeValue("y"), Double.POSITIVE_INFINITY),
+            z = Numbers.parseDouble(element.getAttributeValue("z"), Double.POSITIVE_INFINITY);
+    max = new Vector(x, y, z);
   }
 
 }

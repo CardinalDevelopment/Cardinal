@@ -66,4 +66,23 @@ public class Vectors {
     return coordinates;
   }
 
+  public static Vector min() {
+    return new Vector(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+  }
+
+  public static Vector max() {
+    return new Vector(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+  }
+
+  public static Vector getMirroredVector(Vector vector, Vector origin, Vector normal) {
+    vector = vector.minus(origin);
+    vector = vector.minus(normal.times(vector.dot(normal)).times(2)).add(origin);
+    vector = new Vector(round(vector.getX()), round(vector.getY()), round(vector.getZ()));
+    return vector;
+  }
+
+  public static double round(double d) {
+    return (double) Math.round(d * 10) / 10D;
+  }
+
 }

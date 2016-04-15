@@ -59,6 +59,18 @@ public class Numbers {
 
   /**
    * @param in The input string.
+   * @param fallback The double fallback if parsing fails.
+   * @return The parsed double based on the input string.
+   */
+  public static double parseDouble(String in, double fallback) {
+    if (in == null) {
+      return fallback;
+    }
+    return parseDouble(in);
+  }
+
+  /**
+   * @param in The input string.
    * @return The parsed integer based on the input string.
    */
   public static int parseInteger(String in) {

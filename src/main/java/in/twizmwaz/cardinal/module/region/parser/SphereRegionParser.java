@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.bounded;
+package in.twizmwaz.cardinal.module.region.parser;
 
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
@@ -36,46 +36,36 @@ import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class CylinderRegionParser implements RegionParser {
+public class SphereRegionParser implements RegionParser {
 
-  private final Vector base;
+  private final Vector origin;
   private final double radius;
-  private final double height;
 
   /**
-   * Parses an element for a cylinder region.
+   * Parses an element for a sphere region.
    *
    * @param element The element.
-   * @throws RegionException Thrown if the base, radius, or height attributes are missing or invalid.
+   * @throws RegionException Thrown if the origin or radius attributes are missing or invalid.
    */
-  public CylinderRegionParser(Element element) throws RegionException {
-    String baseValue = element.getAttributeValue("base");
-    if (baseValue == null) {
-      throw new MissingRegionAttributeException("base");
+  public SphereRegionParser(Element element) throws RegionException {
+    String originValue = element.getAttributeValue("origin");
+    if (originValue == null) {
+      throw new MissingRegionAttributeException("origin");
     }
-    Vector base = Vectors.getVector(baseValue);
-    if (base == null) {
-      throw new InvalidRegionAttributeException("base");
+    Vector origin = Vectors.getVector(originValue);
+    if (origin == null) {
+      throw new InvalidRegionAttributeException("origin");
     }
-    this.base = base;
+    this.origin = origin;
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {
       throw new MissingRegionAttributeException("radius");
     }
-    if (!Numbers.isDecimal("radius")) {
+    if (!Numbers.isDecimal(radiusValue)) {
       throw new InvalidRegionAttributeException("radius");
     }
-    radius = Numbers.parseDouble("radius");
-
-    String heightValue = element.getAttributeValue("height");
-    if (heightValue == null) {
-      throw new MissingRegionAttributeException("height");
-    }
-    if (!Numbers.isDecimal("height")) {
-      throw new InvalidRegionAttributeException("height");
-    }
-    height = Numbers.parseDouble("height");
+    radius = Numbers.parseDouble(radiusValue);
   }
 
 }

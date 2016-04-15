@@ -23,27 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.BelowRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.AboveRegionParser;
+import in.twizmwaz.cardinal.util.Vectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
 @AllArgsConstructor
-public class BelowRegion implements UnboundedRegion {
+public class AboveRegion implements Region {
 
-  private final double xAxis;
-  private final double yAxis;
-  private final double zAxis;
+  private final Vector min;
+  @Getter
+  private final RegionBounds bounds;
 
-  public BelowRegion(BelowRegionParser parser) {
-    this(parser.getXAxis(), parser.getYAxis(), parser.getZAxis());
+  public AboveRegion(Vector min) {
+    this(min, new RegionBounds(min, Vectors.max()));
+  }
+
+  public AboveRegion(AboveRegionParser parser) {
+    this(parser.getMin());
   }
 
   @Override
   public boolean evaluate(Vector vector) {
-    return vector.getX() < xAxis && vector.getY() < yAxis && vector.getZ() < zAxis;
+    return vector.isGreater(min);
   }
 
 }

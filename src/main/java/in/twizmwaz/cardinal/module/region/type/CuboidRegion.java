@@ -23,26 +23,40 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.parser.unbounded.CircleRegionParser;
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.CuboidRegionParser;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
 @AllArgsConstructor
-public class CircleRegion implements UnboundedRegion {
+public class CuboidRegion implements RandomizableRegion {
 
-  private final Vector center;
-  private final double radius;
+  private final Vector min;
+  private final Vector max;
+  @Getter
+  private final RegionBounds bounds;
 
-  public CircleRegion(CircleRegionParser parser) {
-    this(parser.getCenter(), parser.getRadius());
+  public CuboidRegion(Vector min, Vector max) {
+    this(min, max, new RegionBounds(min, max));
+  }
+
+  public CuboidRegion(CuboidRegionParser parser) {
+    this(parser.getMin(), parser.getMax());
   }
 
   @Override
   public boolean evaluate(Vector vector) {
-    return Math.hypot(Math.abs(vector.getX() - center.getX()), Math.abs(vector.getZ() - center.getZ())) <= radius;
+    return vector.isInAABB(min, max);
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    return new Vector(Numbers.getRandom(min.getX(), max.getX()), Numbers.getRandom(min.getY(), max.getY()),
+        Numbers.getRandom(min.getZ(), max.getZ()));
   }
 
 }

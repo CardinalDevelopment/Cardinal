@@ -23,16 +23,44 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.unbounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.type.UnboundedRegion;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
-public class EmptyRegion implements UnboundedRegion {
+@AllArgsConstructor
+public class SphereRegion implements RandomizableRegion {
+
+  private final Vector origin;
+  private final double radius;
+  @Getter
+  private final RegionBounds bounds;
+
+  public SphereRegion(Vector origin, double radius) {
+    this(origin, radius, new RegionBounds(
+        new Vector(origin.getX() - radius, origin.getY() - radius, origin.getZ() - radius),
+        new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius)));
+  }
+
+  public SphereRegion(SphereRegionParser parser) {
+    this(parser.getOrigin(), parser.getRadius());
+  }
 
   @Override
-  public boolean evaluate(Vector vector) {
-    return false;
+  public Vector getRandomPoint() {
+    RegionBounds bounds = getBounds();
+    while(true) {
+      Vector random = bounds.getRandom();
+      if (evaluate(random)) return random;
+    }
+  }
+
+  @Override
+  public boolean evaluate(Vector evaluating) {
+    return evaluating.isInSphere(origin, radius);
   }
 
 }

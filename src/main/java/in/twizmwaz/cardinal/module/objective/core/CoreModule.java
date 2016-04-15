@@ -36,8 +36,8 @@ import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.type.BoundedRegion;
-import in.twizmwaz.cardinal.module.region.type.bounded.BlockRegion;
+import in.twizmwaz.cardinal.module.region.type.BlockBoundedRegion;
+import in.twizmwaz.cardinal.module.region.type.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.MaterialPattern;
@@ -94,12 +94,12 @@ public class CoreModule extends AbstractModule {
           errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid region specified for core"}, false));
           continue;
         }
-        if (!(region instanceof BoundedRegion)) {
+        if (!region.getBounds().isBounded()) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Region specified for wool must be a bounded region"}, false));
+              new String[]{"Region specified for core must be a bounded region"}, false));
           continue;
         }
-        BoundedRegion boundedRegion = (BoundedRegion) region;
+        BlockBoundedRegion boundedRegion = new BlockBoundedRegion(region);
 
         String leakValue = ParseUtil.getFirstAttribute("leak", coreElement, coresElement);
         int leak = 5;
@@ -186,7 +186,7 @@ public class CoreModule extends AbstractModule {
     Core closestCore = null;
     double closestDistance = Double.POSITIVE_INFINITY;
     for (Core core : this.cores.get(match)) {
-      BlockRegion center = core.getRegion().getCenterBlock();
+      BlockRegion center = core.getRegion().getBounds().getCenterBlock();
       double distance = vector.distance(center.getVector());
       if (distance < closestDistance) {
         closestCore = core;

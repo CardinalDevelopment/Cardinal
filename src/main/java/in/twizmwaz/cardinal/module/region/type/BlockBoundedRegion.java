@@ -23,49 +23,50 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser.bounded;
+package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.RegionException;
-import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Numbers;
-import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import org.jdom2.Element;
 
-@Getter
-public class SphereRegionParser implements RegionParser {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
-  private final Vector origin;
-  private final double radius;
+public class BlockBoundedRegion implements RandomizableRegion {
 
-  /**
-   * Parses an element for a sphere region.
-   *
-   * @param element The element.
-   * @throws RegionException Thrown if the origin or radius attributes are missing or invalid.
-   */
-  public SphereRegionParser(Element element) throws RegionException {
-    String originValue = element.getAttributeValue("origin");
-    if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
-    }
-    Vector origin = Vectors.getVector(originValue);
-    if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
-    }
-    this.origin = origin;
+  private final Region region;
+  @Getter
+  private final List<Block> blocks;
 
-    String radiusValue = element.getAttributeValue("radius");
-    if (radiusValue == null) {
-      throw new MissingRegionAttributeException("radius");
+  public BlockBoundedRegion(Region region) {
+    this.region = region;
+    this.blocks = new ArrayList<>();
+    try {
+      blocks.addAll(region.getBounds().getBlocks().stream().filter(
+          block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5))).collect(Collectors.toList()));
+    } catch (RegionException e) {
+      //TODO
     }
-    if (!Numbers.isDecimal(radiusValue)) {
-      throw new InvalidRegionAttributeException("radius");
-    }
-    radius = Numbers.parseDouble(radiusValue);
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    return blocks.get(new Random().nextInt(blocks.size() + 1)).getLocation().toVector();
+  }
+
+  @Override
+  public boolean evaluate(Vector vector) {
+    return region.evaluate(vector);
+  }
+
+  @Override
+  public RegionBounds getBounds() {
+    return region.getBounds();
   }
 
 }

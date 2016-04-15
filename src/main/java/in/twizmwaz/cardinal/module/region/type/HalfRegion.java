@@ -23,54 +23,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.bounded;
+package in.twizmwaz.cardinal.module.region.type;
 
-import com.google.common.collect.Lists;
-import in.twizmwaz.cardinal.module.region.parser.bounded.CuboidRegionParser;
-import in.twizmwaz.cardinal.util.Numbers;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.HalfRegionParser;
 import lombok.AllArgsConstructor;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
-import java.util.List;
-
 @AllArgsConstructor
-public class CuboidRegion implements RandomizableRegion {
+public class HalfRegion implements Region {
 
-  private final Vector min;
-  private final Vector max;
+  private static double HALF_PI = Math.PI/2;
 
-  public CuboidRegion(CuboidRegionParser parser) {
-    this(parser.getMin(), parser.getMax());
+  private final Vector origin;
+  private final Vector normal;
+  @Getter
+  private final RegionBounds bounds;
+
+  public HalfRegion(Vector origin, Vector normal) {
+    this(origin, normal, RegionBounds.unbounded());
   }
 
-  @Override
-  public List<Block> getBlocks() {
-    List<Block> blocks = Lists.newArrayList();
-    for (int x = (int) min.getX(); x < max.getX(); x++) {
-      for (int y = (int) min.getY(); y < max.getY(); y++) {
-        for (int z = (int) min.getZ(); z < max.getZ(); z++) {
-          blocks.add(new Location(null, x, y, z).getBlock()); //TODO: Get match world
-        }
-      }
-    }
-    return blocks;
-  }
-
-  @Override
-  public BlockRegion getCenterBlock() {
-    return new BlockRegion(min.getMidpoint(max));
+  public HalfRegion(HalfRegionParser parser) {
+    this(parser.getNormal(), parser.getOrigin());
   }
 
   @Override
   public boolean evaluate(Vector vector) {
-    return vector.isInAABB(min, max);
+    return this.normal.angle(vector.minus(origin)) <= HALF_PI;
   }
 
   @Override
-  public Vector getRandomPoint() {
-    return new Vector(Numbers.getRandom(min.getX(), max.getX()), Numbers.getRandom(min.getY(), max.getY()),
-        Numbers.getRandom(min.getZ(), max.getZ()));
+  public RegionBounds getBounds() {
+    return bounds;
   }
+
 }
