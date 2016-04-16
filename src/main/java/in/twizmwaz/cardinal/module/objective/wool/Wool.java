@@ -120,28 +120,48 @@ public class Wool extends Objective implements Listener {
     complete = false;
   }
 
+  /**
+   * Checks if the wool has been picked up when a player clicks on an item in their inventory.
+   *
+   * @param event The event.
+   */
   @EventHandler(ignoreCancelled = true)
   public void onInventoryClick(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
     ItemStack item = event.getCurrentItem();
-    if (!complete && !touched.contains(player) && item.getType().equals(Material.WOOL) &&
-        item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+    if (!complete && !touched.contains(player) && item.getType().equals(Material.WOOL)
+        && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
       touched.add(player);
-      Channels.getTeamChannel(team).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build()).build());
-      Channels.getTeamChannel(Team.getObservers()).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(), new TeamComponent(team)).build());
+      Channels.getTeamChannel(team).sendMessage(new LocalizedComponentBuilder(
+          ChatConstant.getConstant("objective.wool.touched"), new NameComponent(player),
+          new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build()).build());
+      Channels.getTeamChannel(Team.getObservers()).sendMessage(new LocalizedComponentBuilder(
+          ChatConstant.getConstant("objective.wool.touchedFor"), new NameComponent(player),
+          new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
+          new TeamComponent(team)).build());
       Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
     }
   }
 
+  /**
+   * Checks if the wool has been picked up when a player picks an item up from the ground.
+   *
+   * @param event The event.
+   */
   @EventHandler(ignoreCancelled = true)
   public void onPlayerPickupItem(PlayerPickupItemEvent event) {
     Player player = event.getPlayer();
     ItemStack item = event.getItem().getItemStack();
-    if (!complete && !touched.contains(player) && item.getType().equals(Material.WOOL) &&
-        item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+    if (!complete && !touched.contains(player) && item.getType().equals(Material.WOOL)
+        && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
       touched.add(player);
-      Channels.getTeamChannel(team).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build()).build());
-      Channels.getTeamChannel(Team.getObservers()).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(), new TeamComponent(team)).build());
+      Channels.getTeamChannel(team).sendMessage(new LocalizedComponentBuilder(
+          ChatConstant.getConstant("objective.wool.touched"), new NameComponent(player),
+          new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build()).build());
+      Channels.getTeamChannel(Team.getObservers()).sendMessage(new LocalizedComponentBuilder(
+          ChatConstant.getConstant("objective.wool.touchedFor"), new NameComponent(player),
+          new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
+          new TeamComponent(team)).build());
       Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
     }
   }

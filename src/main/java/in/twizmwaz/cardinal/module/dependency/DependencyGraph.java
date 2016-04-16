@@ -67,11 +67,14 @@ public final class DependencyGraph<T> {
     while (!evaluated.containsAll(nodes.values())) {
       for (DependencyNode<T> node : nodes.values()) {
         if (!evaluated.contains(node)) {
-          for (DependencyNode<T> dep : node.getDependencies()) {
-            if (!evaluated.contains(dep)) {
-              results.add(dep.getValue());
-              evaluated.add(dep);
+          boolean nextNode = false;
+          for (DependencyNode<T> dependency : node.getDependencies()) {
+            if (!evaluated.contains(dependency)) {
+              nextNode = true;
             }
+          }
+          if (nextNode) {
+            continue;
           }
           results.add(node.getValue());
           evaluated.add(node);

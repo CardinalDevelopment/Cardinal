@@ -153,6 +153,11 @@ public class Team implements Iterable<Player> {
         .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), id);
   }
 
+  /**
+   * Gets the currently observing team.
+   *
+   * @return The observing team.
+   */
   public static Team getObservers() {
     for (Team team : getTeams()) {
       if (isObservers(team)) {

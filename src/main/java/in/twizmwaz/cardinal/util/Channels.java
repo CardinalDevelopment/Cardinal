@@ -45,7 +45,8 @@ public class Channels {
   }
 
   public static TeamChannel getTeamChannel(@NonNull Team team) {
-    return Cardinal.getModule(ChannelModule.class).getTeamChannel(Cardinal.getInstance().getMatchThread().getCurrentMatch(), team);
+    return Cardinal.getModule(ChannelModule.class).getTeamChannel(
+        Cardinal.getInstance().getMatchThread().getCurrentMatch(), team);
   }
 
 }
