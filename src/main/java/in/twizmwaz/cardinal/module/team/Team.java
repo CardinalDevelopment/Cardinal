@@ -153,6 +153,15 @@ public class Team implements Iterable<Player> {
         .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), id);
   }
 
+  public static Team getObservers() {
+    for (Team team : getTeams()) {
+      if (isObservers(team)) {
+        return team;
+      }
+    }
+    return null;
+  }
+
   /**
    * Test if a team is an observer team.
    *

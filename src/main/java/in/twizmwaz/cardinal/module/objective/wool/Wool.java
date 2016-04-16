@@ -25,11 +25,14 @@
 
 package in.twizmwaz.cardinal.module.objective.wool;
 
+import com.google.common.collect.Lists;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.NameComponent;
 import ee.ellytr.chat.component.UnlocalizedComponentBuilder;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
+import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
@@ -57,8 +60,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.List;
 
 @Getter
 public class Wool extends Objective implements Listener {
@@ -72,6 +79,8 @@ public class Wool extends Objective implements Listener {
   private final boolean woolProximityHorizontal;
   private final ProximityMetric monumentProximityMetric;
   private final boolean monumentProximityHorizontal;
+
+  private final List<Player> touched = Lists.newArrayList();
 
   private boolean complete;
 
@@ -109,6 +118,32 @@ public class Wool extends Objective implements Listener {
     this.monumentProximityHorizontal = monumentProximityHorizontal;
 
     complete = false;
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onInventoryClick(InventoryClickEvent event) {
+    Player player = (Player) event.getWhoClicked();
+    ItemStack item = event.getCurrentItem();
+    if (!complete && !touched.contains(player) && item.getType().equals(Material.WOOL) &&
+        item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+      touched.add(player);
+      Channels.getTeamChannel(team).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build()).build());
+      Channels.getTeamChannel(Team.getObservers()).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(), new TeamComponent(team)).build());
+      Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
+    }
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+    Player player = event.getPlayer();
+    ItemStack item = event.getItem().getItemStack();
+    if (!complete && !touched.contains(player) && item.getType().equals(Material.WOOL) &&
+        item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+      touched.add(player);
+      Channels.getTeamChannel(team).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build()).build());
+      Channels.getTeamChannel(Team.getObservers()).sendMessage(new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"), new NameComponent(player), new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(), new TeamComponent(team)).build());
+      Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
+    }
   }
 
   /**

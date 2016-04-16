@@ -115,4 +115,13 @@ public class ChannelModule extends AbstractModule implements Listener {
     return playerChannels.get(player);
   }
 
+  public TeamChannel getTeamChannel(@NonNull Match match, @NonNull Team team) {
+    for (TeamChannel channel : teamChannels.get(match)) {
+      if (channel.getTeam().equals(team)) {
+        return channel;
+      }
+    }
+    return null;
+  }
+
 }

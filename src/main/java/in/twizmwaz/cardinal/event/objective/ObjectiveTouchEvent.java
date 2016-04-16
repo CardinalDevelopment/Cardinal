@@ -23,29 +23,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.util;
+package in.twizmwaz.cardinal.event.objective;
 
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.module.channel.ChannelModule;
-import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
-import in.twizmwaz.cardinal.module.channel.channels.PlayerChannel;
-import in.twizmwaz.cardinal.module.channel.channels.TeamChannel;
-import in.twizmwaz.cardinal.module.team.Team;
-import lombok.NonNull;
+import in.twizmwaz.cardinal.event.ObjectiveEvent;
+import in.twizmwaz.cardinal.module.objective.Objective;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 
-public class Channels {
+@Getter
+@Setter
+public class ObjectiveTouchEvent extends ObjectiveEvent {
 
-  public static GlobalChannel getGlobalChannel() {
-    return Cardinal.getModule(ChannelModule.class).getGlobalChannel();
-  }
+  private Player player;
 
-  public static PlayerChannel getPlayerChannel(@NonNull Player player) {
-    return Cardinal.getModule(ChannelModule.class).getPlayerChannel(player);
-  }
-
-  public static TeamChannel getTeamChannel(@NonNull Team team) {
-    return Cardinal.getModule(ChannelModule.class).getTeamChannel(Cardinal.getInstance().getMatchThread().getCurrentMatch(), team);
+  public ObjectiveTouchEvent(Objective objective, Player player) {
+    super(objective);
+    this.player = player;
   }
 
 }
