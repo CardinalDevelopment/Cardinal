@@ -46,6 +46,12 @@ import in.twizmwaz.cardinal.module.region.parser.CylinderRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.HalfRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.RectangleRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.modifications.ComplementRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.modifications.IntersectRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.modifications.MirroredRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.modifications.NegativeRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.modifications.TranslatedRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.modifications.UnionRegionParser;
 import in.twizmwaz.cardinal.module.region.type.AboveRegion;
 import in.twizmwaz.cardinal.module.region.type.BelowRegion;
 import in.twizmwaz.cardinal.module.region.type.BlockRegion;
@@ -58,6 +64,12 @@ import in.twizmwaz.cardinal.module.region.type.HalfRegion;
 import in.twizmwaz.cardinal.module.region.type.NowhereRegion;
 import in.twizmwaz.cardinal.module.region.type.RectangleRegion;
 import in.twizmwaz.cardinal.module.region.type.SphereRegion;
+import in.twizmwaz.cardinal.module.region.type.modifications.ComplementRegion;
+import in.twizmwaz.cardinal.module.region.type.modifications.IntersectRegion;
+import in.twizmwaz.cardinal.module.region.type.modifications.MirroredRegion;
+import in.twizmwaz.cardinal.module.region.type.modifications.NegativeRegion;
+import in.twizmwaz.cardinal.module.region.type.modifications.TranslatedRegion;
+import in.twizmwaz.cardinal.module.region.type.modifications.UnionRegion;
 import lombok.NonNull;
 import org.jdom2.Element;
 
@@ -134,8 +146,19 @@ public class RegionModule extends AbstractModule {
         if (region != null) {
           return checkRegion(match, id, region);
         }
-        return getRegion(match, element.getChildren().get(0), alternateAttributes);
       }
+      case "negative":
+        return checkRegion(match, id, new NegativeRegion(new NegativeRegionParser(element)));
+      case "union":
+        return checkRegion(match, id, new UnionRegion(new UnionRegionParser(element)));
+      case "complement":
+        return checkRegion(match, id, new ComplementRegion(new ComplementRegionParser(element)));
+      case "intersect":
+        return checkRegion(match, id, new IntersectRegion(new IntersectRegionParser(element)));
+      case "translate":
+        return checkRegion(match, id, new TranslatedRegion(new TranslatedRegionParser(element)));
+      case "mirror":
+        return checkRegion(match, id, new MirroredRegion(new MirroredRegionParser(element)));
       default: {
         List<String> attributes = Lists.newArrayList(alternateAttributes);
         attributes.add("id");
