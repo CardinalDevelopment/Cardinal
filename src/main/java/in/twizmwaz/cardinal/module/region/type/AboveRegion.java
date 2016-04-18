@@ -25,23 +25,22 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.AboveRegionParser;
 import in.twizmwaz.cardinal.util.Vectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class AboveRegion implements Region {
+import java.util.List;
+
+public class AboveRegion extends AbstractRegion {
 
   private final Vector min;
-  @Getter
-  private final RegionBounds bounds;
 
   public AboveRegion(Vector min) {
-    this(min, new RegionBounds(min, Vectors.max()));
+    super(new RegionBounds(min, Vectors.max()));
+    this.min = min;
   }
 
   public AboveRegion(AboveRegionParser parser) {
@@ -51,6 +50,26 @@ public class AboveRegion implements Region {
   @Override
   public boolean evaluate(Vector vector) {
     return vector.isGreater(min);
+  }
+
+  @Override
+  public boolean isRandomizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return false;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
   }
 
 }

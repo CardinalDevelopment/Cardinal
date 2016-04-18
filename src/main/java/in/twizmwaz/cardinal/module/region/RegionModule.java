@@ -58,7 +58,6 @@ import in.twizmwaz.cardinal.module.region.type.HalfRegion;
 import in.twizmwaz.cardinal.module.region.type.NowhereRegion;
 import in.twizmwaz.cardinal.module.region.type.RectangleRegion;
 import in.twizmwaz.cardinal.module.region.type.SphereRegion;
-import in.twizmwaz.cardinal.module.region.type.modifications.TranslatedRegion;
 import lombok.NonNull;
 import org.jdom2.Element;
 

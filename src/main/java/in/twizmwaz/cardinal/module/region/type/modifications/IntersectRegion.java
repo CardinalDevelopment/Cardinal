@@ -23,50 +23,69 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.modifications;
 
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
-import in.twizmwaz.cardinal.module.region.RegionException;
-import lombok.Getter;
+import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
-public class BlockBoundedRegion implements RandomizableRegion {
+public class IntersectRegion extends AbstractRegion {
 
-  private final Region region;
-  @Getter
-  private final List<Block> blocks;
+  private final List<Region> regions;
 
-  public BlockBoundedRegion(Region region) {
-    this.region = region;
-    this.blocks = new ArrayList<>();
-    try {
-      blocks.addAll(region.getBounds().getBlocks().stream().filter(
-          block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5))).collect(Collectors.toList()));
-    } catch (RegionException e) {
-      //TODO
+  public IntersectRegion(List<Region> regions) {
+    super(new RegionBounds(Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
+    this.regions = regions;
+  }
+
+  @Override
+  public boolean isRandomizable() {
+    for (Region region : regions) {
+      if (!region.isRandomizable()) {
+        return false;
+      }
     }
+    return true;
+  }
+
+  @Override
+  public boolean isBounded() {
+    for (Region region : regions) {
+      if (!region.isBounded()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    if (!isBounded()) {
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    }
+    return getBounds().getBlocks().stream().filter(block
+        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
   }
 
   @Override
   public Vector getRandomPoint() {
-    return blocks.get(new Random().nextInt(blocks.size() + 1)).getLocation().toVector();
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
-    return region.evaluate(vector);
-  }
-
-  @Override
-  public RegionBounds getBounds() {
-    return region.getBounds();
+  public boolean evaluate(Vector evaluating) {
+    for (Region region : regions) {
+      if (!region.evaluate(evaluating)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

@@ -28,7 +28,7 @@ package in.twizmwaz.cardinal.module.objective.destroyable;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
-import in.twizmwaz.cardinal.module.region.type.BlockBoundedRegion;
+import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.Getter;
@@ -38,7 +38,7 @@ import org.bukkit.event.Listener;
 public class Destroyable extends Objective implements Listener {
 
   private final String name;
-  private final BlockBoundedRegion region;
+  private final Region region;
   private final MaterialPattern materials;
   private final Team owner;
   private final double completion;
@@ -67,7 +67,7 @@ public class Destroyable extends Objective implements Listener {
    * @param proximityHorizontal Determines if only horizontal distance is considered when
    *                            calculating proximity.
    */
-  public Destroyable(Match match, String id, String name, boolean required, BlockBoundedRegion region,
+  public Destroyable(Match match, String id, String name, boolean required, Region region,
                      MaterialPattern materials, Team owner,
                      double completion, boolean modeChanges, boolean showProgress,
                      boolean repairable, boolean sparks, boolean show,

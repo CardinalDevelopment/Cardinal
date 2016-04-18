@@ -25,23 +25,29 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CuboidRegionParser;
 import in.twizmwaz.cardinal.util.Numbers;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class CuboidRegion implements RandomizableRegion {
+import java.util.List;
+
+public class CuboidRegion extends AbstractRegion {
 
   private final Vector min;
   private final Vector max;
-  @Getter
-  private final RegionBounds bounds;
 
+  /**
+   * Creates a cuboid region with a given min and max.
+   * @param min The min.
+   * @param max The max.
+   */
   public CuboidRegion(Vector min, Vector max) {
-    this(min, max, new RegionBounds(min, max));
+    super(new RegionBounds(min, max));
+    this.min = min;
+    this.max = max;
   }
 
   public CuboidRegion(CuboidRegionParser parser) {
@@ -54,7 +60,28 @@ public class CuboidRegion implements RandomizableRegion {
   }
 
   @Override
+  public boolean isRandomizable() {
+    return isBounded();
+  }
+
+  @Override
+  public boolean isBounded() {
+    return getBounds().isBounded();
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    if (!isBounded()) {
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    }
+    return getBounds().getBlocks();
+  }
+
+  @Override
   public Vector getRandomPoint() {
+    if (!isRandomizable()) {
+      throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    }
     return new Vector(Numbers.getRandom(min.getX(), max.getX()), Numbers.getRandom(min.getY(), max.getY()),
         Numbers.getRandom(min.getZ(), max.getZ()));
   }

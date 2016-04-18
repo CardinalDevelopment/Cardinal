@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.spawn;
 
-import in.twizmwaz.cardinal.module.region.type.RandomizableRegion;
+import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,6 +46,6 @@ public class Spawn {
   private final boolean persistent;
   // private final Kit kit;
   // private final Filter filter;
-  private final List<RandomizableRegion> regions;
+  private final List<Region> regions;
 
 }

@@ -36,7 +36,6 @@ import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.type.BlockBoundedRegion;
 import in.twizmwaz.cardinal.module.region.type.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
@@ -94,12 +93,11 @@ public class CoreModule extends AbstractModule {
           errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid region specified for core"}, false));
           continue;
         }
-        if (!region.getBounds().isBounded()) {
+        if (!region.isBounded()) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{"Region specified for core must be a bounded region"}, false));
           continue;
         }
-        BlockBoundedRegion boundedRegion = new BlockBoundedRegion(region);
 
         String leakValue = ParseUtil.getFirstAttribute("leak", coreElement, coresElement);
         int leak = 5;
@@ -160,7 +158,7 @@ public class CoreModule extends AbstractModule {
         boolean proximityHorizontal = proximityHorizontalValue != null
             && Numbers.parseBoolean(proximityHorizontalValue);
 
-        Core core = new Core(match, id, name, required, boundedRegion, leak, material, team, modeChanges, show,
+        Core core = new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
             proximityMetric, proximityHorizontal);
         Cardinal.registerEvents(core);
         cores.add(core);

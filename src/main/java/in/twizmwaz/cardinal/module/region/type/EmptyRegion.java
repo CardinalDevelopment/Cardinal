@@ -25,11 +25,18 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-public class EmptyRegion implements Region {
+import java.util.List;
+
+public class EmptyRegion extends AbstractRegion {
+
+  public EmptyRegion() {
+    super(RegionBounds.empty());
+  }
 
   @Override
   public boolean evaluate(Vector vector) {
@@ -37,8 +44,23 @@ public class EmptyRegion implements Region {
   }
 
   @Override
-  public RegionBounds getBounds() {
-    return RegionBounds.empty();
+  public boolean isRandomizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return false;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
   }
 
 }

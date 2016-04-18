@@ -23,24 +23,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.modifications;
 
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
-import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.Region;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class EverywhereRegion extends AbstractRegion {
+public class ComplementRegion extends AbstractRegion {
 
-  public EverywhereRegion() {
-    super(RegionBounds.unbounded());
-  }
+  private final Region region;
+  private final List<Region> complements;
 
-  @Override
-  public boolean evaluate(Vector vector) {
-    return true;
+  /**
+   * Creates a region from a sub-region and its complements.
+   * @param region The sub-region.
+   * @param complements The complements.
+   */
+  public ComplementRegion(Region region, List<Region> complements) {
+    super(region.getBounds());
+    this.region = region;
+    this.complements = complements;
   }
 
   @Override
@@ -50,17 +56,34 @@ public class EverywhereRegion extends AbstractRegion {
 
   @Override
   public boolean isBounded() {
-    return false;
+    return region.isBounded();
   }
 
   @Override
   public List<Block> getBlocks() {
-    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    if (!isBounded()) {
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    }
+    return getBounds().getBlocks().stream().filter(block
+        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
   }
 
   @Override
   public Vector getRandomPoint() {
     throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+  }
+
+  @Override
+  public boolean evaluate(Vector evaluating) {
+    if (!region.evaluate(evaluating)) {
+      return false;
+    }
+    for (Region complement : complements) {
+      if (complement.evaluate(evaluating)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

@@ -38,7 +38,6 @@ import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.type.RandomizableRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.ListUtil;
@@ -118,7 +117,7 @@ public class SpawnModule extends AbstractModule implements Listener {
     String persistentValue = ParseUtil.getFirstAttribute("persistent", elements);
     boolean persistent = persistentValue != null && Numbers.parseBoolean(persistentValue);
 
-    List<RandomizableRegion> regions = Lists.newArrayList();
+    List<Region> regions = Lists.newArrayList();
     List<Element> working;
     if (elements[0].getChild("regions") == null) {
       working = elements[0].getChildren();
@@ -139,12 +138,12 @@ public class SpawnModule extends AbstractModule implements Listener {
             new String[]{"Invalid region specified for default spawn"}, false));
         continue;
       }
-      if (!(region instanceof RandomizableRegion)) {
+      if (!region.isRandomizable()) {
         errors.add(new ModuleError(this, match.getMap(),
             new String[]{"Region specified for default spawn must be randomizable"}, false));
         continue;
       }
-      regions.add((RandomizableRegion) region);
+      regions.add(region);
     }
 
     return new Spawn(true, null, safe, sequential, spread, exclusive, persistent, regions);
@@ -157,7 +156,7 @@ public class SpawnModule extends AbstractModule implements Listener {
    */
   @EventHandler
   public void onPlayerInitialSpawn(PlayerInitialSpawnEvent event) {
-    List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
+    List<Region> regions = getDefaultSpawn().getRegions();
     event.setSpawnLocation(ListUtil.getRandom(regions).getRandomPoint().toLocation(
         Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
   }
@@ -207,18 +206,18 @@ public class SpawnModule extends AbstractModule implements Listener {
       player.setGameMode(GameMode.SURVIVAL);
       if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
         List<Spawn> spawns = getSpawns(team);
-        List<RandomizableRegion> regions = ListUtil.getRandom(spawns).getRegions();
+        List<Region> regions = ListUtil.getRandom(spawns).getRegions();
         player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
             Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
       } else {
-        List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
+        List<Region> regions = getDefaultSpawn().getRegions();
         player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
             Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
       }
     } else {
       player.setGameMode(GameMode.CREATIVE);
 
-      List<RandomizableRegion> regions = getDefaultSpawn().getRegions();
+      List<Region> regions = getDefaultSpawn().getRegions();
       player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
           Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
     }

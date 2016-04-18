@@ -23,44 +23,76 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region.type.modifications;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
+import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.util.ListUtil;
+import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.Set;
 
-public class EverywhereRegion extends AbstractRegion {
+public class UnionRegion extends AbstractRegion {
 
-  public EverywhereRegion() {
-    super(RegionBounds.unbounded());
-  }
+  private final List<Region> regions;
 
-  @Override
-  public boolean evaluate(Vector vector) {
-    return true;
+  public UnionRegion(List<Region> regions) {
+    super(new RegionBounds(Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
+    this.regions = regions;
   }
 
   @Override
   public boolean isRandomizable() {
-    return false;
+    for (Region region : regions) {
+      if (!region.isRandomizable()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
   public boolean isBounded() {
-    return false;
+    for (Region region : regions) {
+      if (!region.isBounded()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
   public List<Block> getBlocks() {
-    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    if (!isBounded()) {
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    }
+    Set<Block> blocks = Sets.newHashSet();
+    regions.forEach(region -> blocks.addAll(region.getBlocks()));
+    return Lists.newArrayList(blocks);
   }
 
   @Override
   public Vector getRandomPoint() {
-    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    if (!isRandomizable()) {
+      throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    }
+    return ListUtil.getRandom(regions).getRandomPoint();
+  }
+
+  @Override
+  public boolean evaluate(Vector evaluating) {
+    for (Region region : regions) {
+      if (region.evaluate(evaluating)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }

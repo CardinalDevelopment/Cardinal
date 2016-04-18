@@ -23,16 +23,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.exception.operation;
+package in.twizmwaz.cardinal.module.region.type.modifications;
 
-import in.twizmwaz.cardinal.module.region.RegionException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
+import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.util.Vectors;
+import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
-@Getter
-@AllArgsConstructor
-public class RegionOperationException extends RegionException {
+import java.util.List;
 
-  String message;
+public class NegativeRegion extends AbstractRegion {
 
+  private final Region region;
+
+  public NegativeRegion(Region region) {
+    super(new RegionBounds(Vectors.min(), Vectors.max()));
+    this.region = region;
+  }
+
+  @Override
+  public boolean isRandomizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return false;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+  }
+
+  @Override
+  public boolean evaluate(Vector evaluating) {
+    return !region.evaluate(evaluating);
+  }
 }

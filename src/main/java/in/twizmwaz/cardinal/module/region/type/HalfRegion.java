@@ -25,25 +25,30 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.HalfRegionParser;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class HalfRegion implements Region {
+import java.util.List;
 
-  private static double HALF_PI = Math.PI/2;
+public class HalfRegion extends AbstractRegion {
+
+  private static double HALF_PI = Math.PI / 2;
 
   private final Vector origin;
   private final Vector normal;
-  @Getter
-  private final RegionBounds bounds;
 
+  /**
+   * Creates a half region with a given origin and normal.
+   * @param origin The origin.
+   * @param normal The normal.
+   */
   public HalfRegion(Vector origin, Vector normal) {
-    this(origin, normal, RegionBounds.unbounded());
+    super(RegionBounds.unbounded());
+    this.origin = origin;
+    this.normal = normal;
   }
 
   public HalfRegion(HalfRegionParser parser) {
@@ -56,8 +61,22 @@ public class HalfRegion implements Region {
   }
 
   @Override
-  public RegionBounds getBounds() {
-    return bounds;
+  public boolean isRandomizable() {
+    return false;
   }
 
+  @Override
+  public boolean isBounded() {
+    return false;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+  }
 }

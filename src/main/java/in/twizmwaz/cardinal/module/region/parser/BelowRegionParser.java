@@ -45,21 +45,23 @@ public class BelowRegionParser implements RegionParser {
    */
   public BelowRegionParser(Element element) throws RegionException {
     String xAxisValue = element.getAttributeValue("x");
-    if (xAxisValue != null && !Numbers.isDecimal(xAxisValue))
+    if (xAxisValue != null && !Numbers.isDecimal(xAxisValue)) {
       throw new InvalidRegionAttributeException("x");
+    }
 
     String yAxisValue = element.getAttributeValue("y");
-    if (yAxisValue != null && !Numbers.isDecimal(yAxisValue))
+    if (yAxisValue != null && !Numbers.isDecimal(yAxisValue)) {
       throw new InvalidRegionAttributeException("y");
+    }
 
     String zAxisValue = element.getAttributeValue("z");
-    if (zAxisValue != null && !Numbers.isDecimal(zAxisValue))
+    if (zAxisValue != null && !Numbers.isDecimal(zAxisValue)) {
       throw new InvalidRegionAttributeException("z");
+    }
 
-    Double
-            x = Numbers.parseDouble(element.getAttributeValue("x"), Double.POSITIVE_INFINITY),
-            y = Numbers.parseDouble(element.getAttributeValue("y"), Double.POSITIVE_INFINITY),
-            z = Numbers.parseDouble(element.getAttributeValue("z"), Double.POSITIVE_INFINITY);
+    double x = Numbers.parseDouble(xAxisValue, Double.POSITIVE_INFINITY);
+    double y = Numbers.parseDouble(yAxisValue, Double.POSITIVE_INFINITY);
+    double z = Numbers.parseDouble(zAxisValue, Double.POSITIVE_INFINITY);
     max = new Vector(x, y, z);
   }
 

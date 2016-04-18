@@ -25,35 +25,35 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.RectangleRegionParser;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-public class RectangleRegion implements Region {
+import java.util.List;
+
+public class RectangleRegion extends AbstractRegion {
 
   private final Vector min;
   private final Vector max;
-  @Getter
-  private final RegionBounds bounds;
-
-  public RectangleRegion(RectangleRegionParser parser) {
-    this(parser.getMin(), parser.getMax());
-  }
 
   /**
    * @param min The rectangle's minimum bound.
    * @param max The rectangle's maximum bound.
    */
   public RectangleRegion(Vector min, Vector max) {
+    super(new RegionBounds(min, max));
+
     this.min = Vector.getMinimum(min, max);
     this.min.setY(Double.NEGATIVE_INFINITY);
 
     this.max = Vector.getMaximum(min, max);
     this.max.setY(Double.POSITIVE_INFINITY);
+  }
 
-    this.bounds = new RegionBounds(min, max);
+  public RectangleRegion(RectangleRegionParser parser) {
+    this(parser.getMin(), parser.getMax());
   }
 
   @Override
@@ -61,4 +61,23 @@ public class RectangleRegion implements Region {
     return vector.isInAABB(min, max);
   }
 
+  @Override
+  public boolean isRandomizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return false;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+  }
 }

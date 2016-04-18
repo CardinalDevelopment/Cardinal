@@ -25,23 +25,23 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.BlockRegionParser;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class BlockRegion implements RandomizableRegion {
+import java.util.List;
+
+public class BlockRegion extends AbstractRegion {
 
   private final Vector vector;
-  @Getter
-  private final RegionBounds bounds;
 
   public BlockRegion(Vector vector) {
-    this(vector, new RegionBounds(vector, vector.clone().add(0.5, 0.5, 0.5)));
+    super(new RegionBounds(vector, vector.plus(1, 1, 1)));
+    this.vector = vector;
   }
 
   public BlockRegion(BlockRegionParser parser) {
@@ -65,6 +65,21 @@ public class BlockRegion implements RandomizableRegion {
 
   public Block getBlock() {
     return getLocation().getBlock();
+  }
+
+  @Override
+  public boolean isRandomizable() {
+    return true;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return true;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    return Lists.newArrayList(getBlock());
   }
 
   @Override

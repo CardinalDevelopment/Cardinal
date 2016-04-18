@@ -23,14 +23,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type;
+package in.twizmwaz.cardinal.module.region;
 
-import in.twizmwaz.cardinal.module.region.Region;
-import org.bukkit.util.Vector;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
+public abstract class AbstractRegion implements Region {
 
-public interface RandomizableRegion extends Region {
-
-  Vector getRandomPoint();
+  private final RegionBounds bounds;
 
 }

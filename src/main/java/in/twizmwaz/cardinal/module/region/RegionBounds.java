@@ -26,13 +26,10 @@
 package in.twizmwaz.cardinal.module.region;
 
 import com.google.common.collect.Lists;
-import in.twizmwaz.cardinal.module.region.exception.operation.RegionOperationException;
 import in.twizmwaz.cardinal.module.region.type.BlockRegion;
-import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Data;
 import org.bukkit.block.Block;
-import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -45,7 +42,8 @@ import java.util.List;
 @Data
 public class RegionBounds {
 
-  private final Vector min, max;
+  private final Vector min;
+  private final Vector max;
 
   public static RegionBounds empty() {
     return new RegionBounds(Vectors.max(), Vectors.min());
@@ -59,12 +57,22 @@ public class RegionBounds {
     return new RegionBounds(min.plus(offset), max.plus(offset));
   }
 
+  /**
+   * Mirrors region bounds across a normal from an origin.
+   * @param origin The origin.
+   * @param normal The normal.
+   * @return The mirrored region bounds.
+   */
   public RegionBounds mirror(Vector origin, Vector normal) {
     return new RegionBounds(
         Vectors.getMirroredVector(min, origin, normal),
         Vectors.getMirroredVector(max, origin, normal));
   }
 
+  /**
+   * Checks if region bounds are bounded (non-infinite).
+   * @return If the bounds are bounded.
+   */
   public boolean isBounded() {
     return !(Double.isInfinite(min.getX())
         || Double.isInfinite(max.getX())
@@ -72,11 +80,6 @@ public class RegionBounds {
         || Double.isInfinite(max.getY())
         || Double.isInfinite(min.getZ())
         || Double.isInfinite(max.getZ()));
-  }
-
-  public Vector getRandom() {
-    return new Vector(Numbers.getRandom(min.getX(), max.getX()), Numbers.getRandom(min.getY(), max.getY()),
-        Numbers.getRandom(min.getZ(), max.getZ()));
   }
 
   public Vector getCenter() {
@@ -87,22 +90,26 @@ public class RegionBounds {
     return new BlockRegion(getCenter());
   }
 
-  public BlockVector blockAlign(Vector vector) {
-    return new BlockVector(vector.getBlockX() + 0.5d, vector.getBlockY() + 0.5d, vector.getBlockZ() + 0.5d);
+  public Vector blockAlign(Vector vector) {
+    return new Vector(vector.getBlockX() + 0.5d, vector.getBlockY() + 0.5d, vector.getBlockZ() + 0.5d);
   }
 
-  public List<Block> getBlocks() throws RegionException {
+  /**
+   * Gets the blocks inside this region's bounds.
+   * @return The blocks.
+   */
+  public List<Block> getBlocks() {
     if (!isBounded()) {
-      throw new RegionOperationException("Can't get all blocks inside an unbounded region");
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    BlockVector min = blockAlign(this.min);
-    BlockVector max = blockAlign(this.max);
+    Vector min = blockAlign(this.min);
+    Vector max = blockAlign(this.max);
 
     List<Block> blocks = Lists.newArrayList();
     for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
       for (int y = min.getBlockY(); y < max.getBlockY(); y++) {
         for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
-          blocks.add(new Vector(x, y, z).toLocation(null).getBlock()); //TODO get match world
+          blocks.add(new Vector(x, y, z).toLocation(null).getBlock()); //TODO: Get match world
         }
       }
     }

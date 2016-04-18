@@ -26,9 +26,12 @@
 package in.twizmwaz.cardinal.util;
 
 import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.module.region.Region;
+import lombok.NonNull;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Vectors {
 
@@ -74,6 +77,13 @@ public class Vectors {
     return new Vector(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
   }
 
+  /**
+   * Mirrors a vector across a normal from an origin.
+   * @param vector The original vector.
+   * @param origin The origin.
+   * @param normal The normal.
+   * @return The mirrored vector.
+   */
   public static Vector getMirroredVector(Vector vector, Vector origin, Vector normal) {
     vector = vector.minus(origin);
     vector = vector.minus(normal.times(vector.dot(normal)).times(2)).add(origin);
@@ -83,6 +93,66 @@ public class Vectors {
 
   public static double round(double d) {
     return (double) Math.round(d * 10) / 10D;
+  }
+
+  public static Vector getMinimumBound(@NonNull List<Region> regions) {
+    return getMinimum(regions.stream().map(region -> region.getBounds().getMin()).collect(Collectors.toList()));
+  }
+
+  /**
+   * Gets the minimum vector from a list of vectors.
+   * @param vectors The list of vectors.
+   * @return The minimum vector.
+   */
+  public static Vector getMinimum(@NonNull List<Vector> vectors) {
+    if (vectors.size() == 0) {
+      throw new IllegalArgumentException("Cannot get maximum vector of no vectors");
+    }
+    double x = vectors.get(0).getX();
+    double y = vectors.get(0).getY();
+    double z = vectors.get(0).getZ();
+    for (int i = 1; i < vectors.size(); i++) {
+      if (vectors.get(i).getX() < x) {
+        x = vectors.get(i).getX();
+      }
+      if (vectors.get(i).getY() < y) {
+        y = vectors.get(i).getY();
+      }
+      if (vectors.get(i).getZ() < z) {
+        z = vectors.get(i).getZ();
+      }
+    }
+    return new Vector(x, y, z);
+  }
+
+  public static Vector getMaximumBound(@NonNull List<Region> regions) {
+    return getMaximum(regions.stream().map(region -> region.getBounds().getMax()).collect(Collectors.toList()));
+  }
+
+  /**
+   * Gets the maximum vector from a list of vectors.
+   * @param vectors The list of vectors.
+   * @return The maximum vector.
+   */
+  public static Vector getMaximum(@NonNull List<Vector> vectors) {
+    if (vectors.size() == 0) {
+      throw new IllegalArgumentException("Cannot get maximum vector of no vectors");
+    }
+    double x = vectors.get(0).getX();
+    double y = vectors.get(0).getY();
+    double z = vectors.get(0).getZ();
+    for (int i = 1; i < vectors.size(); i++) {
+      if (vectors.get(i).getX() > x) {
+        x = vectors.get(i).getX();
+      }
+      if (vectors.get(i).getY() > y) {
+        y = vectors.get(i).getY();
+      }
+      if (vectors.get(i).getZ() > z) {
+        z = vectors.get(i).getZ();
+      }
+    }
+    return new Vector(x, y, z);
   }
 
 }

@@ -25,26 +25,35 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CylinderRegionParser;
 import in.twizmwaz.cardinal.util.Numbers;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class CylinderRegion implements RandomizableRegion {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CylinderRegion extends AbstractRegion {
 
   private final Vector base;
   private final double radius;
   private final double height;
-  @Getter
-  private final RegionBounds bounds;
 
+  /**
+   * Creates a cylinder region with a given base, radius, and height.
+   * @param base The base.
+   * @param radius The radius.
+   * @param height The height.
+   */
   public CylinderRegion(Vector base, double radius, double height) {
-    this(base, radius, height, new RegionBounds(
+    super(new RegionBounds(
         new Vector(base.getX() - radius, base.getY(), base.getZ() - radius),
         new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius)));
+    this.base = base;
+    this.radius = radius;
+    this.height = height;
   }
 
   public CylinderRegion(CylinderRegionParser parser) {
@@ -52,7 +61,29 @@ public class CylinderRegion implements RandomizableRegion {
   }
 
   @Override
+  public boolean isRandomizable() {
+    return isBounded();
+  }
+
+  @Override
+  public boolean isBounded() {
+    return getBounds().isBounded();
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    if (!isBounded()) {
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    }
+    return getBounds().getBlocks().stream().filter(block
+        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
+  }
+
+  @Override
   public Vector getRandomPoint() {
+    if (!isRandomizable()) {
+      throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    }
     double a = Numbers.getRandom(0, radius);
     double b = Numbers.getRandom(0, height);
     double c = Numbers.getRandom(0, 2 * Math.PI);

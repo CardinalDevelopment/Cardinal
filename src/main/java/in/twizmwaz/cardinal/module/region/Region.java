@@ -26,10 +26,21 @@
 package in.twizmwaz.cardinal.module.region;
 
 import in.twizmwaz.cardinal.module.filter.Filter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+
+import java.util.List;
 
 public interface Region extends Filter<Vector> {
 
-    RegionBounds getBounds();
+  boolean isRandomizable();
+
+  boolean isBounded();
+
+  RegionBounds getBounds();
+
+  List<Block> getBlocks();
+
+  Vector getRandomPoint();
 
 }

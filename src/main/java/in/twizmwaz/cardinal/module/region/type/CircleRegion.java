@@ -25,25 +25,30 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
-import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CircleRegionParser;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class CircleRegion implements Region {
+import java.util.List;
+
+public class CircleRegion extends AbstractRegion {
 
   private final Vector center;
   private final double radius;
-  @Getter
-  private final RegionBounds bounds;
 
+  /**
+   * Creates a circle region with a given center and radius.
+   * @param center The center.
+   * @param radius The radius.
+   */
   public CircleRegion(Vector center, double radius) {
-    this(center, radius, new RegionBounds(
+    super(new RegionBounds(
         new Vector(center.getX() - radius, Double.NEGATIVE_INFINITY, center.getZ() - radius),
         new Vector(center.getX() + radius, Double.POSITIVE_INFINITY, center.getZ() + radius)));
+    this.center = center;
+    this.radius = radius;
   }
 
   public CircleRegion(CircleRegionParser parser) {
@@ -53,6 +58,26 @@ public class CircleRegion implements Region {
   @Override
   public boolean evaluate(Vector vector) {
     return Math.hypot(Math.abs(vector.getX() - center.getX()), Math.abs(vector.getZ() - center.getZ())) <= radius;
+  }
+
+  @Override
+  public boolean isRandomizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return false;
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+  }
+
+  @Override
+  public Vector getRandomPoint() {
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
   }
 
 }

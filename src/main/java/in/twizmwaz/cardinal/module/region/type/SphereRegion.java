@@ -25,24 +25,31 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@AllArgsConstructor
-public class SphereRegion implements RandomizableRegion {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class SphereRegion extends AbstractRegion {
 
   private final Vector origin;
   private final double radius;
-  @Getter
-  private final RegionBounds bounds;
 
+  /**
+   * Creates a sphere region with a given origin and radius.
+   * @param origin The origin.
+   * @param radius The radius.
+   */
   public SphereRegion(Vector origin, double radius) {
-    this(origin, radius, new RegionBounds(
+    super(new RegionBounds(
         new Vector(origin.getX() - radius, origin.getY() - radius, origin.getZ() - radius),
         new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius)));
+    this.origin = origin;
+    this.radius = radius;
   }
 
   public SphereRegion(SphereRegionParser parser) {
@@ -50,12 +57,24 @@ public class SphereRegion implements RandomizableRegion {
   }
 
   @Override
+  public boolean isRandomizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isBounded() {
+    return getBounds().isBounded();
+  }
+
+  @Override
+  public List<Block> getBlocks() {
+    return getBounds().getBlocks().stream().filter(block
+        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
+  }
+
+  @Override
   public Vector getRandomPoint() {
-    RegionBounds bounds = getBounds();
-    while(true) {
-      Vector random = bounds.getRandom();
-      if (evaluate(random)) return random;
-    }
+    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
   }
 
   @Override
