@@ -42,6 +42,7 @@ public class HalfRegion extends AbstractRegion {
 
   /**
    * Creates a half region with a given origin and normal.
+   *
    * @param origin The origin.
    * @param normal The normal.
    */

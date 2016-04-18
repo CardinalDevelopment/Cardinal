@@ -41,6 +41,7 @@ public class CuboidRegion extends AbstractRegion {
 
   /**
    * Creates a cuboid region with a given min and max.
+   *
    * @param min The min.
    * @param max The max.
    */

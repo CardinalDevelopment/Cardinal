@@ -59,6 +59,7 @@ public class RegionBounds {
 
   /**
    * Mirrors region bounds across a normal from an origin.
+   *
    * @param origin The origin.
    * @param normal The normal.
    * @return The mirrored region bounds.
@@ -71,6 +72,7 @@ public class RegionBounds {
 
   /**
    * Checks if region bounds are bounded (non-infinite).
+   *
    * @return If the bounds are bounded.
    */
   public boolean isBounded() {
@@ -96,6 +98,7 @@ public class RegionBounds {
 
   /**
    * Gets the blocks inside this region's bounds.
+   *
    * @return The blocks.
    */
   public List<Block> getBlocks() {

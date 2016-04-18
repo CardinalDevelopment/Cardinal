@@ -28,6 +28,7 @@ package in.twizmwaz.cardinal.module.region.type.modifications;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.modifications.IntersectRegionParser;
 import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -42,6 +43,10 @@ public class IntersectRegion extends AbstractRegion {
   public IntersectRegion(List<Region> regions) {
     super(new RegionBounds(Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
     this.regions = regions;
+  }
+
+  public IntersectRegion(IntersectRegionParser parser) {
+    this(parser.getRegions());
   }
 
   @Override

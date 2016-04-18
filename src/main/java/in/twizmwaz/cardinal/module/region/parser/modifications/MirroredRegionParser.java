@@ -23,9 +23,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser;
+package in.twizmwaz.cardinal.module.region.parser.modifications;
 
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
+import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
@@ -35,18 +38,41 @@ import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
-public class HalfRegionParser implements RegionParser {
+public class MirroredRegionParser implements RegionParser {
 
-  private final Vector normal;
+  private Region region;
   private final Vector origin;
+  private final Vector normal;
 
   /**
-   * Parses an element for a half region.
+   * Parses an element for a mirrored region.
    *
    * @param element The element.
-   * @throws RegionException Thrown if the normal or origin attributes are missing or invalid.
+   * @throws RegionException Thrown if no sub-region is specified, if the origin attribute is invalid, or if the normal
+   *                         attribute is missing or invalid.
    */
-  public HalfRegionParser(Element element) throws RegionException {
+  public MirroredRegionParser(Element element) throws RegionException {
+    for (Element subRegionElement : element.getChildren()) {
+      region = Cardinal.getModule(RegionModule.class).getRegion(
+          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement);
+      if (region != null) {
+        break;
+      }
+    }
+    if (region == null) {
+      throw new RegionException("No sub-region specified for mirrored region");
+    }
+
+    String originValue = element.getAttributeValue("origin");
+    if (originValue == null) {
+      origin = new Vector(0, 0, 0);
+    } else {
+      origin = Vectors.getVector(originValue);
+      if (origin == null) {
+        throw new InvalidRegionAttributeException("origin");
+      }
+    }
+
     String normalValue = element.getAttributeValue("normal");
     if (normalValue == null) {
       throw new MissingRegionAttributeException("normal");
@@ -54,15 +80,6 @@ public class HalfRegionParser implements RegionParser {
     normal = Vectors.getVector(normalValue);
     if (normal == null) {
       throw new InvalidRegionAttributeException("normal");
-    }
-
-    String originValue = element.getAttributeValue("origin");
-    if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
-    }
-    origin = Vectors.getVector(originValue);
-    if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
     }
   }
 

@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.modifications.UnionRegionParser;
 import in.twizmwaz.cardinal.util.ListUtil;
 import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
@@ -45,6 +46,10 @@ public class UnionRegion extends AbstractRegion {
   public UnionRegion(List<Region> regions) {
     super(new RegionBounds(Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
     this.regions = regions;
+  }
+
+  public UnionRegion(UnionRegionParser parser) {
+    this(parser.getRegions());
   }
 
   @Override

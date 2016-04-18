@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.region.type.modifications;
 
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.parser.modifications.ComplementRegionParser;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -40,13 +41,18 @@ public class ComplementRegion extends AbstractRegion {
 
   /**
    * Creates a region from a sub-region and its complements.
-   * @param region The sub-region.
+   *
+   * @param region      The sub-region.
    * @param complements The complements.
    */
   public ComplementRegion(Region region, List<Region> complements) {
     super(region.getBounds());
     this.region = region;
     this.complements = complements;
+  }
+
+  public ComplementRegion(ComplementRegionParser parser) {
+    this(parser.getRegion(), parser.getComplements());
   }
 
   @Override

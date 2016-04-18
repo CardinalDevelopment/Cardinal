@@ -52,11 +52,10 @@ public class SphereRegionParser implements RegionParser {
     if (originValue == null) {
       throw new MissingRegionAttributeException("origin");
     }
-    Vector origin = Vectors.getVector(originValue);
+    origin = Vectors.getVector(originValue);
     if (origin == null) {
       throw new InvalidRegionAttributeException("origin");
     }
-    this.origin = origin;
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {

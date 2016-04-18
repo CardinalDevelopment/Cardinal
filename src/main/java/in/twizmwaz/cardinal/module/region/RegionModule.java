@@ -196,7 +196,8 @@ public class RegionModule extends AbstractModule {
             + (parent != null ? " for " + parent : "");
       }
     }
-    return "Could not parse " + name + (parent != null ? " for " + parent : "");
+    return "Could not parse " + (name != null ? name : "region") + (parent != null ? " for " + parent : "")
+        + (e.getMessage() != null ? ": " + e.getMessage() : "");
   }
 
 }

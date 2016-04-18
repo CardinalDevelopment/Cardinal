@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.region.type.modifications;
 
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.parser.modifications.TranslatedRegionParser;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -40,6 +41,7 @@ public class TranslatedRegion extends AbstractRegion {
 
   /**
    * Creates a region translated by an offset from an original region.
+   *
    * @param region The original region.
    * @param offset The offset.
    */
@@ -47,6 +49,10 @@ public class TranslatedRegion extends AbstractRegion {
     super(region.getBounds().translate(offset));
     this.region = region;
     this.offset = offset;
+  }
+
+  public TranslatedRegion(TranslatedRegionParser parser) {
+    this(parser.getRegion(), parser.getOffset());
   }
 
   @Override

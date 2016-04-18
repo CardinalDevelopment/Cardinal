@@ -40,6 +40,7 @@ public class CircleRegion extends AbstractRegion {
 
   /**
    * Creates a circle region with a given center and radius.
+   *
    * @param center The center.
    * @param radius The radius.
    */

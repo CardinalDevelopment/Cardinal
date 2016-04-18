@@ -49,11 +49,10 @@ public class BlockRegionParser implements RegionParser {
     if (text == null) {
       throw new MissingRegionPropertyException("location");
     }
-    Vector vector = Vectors.getVector(text);
+    vector = Vectors.getVector(text);
     if (vector == null) {
       throw new InvalidRegionPropertyException("location");
     }
-    this.vector = vector;
   }
 
 }

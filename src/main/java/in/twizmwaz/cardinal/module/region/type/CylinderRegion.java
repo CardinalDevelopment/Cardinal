@@ -43,7 +43,8 @@ public class CylinderRegion extends AbstractRegion {
 
   /**
    * Creates a cylinder region with a given base, radius, and height.
-   * @param base The base.
+   *
+   * @param base   The base.
    * @param radius The radius.
    * @param height The height.
    */

@@ -23,46 +23,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.parser;
+package in.twizmwaz.cardinal.module.region.parser.modifications;
 
+import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
+import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
-import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
-import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
-import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
-@Getter
-public class HalfRegionParser implements RegionParser {
+import java.util.List;
 
-  private final Vector normal;
-  private final Vector origin;
+@Getter
+public class ComplementRegionParser implements RegionParser {
+
+  private Region region;
+  private final List<Region> complements = Lists.newArrayList();
 
   /**
-   * Parses an element for a half region.
+   * Parses an element for a complement region.
    *
    * @param element The element.
-   * @throws RegionException Thrown if the normal or origin attributes are missing or invalid.
+   * @throws RegionException Thrown if no sub-regions are specified.
    */
-  public HalfRegionParser(Element element) throws RegionException {
-    String normalValue = element.getAttributeValue("normal");
-    if (normalValue == null) {
-      throw new MissingRegionAttributeException("normal");
+  public ComplementRegionParser(Element element) throws RegionException {
+    for (Element subRegionElement : element.getChildren()) {
+      Region region = Cardinal.getModule(RegionModule.class).getRegion(
+          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement);
+      if (region != null) {
+        if (this.region == null) {
+          this.region = region;
+        } else {
+          complements.add(region);
+        }
+      }
     }
-    normal = Vectors.getVector(normalValue);
-    if (normal == null) {
-      throw new InvalidRegionAttributeException("normal");
+    if (region == null) {
+      throw new RegionException("No sub-regions specified for complement region");
     }
-
-    String originValue = element.getAttributeValue("origin");
-    if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
-    }
-    origin = Vectors.getVector(originValue);
-    if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
+    if (complements.isEmpty()) {
+      throw new RegionException("No complements specified for complement region");
     }
   }
 

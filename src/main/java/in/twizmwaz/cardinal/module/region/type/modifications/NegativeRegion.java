@@ -28,6 +28,7 @@ package in.twizmwaz.cardinal.module.region.type.modifications;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
+import in.twizmwaz.cardinal.module.region.parser.modifications.NegativeRegionParser;
 import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -41,6 +42,10 @@ public class NegativeRegion extends AbstractRegion {
   public NegativeRegion(Region region) {
     super(new RegionBounds(Vectors.min(), Vectors.max()));
     this.region = region;
+  }
+
+  public NegativeRegion(NegativeRegionParser parser) {
+    this(parser.getRegion());
   }
 
   @Override

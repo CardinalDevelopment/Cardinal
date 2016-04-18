@@ -53,11 +53,10 @@ public class CylinderRegionParser implements RegionParser {
     if (baseValue == null) {
       throw new MissingRegionAttributeException("base");
     }
-    Vector base = Vectors.getVector(baseValue);
+    base = Vectors.getVector(baseValue);
     if (base == null) {
       throw new InvalidRegionAttributeException("base");
     }
-    this.base = base;
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {

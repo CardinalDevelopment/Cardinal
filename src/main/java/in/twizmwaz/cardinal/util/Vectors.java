@@ -58,12 +58,19 @@ public class Vectors {
   public static List<Double> getCoordinates(String str) {
     List<Double> coordinates = Lists.newArrayList();
 
-    String[] rawCoords = str.split(",");
-    for (String coordinate : rawCoords) {
-      if (!Numbers.isDecimal(coordinate.trim())) {
+    if (str.contains("\\,")) {
+      String[] rawCoords = str.split(",");
+      for (String coordinate : rawCoords) {
+        if (!Numbers.isDecimal(coordinate.trim())) {
+          return null;
+        }
+        coordinates.add(Numbers.parseDouble(coordinate.trim()));
+      }
+    } else {
+      if (!Numbers.isDecimal(str.trim())) {
         return null;
       }
-      coordinates.add(Numbers.parseDouble(coordinate.trim()));
+      coordinates.add(Numbers.parseDouble(str.trim()));
     }
 
     return coordinates;
@@ -79,6 +86,7 @@ public class Vectors {
 
   /**
    * Mirrors a vector across a normal from an origin.
+   *
    * @param vector The original vector.
    * @param origin The origin.
    * @param normal The normal.
@@ -101,6 +109,7 @@ public class Vectors {
 
   /**
    * Gets the minimum vector from a list of vectors.
+   *
    * @param vectors The list of vectors.
    * @return The minimum vector.
    */
@@ -131,6 +140,7 @@ public class Vectors {
 
   /**
    * Gets the maximum vector from a list of vectors.
+   *
    * @param vectors The list of vectors.
    * @return The maximum vector.
    */

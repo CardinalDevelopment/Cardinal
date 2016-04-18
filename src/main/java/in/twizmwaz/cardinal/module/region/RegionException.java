@@ -26,4 +26,12 @@
 package in.twizmwaz.cardinal.module.region;
 
 public class RegionException extends Exception {
+
+  public RegionException() {
+  }
+
+  public RegionException(String message) {
+    super(message);
+  }
+
 }

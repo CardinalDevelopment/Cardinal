@@ -41,6 +41,7 @@ public class SphereRegion extends AbstractRegion {
 
   /**
    * Creates a sphere region with a given origin and radius.
+   *
    * @param origin The origin.
    * @param radius The radius.
    */

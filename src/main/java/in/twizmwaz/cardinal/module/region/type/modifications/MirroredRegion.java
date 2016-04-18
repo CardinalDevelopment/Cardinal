@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.region.type.modifications;
 
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.parser.modifications.MirroredRegionParser;
 import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -42,6 +43,7 @@ public class MirroredRegion extends AbstractRegion {
 
   /**
    * Creates a region, mirrored over a normal from an origin.
+   *
    * @param region The original region.
    * @param origin The origin.
    * @param normal The normal.
@@ -51,6 +53,10 @@ public class MirroredRegion extends AbstractRegion {
     this.region = region;
     this.origin = origin;
     this.normal = normal.normalize();
+  }
+
+  public MirroredRegion(MirroredRegionParser parser) {
+    this(parser.getRegion(), parser.getOrigin(), parser.getNormal());
   }
 
   @Override
