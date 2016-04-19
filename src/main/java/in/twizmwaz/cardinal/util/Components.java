@@ -27,8 +27,11 @@ package in.twizmwaz.cardinal.util;
 
 import ee.ellytr.chat.component.NameComponent;
 import ee.ellytr.chat.component.NameComponentBuilder;
+import ee.ellytr.chat.component.UnlocalizedComponentBuilder;
+import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.ServerOperator;
@@ -57,6 +60,21 @@ public class Components {
       return builder.color(Team.getTeamColor((Player) who));
     }
     return builder;
+  }
+
+  /**
+   * Appends a team prefix to the beginning of an array of base components.
+   *
+   * @param team The team.
+   * @param components The base components.
+   * @return The new array of base components.
+   */
+  public static BaseComponent[] appendTeamPrefix(@NonNull Team team, BaseComponent... components) {
+    BaseComponent[] newComponents = new BaseComponent[components.length + 1];
+    newComponents[0] = new UnlocalizedComponentBuilder("[{0}] ",
+        new TeamComponent(team)).color(team.getColor()).build();
+    System.arraycopy(components, 0, newComponents, 1, components.length);
+    return newComponents;
   }
 
 }

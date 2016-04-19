@@ -46,6 +46,8 @@ public abstract class Objective {
   private final boolean required;
   private final boolean show;
 
+  public abstract String getName();
+
   /**
    * Gets the objectives in the current match.
    *

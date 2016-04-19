@@ -50,4 +50,16 @@ public class Strings {
     return str.split(" ")[0];
   }
 
+  /**
+   * Trims a string from a start position to an end position.
+   *
+   * @param str The string.
+   * @param start The start position.
+   * @param end The end position.
+   * @return The trimmed string.
+   */
+  public static String trim(@NonNull String str, int start, int end) {
+    return str.length() > start ? (str.length() > end ? str.substring(start, end) : str.substring(start)) : "";
+  }
+
 }

@@ -25,16 +25,17 @@
 
 package in.twizmwaz.cardinal.module.scoreboard;
 
+import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
-import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
-import in.twizmwaz.cardinal.module.objective.core.CoreModule;
-import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
-import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
-import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
+import in.twizmwaz.cardinal.module.scoreboard.slot.BlankScoreboardSlot;
+import in.twizmwaz.cardinal.module.scoreboard.slot.ObjectiveScoreboardSlot;
+import in.twizmwaz.cardinal.module.scoreboard.slot.TeamScoreboardSlot;
+import in.twizmwaz.cardinal.module.scoreboard.slot.objective.CoreScoreboardSlot;
+import in.twizmwaz.cardinal.module.scoreboard.slot.objective.WoolScoreboardSlot;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -43,10 +44,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.util.List;
+
 public class CardinalScoreboard implements Listener {
 
   private final Team team;
   private final Scoreboard scoreboard;
+  private final List<ScoreboardSlot> slots = Lists.newArrayList();
 
   /**
    * A new scoreboard based on a team.
@@ -61,8 +65,37 @@ public class CardinalScoreboard implements Listener {
     objective.setDisplayName(Cardinal.getModule(ScoreboardModule.class).getDisplayTitle());
     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-    Team.getTeams().forEach(this::updateTeam);
-    Objective.getObjectives().forEach(this::updateObjective);
+    //TODO: Check for time limit module
+    boolean proximity = true;
+
+    int position = 0;
+    List<String> used = Lists.newArrayList();
+    for (Team scoreboardTeam : Team.getTeams()) {
+      List<Objective> objectives = Team.getTeamObjectives(scoreboardTeam);
+      if (!Team.isObservers(scoreboardTeam) && objectives.size() > 0) {
+        if (position != 0) {
+          String base = BlankScoreboardSlot.getNextBlankBase(used);
+          used.add(base);
+          slots.add(new BlankScoreboardSlot(base, position));
+          position++;
+        }
+        for (Objective scoreboardObj : objectives) {
+          if (scoreboardObj instanceof Core) {
+            slots.add(new CoreScoreboardSlot((Core) scoreboardObj, position, team, proximity));
+            position++;
+          } else if (scoreboardObj instanceof Wool) {
+            slots.add(new WoolScoreboardSlot((Wool) scoreboardObj, position, team, proximity));
+            position++;
+          }
+        }
+        String base = TeamScoreboardSlot.getNextTeamBase(scoreboardTeam, used);
+        used.add(base);
+        slots.add(new TeamScoreboardSlot(scoreboardTeam, base, position));
+        position++;
+      }
+      position ++;
+    }
+    slots.forEach(this::updateSlot);
   }
 
   /**
@@ -77,12 +110,17 @@ public class CardinalScoreboard implements Listener {
     }
   }
 
-  private void updateTeam(@NonNull Team team) {
-    getObjective().getScore(team.getColor() + team.getName()).setScore(getTeamSlot(team));
-  }
-
-  private void updateObjective(@NonNull Objective objective) {
-    getObjective().getScore(objective.getId()).setScore(getObjectiveSlot(objective));
+  private void updateSlot(@NonNull ScoreboardSlot slot) {
+    String id = null;
+    if (slot instanceof TeamScoreboardSlot) {
+      id = ((TeamScoreboardSlot) slot).getTeam().getId() + "-t";
+    } else if (slot instanceof ObjectiveScoreboardSlot) {
+      id = ((ObjectiveScoreboardSlot) slot).getObjective().getId() + "-o";
+    }
+    org.bukkit.scoreboard.Team team = scoreboard.getTeam(id);
+    team.setPrefix(slot.getPrefix());
+    getObjective().getScore(slot.getBase()).setScore(slot.getPosition());
+    team.setSuffix(slot.getSuffix());
   }
 
   @NonNull
@@ -90,56 +128,33 @@ public class CardinalScoreboard implements Listener {
     return scoreboard.getObjective("objectives");
   }
 
-  private int getTeamSlot(Team team) {
-    int slot = 0;
-    for (Team eachTeam : Team.getTeams()) {
-      Match match = Cardinal.getInstance().getMatchThread().getCurrentMatch();
-      for (Core ignored : Cardinal.getModule(CoreModule.class).getCores(match)) {
-        slot++;
+  private TeamScoreboardSlot getTeamSlot(@NonNull Team team) {
+    for (ScoreboardSlot slot : slots) {
+      if (slot instanceof TeamScoreboardSlot) {
+        TeamScoreboardSlot teamSlot = (TeamScoreboardSlot) slot;
+        if (teamSlot.getTeam().equals(team)) {
+          return teamSlot;
+        }
       }
-      for (Destroyable ignored : Cardinal.getModule(DestroyableModule.class).getDestroyables(match)) {
-        slot++;
-      }
-      for (Wool ignored : Cardinal.getModule(WoolModule.class).getWools(match)) {
-        slot++;
-      }
-
-      if (team.equals(eachTeam)) {
-        return slot;
-      }
-      slot++;
     }
-    return slot;
+    return null;
   }
 
-  private int getObjectiveSlot(Objective objective) {
-    int slot = 0;
-    for (Team ignored : Team.getTeams()) {
-      Match match = Cardinal.getInstance().getMatchThread().getCurrentMatch();
-      for (Core core : Cardinal.getModule(CoreModule.class).getCores(match)) {
-        if (objective.equals(core)) {
-          return slot;
+  private ObjectiveScoreboardSlot getObjectiveSlot(@NonNull Objective objective) {
+    for (ScoreboardSlot slot : slots) {
+      if (slot instanceof ObjectiveScoreboardSlot) {
+        ObjectiveScoreboardSlot objSlot = (ObjectiveScoreboardSlot) slot;
+        if (objSlot.getObjective().equals(objective)) {
+          return objSlot;
         }
-        slot++;
       }
-
-      for (Destroyable destroyable : Cardinal.getModule(DestroyableModule.class).getDestroyables(match)) {
-        if (objective.equals(destroyable)) {
-          return slot;
-        }
-        slot++;
-      }
-
-      for (Wool wool : Cardinal.getModule(WoolModule.class).getWools(match)) {
-        if (objective.equals(wool)) {
-          return slot;
-        }
-        slot++;
-      }
-
-      slot++;
     }
-    return slot;
+    return null;
+  }
+
+  public boolean isCompact() {
+    //TODO: Check if more than 16 slots in original scoreboard
+    return false;
   }
 
 }

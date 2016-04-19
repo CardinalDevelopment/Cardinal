@@ -181,7 +181,7 @@ public class TeamModule extends AbstractModule {
    * @return The team which the player is on.
    */
   public Team getTeamByPlayer(@NonNull Match match, @NonNull Player player) {
-    if (teams.get(match) == null) {
+    if (!teams.containsKey(match)) {
       return null;
     }
     for (Team team : teams.get(match)) {

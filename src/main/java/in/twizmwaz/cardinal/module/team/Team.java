@@ -27,9 +27,14 @@
 package in.twizmwaz.cardinal.module.team;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
+import in.twizmwaz.cardinal.module.objective.Objective;
+import in.twizmwaz.cardinal.module.objective.core.Core;
+import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
+import in.twizmwaz.cardinal.module.objective.wool.Wool;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -38,7 +43,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -175,5 +182,16 @@ public class Team implements Iterable<Player> {
    */
   public static boolean isObservers(@NonNull Team team) {
     return team.getId().equals("observers");
+  }
+
+  public static List<Objective> getTeamObjectives(@NonNull Team team) {
+    List<Objective> objectives = Lists.newArrayList();
+    objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Core
+        && !((Core) objective).getTeam().equals(team)).collect(Collectors.toList()));
+    objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Destroyable
+        && !((Destroyable) objective).getOwner().equals(team)).collect(Collectors.toList()));
+    objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Wool
+        && ((Wool) objective).getTeam().equals(team)).collect(Collectors.toList()));
+    return objectives;
   }
 }

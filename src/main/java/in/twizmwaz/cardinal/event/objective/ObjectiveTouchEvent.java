@@ -36,10 +36,12 @@ import org.bukkit.entity.Player;
 public class ObjectiveTouchEvent extends ObjectiveEvent {
 
   private Player player;
+  private boolean showMessage;
 
-  public ObjectiveTouchEvent(Objective objective, Player player) {
+  public ObjectiveTouchEvent(Objective objective, Player player, boolean showMessage) {
     super(objective);
     this.player = player;
+    this.showMessage = showMessage;
   }
 
 }

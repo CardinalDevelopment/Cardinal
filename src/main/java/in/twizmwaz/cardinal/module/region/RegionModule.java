@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -60,6 +61,7 @@ import in.twizmwaz.cardinal.module.region.type.unbounded.RectangleRegion;
 import lombok.NonNull;
 import org.jdom2.Element;
 
+import java.util.List;
 import java.util.Map;
 
 @ModuleEntry
@@ -69,6 +71,7 @@ public class RegionModule extends AbstractModule {
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
+    regions.put(match, Maps.newHashMap());
     for (Element regionsElement : match.getMap().getDocument().getRootElement().getChildren("regions")) {
       for (Element regionElement : regionsElement.getChildren()) {
         try {
@@ -124,24 +127,36 @@ public class RegionModule extends AbstractModule {
         return checkRegion(match, id, new NowhereRegion());
       case "everywhere":
         return checkRegion(match, id, new EverywhereRegion());
-      default:
-        for (String alternateAttribute : alternateAttributes) {
-          String regionValue = element.getAttributeValue(alternateAttribute);
-          if (regionValue != null) {
-            Region region = getRegionById(match, regionValue);
-            if (region != null) {
-              return checkRegion(match, id, region);
-            }
-          }
+      case "region": {
+        List<String> attributes = Lists.newArrayList(alternateAttributes);
+        attributes.add("id");
+        Region region = fromAttributes(match, element, attributes);
+        if (region != null) {
+          return checkRegion(match, id, region);
         }
+        return getRegion(match, element.getChildren().get(0), alternateAttributes);
+      }
+      default: {
+        List<String> attributes = Lists.newArrayList(alternateAttributes);
+        attributes.add("id");
+        Region region = fromAttributes(match, element, attributes);
+        if (region != null) {
+          return checkRegion(match, id, region);
+        }
+      }
+    }
+    return null;
+  }
 
-        String regionValue = element.getAttributeValue("id");
-        if (regionValue != null) {
-          Region region = getRegionById(match, regionValue);
-          if (region != null) {
-            return checkRegion(match, id, region);
-          }
+  private Region fromAttributes(@NonNull Match match, @NonNull Element element, @NonNull List<String> attributes) {
+    for (String attribute : attributes) {
+      String regionValue = element.getAttributeValue(attribute);
+      if (regionValue != null) {
+        Region region = getRegionById(match, regionValue);
+        if (region != null) {
+          return region;
         }
+      }
     }
     return null;
   }
