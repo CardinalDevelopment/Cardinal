@@ -29,7 +29,7 @@ import in.twizmwaz.cardinal.module.filter.Filter;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface Region extends Filter<Vector> {
 
@@ -39,7 +39,7 @@ public interface Region extends Filter<Vector> {
 
   RegionBounds getBounds();
 
-  List<Block> getBlocks();
+  Collection<Block> getBlocks();
 
   Vector getRandomPoint();
 

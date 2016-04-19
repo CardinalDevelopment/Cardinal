@@ -31,7 +31,7 @@ import in.twizmwaz.cardinal.module.region.parser.modifications.TranslatedRegionP
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class TranslatedRegion extends AbstractRegion {
@@ -71,12 +71,17 @@ public class TranslatedRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     if (!isBounded()) {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    return getBounds().getBlocks().stream().filter(block
-        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
+    if (super.getBlocks() != null) {
+      return super.getBlocks();
+    }
+    Collection<Block> blocks = getBounds().getBlocks().stream().filter(
+        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+    setBlocks(blocks);
+    return super.getBlocks();
   }
 
   @Override

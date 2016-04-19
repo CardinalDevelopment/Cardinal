@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.BlockRegionParser;
@@ -33,7 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 
 public class BlockRegion extends AbstractRegion {
 
@@ -78,8 +78,13 @@ public class BlockRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
-    return Lists.newArrayList(getBlock());
+  public Collection<Block> getBlocks() {
+    if (super.getBlocks() != null) {
+      return super.getBlocks();
+    }
+    Collection<Block> blocks = ImmutableSet.of(getBlock());
+    setBlocks(blocks);
+    return super.getBlocks();
   }
 
   @Override

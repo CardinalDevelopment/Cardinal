@@ -31,7 +31,7 @@ import in.twizmwaz.cardinal.module.region.parser.HalfRegionParser;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 
 public class HalfRegion extends AbstractRegion {
 
@@ -72,7 +72,7 @@ public class HalfRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
   }
 

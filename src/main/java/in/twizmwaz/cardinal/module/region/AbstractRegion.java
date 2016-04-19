@@ -25,13 +25,21 @@
 
 package in.twizmwaz.cardinal.module.region;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.bukkit.block.Block;
+
+import java.util.Collection;
 
 @Getter
-@AllArgsConstructor
+@Setter(AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public abstract class AbstractRegion implements Region {
 
   private final RegionBounds bounds;
+
+  private Collection<Block> blocks;
 
 }

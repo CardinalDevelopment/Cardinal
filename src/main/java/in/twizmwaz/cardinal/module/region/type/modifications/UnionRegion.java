@@ -25,8 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.modifications;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
@@ -36,8 +35,8 @@ import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class UnionRegion extends AbstractRegion {
 
@@ -73,13 +72,17 @@ public class UnionRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     if (!isBounded()) {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    Set<Block> blocks = Sets.newHashSet();
-    regions.forEach(region -> blocks.addAll(region.getBlocks()));
-    return Lists.newArrayList(blocks);
+    if (super.getBlocks() != null) {
+      return super.getBlocks();
+    }
+    ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
+    regions.forEach(region -> builder.addAll(region.getBlocks()));
+    setBlocks(builder.build());
+    return super.getBlocks();
   }
 
   @Override

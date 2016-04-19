@@ -32,7 +32,7 @@ import in.twizmwaz.cardinal.util.Numbers;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 
 public class CuboidRegion extends AbstractRegion {
 
@@ -71,11 +71,16 @@ public class CuboidRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     if (!isBounded()) {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    return getBounds().getBlocks();
+    if (super.getBlocks() != null) {
+      return super.getBlocks();
+    }
+    Collection<Block> blocks = getBounds().getBlocks();
+    setBlocks(blocks);
+    return super.getBlocks();
   }
 
   @Override
@@ -83,7 +88,9 @@ public class CuboidRegion extends AbstractRegion {
     if (!isRandomizable()) {
       throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
     }
-    return new Vector(Numbers.getRandom(min.getX(), max.getX()), Numbers.getRandom(min.getY(), max.getY()),
+    return new Vector(
+        Numbers.getRandom(min.getX(), max.getX()),
+        Numbers.getRandom(min.getY(), max.getY()),
         Numbers.getRandom(min.getZ(), max.getZ()));
   }
 

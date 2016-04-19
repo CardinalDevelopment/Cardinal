@@ -25,13 +25,14 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class SphereRegion extends AbstractRegion {
@@ -68,9 +69,17 @@ public class SphereRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
-    return getBounds().getBlocks().stream().filter(block
-        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
+  public Collection<Block> getBlocks() {
+    if (!isBounded()) {
+      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    }
+    if (super.getBlocks() != null) {
+      return super.getBlocks();
+    }
+    Collection<Block> blocks = getBounds().getBlocks().stream().filter(
+        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+    setBlocks(ImmutableSet.copyOf(blocks));
+    return super.getBlocks();
   }
 
   @Override

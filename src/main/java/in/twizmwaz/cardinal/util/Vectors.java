@@ -165,4 +165,8 @@ public class Vectors {
     return new Vector(x, y, z);
   }
 
+  public static Vector alignToBlock(Vector vector) {
+    return new Vector(vector.getBlockX() + 0.5d, vector.getBlockY() + 0.5d, vector.getBlockZ() + 0.5d);
+  }
+
 }

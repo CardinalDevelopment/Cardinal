@@ -25,14 +25,14 @@
 
 package in.twizmwaz.cardinal.module.region;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.module.region.type.BlockRegion;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Data;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * RegionBounds is the smallest cuboid that contains a region,
@@ -92,31 +92,27 @@ public class RegionBounds {
     return new BlockRegion(getCenter());
   }
 
-  public Vector blockAlign(Vector vector) {
-    return new Vector(vector.getBlockX() + 0.5d, vector.getBlockY() + 0.5d, vector.getBlockZ() + 0.5d);
-  }
-
   /**
    * Gets the blocks inside this region's bounds.
    *
    * @return The blocks.
    */
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     if (!isBounded()) {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    Vector min = blockAlign(this.min);
-    Vector max = blockAlign(this.max);
+    Vector min = Vectors.alignToBlock(this.min);
+    Vector max = Vectors.alignToBlock(this.max);
 
-    List<Block> blocks = Lists.newArrayList();
+    ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
     for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
       for (int y = min.getBlockY(); y < max.getBlockY(); y++) {
         for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
-          blocks.add(new Vector(x, y, z).toLocation(null).getBlock()); //TODO: Get match world
+          builder.add(new Vector(x, y, z).toLocation(null).getBlock()); //TODO: Get match world
         }
       }
     }
-    return blocks;
+    return builder.build();
   }
 
 }

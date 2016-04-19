@@ -59,10 +59,10 @@ public class AboveRegionParser implements RegionParser {
       throw new InvalidRegionAttributeException("z");
     }
 
-    double x = Numbers.parseDouble(xAxisValue, Double.NEGATIVE_INFINITY);
-    double y = Numbers.parseDouble(yAxisValue, Double.NEGATIVE_INFINITY);
-    double z = Numbers.parseDouble(zAxisValue, Double.NEGATIVE_INFINITY);
-    min = new Vector(x, y, z);
+    min = new Vector(
+        Numbers.parseDouble(xAxisValue, Double.NEGATIVE_INFINITY),
+        Numbers.parseDouble(yAxisValue, Double.NEGATIVE_INFINITY),
+        Numbers.parseDouble(zAxisValue, Double.NEGATIVE_INFINITY));
   }
 
 }

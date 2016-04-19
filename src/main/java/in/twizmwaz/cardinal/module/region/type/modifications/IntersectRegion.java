@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.modifications;
 
+import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
@@ -33,6 +34,7 @@ import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,12 +72,17 @@ public class IntersectRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     if (!isBounded()) {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    return getBounds().getBlocks().stream().filter(block
-        -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toList());
+    if (super.getBlocks() != null) {
+      return super.getBlocks();
+    }
+    Collection<Block> blocks = getBounds().getBlocks().stream().filter(
+        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+    setBlocks(ImmutableSet.copyOf(blocks));
+    return super.getBlocks();
   }
 
   @Override

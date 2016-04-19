@@ -30,7 +30,7 @@ import in.twizmwaz.cardinal.module.region.RegionBounds;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.Collection;
 
 public class EmptyRegion extends AbstractRegion {
 
@@ -54,7 +54,7 @@ public class EmptyRegion extends AbstractRegion {
   }
 
   @Override
-  public List<Block> getBlocks() {
+  public Collection<Block> getBlocks() {
     throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
   }
 
