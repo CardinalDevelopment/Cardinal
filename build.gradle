@@ -44,10 +44,10 @@ dependencies {
 
 processResources {
     filter ReplaceTokens, tokens: [
-        'name': rootProject.name,
-        'description': project.description,
-        'mainClass': mainClass,
-        'version': version
+            'name'       : rootProject.name,
+            'description': project.description,
+            'mainClass'  : mainClass,
+            'version'    : version
     ]
 }
 

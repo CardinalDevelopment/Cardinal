@@ -184,6 +184,12 @@ public class Team implements Iterable<Player> {
     return team.getId().equals("observers");
   }
 
+  /**
+   * Gets the objectives required for a team to complete.
+   *
+   * @param team The team.
+   * @return The team's objectives.
+   */
   public static List<Objective> getTeamObjectives(@NonNull Team team) {
     List<Objective> objectives = Lists.newArrayList();
     objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Core

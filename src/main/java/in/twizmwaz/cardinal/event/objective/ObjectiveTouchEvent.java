@@ -38,6 +38,13 @@ public class ObjectiveTouchEvent extends ObjectiveEvent {
   private Player player;
   private boolean showMessage;
 
+  /**
+   * An event that is called when any objective has been touched.
+   *
+   * @param objective The objective.
+   * @param player The player that has touched the objective, if applicable.
+   * @param showMessage If a message was shown when the objective was touched.
+   */
   public ObjectiveTouchEvent(Objective objective, Player player, boolean showMessage) {
     super(objective);
     this.player = player;

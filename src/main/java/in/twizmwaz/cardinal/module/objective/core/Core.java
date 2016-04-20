@@ -120,6 +120,11 @@ public class Core extends Objective implements Listener {
     }
   }
 
+  /**
+   * Checks if the core has been touched when a player breaks a block.
+   *
+   * @param event The event.
+   */
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();

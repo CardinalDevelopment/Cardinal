@@ -65,7 +65,7 @@ public class Components {
   /**
    * Appends a team prefix to the beginning of an array of base components.
    *
-   * @param team The team.
+   * @param team       The team.
    * @param components The base components.
    * @return The new array of base components.
    */

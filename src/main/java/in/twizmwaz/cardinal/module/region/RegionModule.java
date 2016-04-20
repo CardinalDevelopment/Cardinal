@@ -146,6 +146,7 @@ public class RegionModule extends AbstractModule {
         if (region != null) {
           return checkRegion(match, id, region);
         }
+        return getRegion(match, element.getChildren().get(0));
       }
       case "negative":
         return checkRegion(match, id, new NegativeRegion(new NegativeRegionParser(element)));

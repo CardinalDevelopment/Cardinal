@@ -93,7 +93,7 @@ public class CardinalScoreboard implements Listener {
         slots.add(new TeamScoreboardSlot(scoreboardTeam, base, position));
         position++;
       }
-      position ++;
+      position++;
     }
     slots.forEach(this::updateSlot);
   }
