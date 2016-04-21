@@ -105,7 +105,6 @@ public class CardinalScoreboard implements Listener {
       position++;
     }
     slots.forEach(this::updateSlot);
-    Cardinal.getPluginLogger().info(slots + "");
   }
 
   /**
@@ -125,12 +124,11 @@ public class CardinalScoreboard implements Listener {
     scoreboard.getTeam(newTeam.getId()).addEntry(entry);
     if (newTeam.equals(team)) {
       player.setScoreboard(scoreboard);
-      Cardinal.getPluginLogger().info("1");
     }
   }
 
   private void updateSlot(@NonNull ScoreboardSlot slot) {
-    String id = null;
+    String id;
     if (slot instanceof TeamScoreboardSlot) {
       id = ((TeamScoreboardSlot) slot).getTeam().getId() + "-t";
     } else if (slot instanceof ObjectiveScoreboardSlot) {
