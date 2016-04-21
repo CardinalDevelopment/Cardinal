@@ -66,7 +66,11 @@ public class WoolModule extends AbstractModule {
     Document document = match.getMap().getDocument();
     for (Element woolsElement : document.getRootElement().getChildren("wools")) {
       for (Element woolElement : woolsElement.getChildren("wool")) {
+        String colorValue = ParseUtil.getFirstAttribute("color", woolElement, woolsElement);
         String id = ParseUtil.getFirstAttribute("id", woolElement, woolsElement);
+        if (id == null) {
+          id = colorValue;
+        }
 
         String requiredValue = ParseUtil.getFirstAttribute("required", woolElement, woolsElement);
         boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
@@ -82,14 +86,13 @@ public class WoolModule extends AbstractModule {
           continue;
         }
 
-        String colorValue = ParseUtil.getFirstAttribute("color", woolElement, woolsElement);
         if (colorValue == null) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{"No color specified for wool"}, false));
           continue;
         }
         DyeColor color;
         try {
-          color = DyeColor.valueOf(colorValue);
+          color = DyeColor.valueOf(Strings.getTechnicalName(colorValue));
         } catch (IllegalArgumentException e) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid color specified for wool"}, false));
           continue;

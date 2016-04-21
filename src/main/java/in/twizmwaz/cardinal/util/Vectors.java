@@ -58,7 +58,7 @@ public class Vectors {
   public static List<Double> getCoordinates(String str) {
     List<Double> coordinates = Lists.newArrayList();
 
-    if (str.contains("\\,")) {
+    if (str.contains(",")) {
       String[] rawCoords = str.split(",");
       for (String coordinate : rawCoords) {
         if (!Numbers.isDecimal(coordinate.trim())) {

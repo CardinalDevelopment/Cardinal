@@ -32,6 +32,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
 
+import java.util.logging.Logger;
+
 /**
  * Object to control modules.
  */
@@ -61,6 +63,13 @@ public class ModuleHandler {
       } catch (Throwable throwable) {
         throwable.printStackTrace();
         return true;
+      }
+      for (ModuleError error : module.getErrors()) {
+        Logger logger = Cardinal.getPluginLogger();
+        logger.info("Error loading module \"" + module.getClass().getSimpleName() + "\":");
+        for (String message : error.getMessage()) {
+          logger.info(" " + message);
+        }
       }
     }
     return true;

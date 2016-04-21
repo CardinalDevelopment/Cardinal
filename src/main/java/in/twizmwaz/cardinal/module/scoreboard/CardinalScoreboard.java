@@ -39,6 +39,7 @@ import in.twizmwaz.cardinal.module.scoreboard.slot.objective.WoolScoreboardSlot;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -61,6 +62,14 @@ public class CardinalScoreboard implements Listener {
     this.team = team;
     scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 
+    Team.getTeams().forEach(scoreboardTeam -> {
+      org.bukkit.scoreboard.Team registered = scoreboard.registerNewTeam(scoreboardTeam.getId());
+      registered.setPrefix(scoreboardTeam.getColor() + "");
+    });
+
+    if (team == null) {
+      return;
+    }
     org.bukkit.scoreboard.Objective objective = scoreboard.registerNewObjective("objectives", "dummy");
     objective.setDisplayName(Cardinal.getModule(ScoreboardModule.class).getDisplayTitle());
     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -96,6 +105,7 @@ public class CardinalScoreboard implements Listener {
       position++;
     }
     slots.forEach(this::updateSlot);
+    Cardinal.getPluginLogger().info(slots + "");
   }
 
   /**
@@ -105,8 +115,17 @@ public class CardinalScoreboard implements Listener {
    */
   @EventHandler
   public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
-    if (event.getNewTeam().equals(team)) {
-      event.getPlayer().setScoreboard(scoreboard);
+    Team oldTeam = event.getOldTeam();
+    Player player = event.getPlayer();
+    String entry = player.getName();
+    if (oldTeam != null) {
+      scoreboard.getTeam(oldTeam.getId()).removeEntry(entry);
+    }
+    Team newTeam = event.getNewTeam();
+    scoreboard.getTeam(newTeam.getId()).addEntry(entry);
+    if (newTeam.equals(team)) {
+      player.setScoreboard(scoreboard);
+      Cardinal.getPluginLogger().info("1");
     }
   }
 
@@ -116,10 +135,19 @@ public class CardinalScoreboard implements Listener {
       id = ((TeamScoreboardSlot) slot).getTeam().getId() + "-t";
     } else if (slot instanceof ObjectiveScoreboardSlot) {
       id = ((ObjectiveScoreboardSlot) slot).getObjective().getId() + "-o";
+    } else {
+      id = "blank";
     }
     org.bukkit.scoreboard.Team team = scoreboard.getTeam(id);
+    if (team == null) {
+      team = scoreboard.registerNewTeam(id);
+    }
+    String base = slot.getBase();
+    if (!team.hasEntry(base)) {
+      team.addEntry(base);
+    }
     team.setPrefix(slot.getPrefix());
-    getObjective().getScore(slot.getBase()).setScore(slot.getPosition());
+    getObjective().getScore(base).setScore(slot.getPosition());
     team.setSuffix(slot.getSuffix());
   }
 

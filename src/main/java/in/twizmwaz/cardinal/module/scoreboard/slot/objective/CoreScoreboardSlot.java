@@ -28,7 +28,7 @@ package in.twizmwaz.cardinal.module.scoreboard.slot.objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.scoreboard.slot.ObjectiveScoreboardSlot;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.util.Strings;
+import in.twizmwaz.cardinal.util.Characters;
 import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
@@ -58,29 +58,19 @@ public class CoreScoreboardSlot extends ObjectiveScoreboardSlot {
   @Override
   public String getPrefix() {
     if (core.isComplete()) {
-      return ChatColor.GREEN + "✔";
+      return ChatColor.GREEN + " " + Characters.CORE_COMPLETED;
     } else if (core.isTouched() && !core.getTeam().equals(viewing)) {
-      return ChatColor.YELLOW + "✳";
+      return ChatColor.YELLOW + " " + Characters.CORE_TOUCHED;
     } else if (!core.getTeam().equals(viewing) && proximity) {
-      return ChatColor.RED + "⬜ " + getFormattedProximity();
+      return ChatColor.RED + " " + Characters.CORE_INCOMPLETE + " " + getFormattedProximity();
     } else {
-      return ChatColor.RED + "⬜";
+      return ChatColor.RED + " " + Characters.CORE_INCOMPLETE;
     }
   }
 
   private String getFormattedProximity() {
     //TODO: Core proximity
     return null;
-  }
-
-  @Override
-  public String getBase() {
-    return " " + Strings.trim(core.getName(), 0, 15);
-  }
-
-  @Override
-  public String getSuffix() {
-    return Strings.trim(core.getName(), 15, 31);
   }
 
 }

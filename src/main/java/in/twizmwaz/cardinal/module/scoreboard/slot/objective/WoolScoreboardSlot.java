@@ -28,8 +28,8 @@ package in.twizmwaz.cardinal.module.scoreboard.slot.objective;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
 import in.twizmwaz.cardinal.module.scoreboard.slot.ObjectiveScoreboardSlot;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.util.Characters;
 import in.twizmwaz.cardinal.util.Colors;
-import in.twizmwaz.cardinal.util.Strings;
 import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
@@ -60,29 +60,19 @@ public class WoolScoreboardSlot extends ObjectiveScoreboardSlot {
   public String getPrefix() {
     ChatColor color = Colors.convertDyeToChatColor(wool.getColor());
     if (wool.isComplete()) {
-      return color + "⬛";
+      return color + " " + Characters.WOOL_COMPLETED;
     } else if (wool.isTouched() && (wool.getTeam().equals(viewing) || Team.isObservers(viewing))) {
-      return color + "▒" + (proximity ? " " + getFormattedProximity() : "");
+      return color + " " + Characters.WOOL_TOUCHED + (proximity ? " " + getFormattedProximity() : "");
     } else if (wool.getTeam().equals(viewing) || Team.isObservers(viewing) && proximity) {
-      return color + "⬜ " + getFormattedProximity();
+      return color + " " + Characters.WOOL_INCOMPLETE + (proximity ? " " + getFormattedProximity() : "");
     } else {
-      return color + "⬜";
+      return color + " " + Characters.WOOL_INCOMPLETE;
     }
   }
 
   private String getFormattedProximity() {
     //TODO: Wool proximity
     return null;
-  }
-
-  @Override
-  public String getBase() {
-    return " " + Strings.trim(wool.getName(), 0, 15);
-  }
-
-  @Override
-  public String getSuffix() {
-    return Strings.trim(wool.getName(), 15, 31);
   }
 
 }

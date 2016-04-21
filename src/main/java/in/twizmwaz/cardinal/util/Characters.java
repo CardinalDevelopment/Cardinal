@@ -23,32 +23,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.event.objective;
+package in.twizmwaz.cardinal.util;
 
-import in.twizmwaz.cardinal.event.ObjectiveEvent;
-import in.twizmwaz.cardinal.module.objective.Objective;
-import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.entity.Player;
+public enum Characters {
 
-@Getter
-@Setter
-public class ObjectiveTouchEvent extends ObjectiveEvent {
+  CORE_COMPLETED('\u2714'),
+  CORE_INCOMPLETE('\u2715'),
+  CORE_TOUCHED('\u2733'),
 
-  private Player player;
-  private boolean showMessage;
+  WOOL_COMPLETED('\u2B1B'),
+  WOOL_INCOMPLETE('\u2B1C'),
+  WOOL_TOUCHED('\u2592');
 
-  /**
-   * An event that is called when any objective has been touched.
-   *
-   * @param objective   The objective.
-   * @param player      The player that has touched the objective, if applicable.
-   * @param showMessage If a message was shown when the objective was touched.
-   */
-  public ObjectiveTouchEvent(Objective objective, Player player, boolean showMessage) {
-    super(objective);
-    this.player = player;
-    this.showMessage = showMessage;
+  private final char c;
+
+  Characters(char c) {
+    this.c = c;
+  }
+
+  @Override
+  public String toString() {
+    return c + "";
   }
 
 }

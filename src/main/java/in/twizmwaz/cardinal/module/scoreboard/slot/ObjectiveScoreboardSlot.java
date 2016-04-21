@@ -27,8 +27,10 @@ package in.twizmwaz.cardinal.module.scoreboard.slot;
 
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.scoreboard.ScoreboardSlot;
+import in.twizmwaz.cardinal.util.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 
 @Getter
 @AllArgsConstructor
@@ -36,5 +38,15 @@ public abstract class ObjectiveScoreboardSlot implements ScoreboardSlot {
 
   private final Objective objective;
   private final int position;
+
+  @Override
+  public String getBase() {
+    return ChatColor.WHITE + " " + Strings.trim(objective.getName(), 0, 37);
+  }
+
+  @Override
+  public String getSuffix() {
+    return Strings.trim(objective.getName(), 37, 53);
+  }
 
 }

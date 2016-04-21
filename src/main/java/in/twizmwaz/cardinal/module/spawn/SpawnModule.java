@@ -229,7 +229,7 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @return The default spawn.
    */
   @NonNull
-  private Spawn getDefaultSpawn() {
+  public Spawn getDefaultSpawn() {
     for (Spawn spawn : spawns.get(Cardinal.getInstance().getMatchThread().getCurrentMatch())) {
       if (spawn.isDefaultSpawn()) {
         return spawn;
