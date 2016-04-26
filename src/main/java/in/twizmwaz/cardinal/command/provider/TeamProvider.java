@@ -23,50 +23,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard.slot;
+package in.twizmwaz.cardinal.command.provider;
 
+import com.google.common.collect.Lists;
+import ee.ellytr.command.argument.provider.ArgumentProvider;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.util.Strings;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public class TeamScoreboardSlot implements EntryScoreboardSlot {
-
-  private final Team team;
-  private final String base;
-  private final int position;
+public class TeamProvider implements ArgumentProvider<Team> {
 
   @Override
-  public String getPrefix() {
-    return Strings.trim(getFormattedText(), 0, 16);
+  public Team getMatch(String input) {
+    return Team.getTeamById(input);
   }
 
   @Override
-  public String getSuffix() {
-    return Strings.trim(getFormattedText(), 16, 32);
-  }
-
-  private String getFormattedText() {
-    return team.getColor() + team.getName();
-  }
-
-  /**
-   * Gets the next slot base for a team, based on previously used values.
-   *
-   * @param team The team.
-   * @param used The used values.
-   * @return The next base.
-   */
-  public static String getNextTeamBase(Team team, List<String> used) {
-    String base = team.getColor() + "";
-    while (used.contains(base)) {
-      base += team.getColor();
+  public List<String> getSuggestions(String input) {
+    List<String> suggestions = Lists.newArrayList();
+    for (Team team : Team.getTeams()) {
+      String id = team.getId();
+      if (id.toLowerCase().startsWith(input.toLowerCase())) {
+        suggestions.add(id);
+      }
     }
-    return base;
+    return suggestions;
   }
 
 }

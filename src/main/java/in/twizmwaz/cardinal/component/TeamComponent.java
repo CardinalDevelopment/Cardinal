@@ -27,7 +27,8 @@ package in.twizmwaz.cardinal.component;
 
 import com.google.common.collect.Lists;
 import ee.ellytr.chat.ChatConstant;
-import ee.ellytr.chat.component.LocalizedComponent;
+import ee.ellytr.chat.component.LanguageComponent;
+import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import ee.ellytr.chat.util.ChatUtil;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.Strings;
@@ -38,10 +39,11 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
 import java.util.List;
+import java.util.Locale;
 
 @Getter
 @Setter
-public class TeamComponent extends BaseComponent {
+public class TeamComponent extends LanguageComponent {
 
   private Team team;
   private boolean hover;
@@ -71,13 +73,8 @@ public class TeamComponent extends BaseComponent {
     return component;
   }
 
-  /**
-   * Gets an array of {@link BaseComponent} that contains the localized components of this component.
-   *
-   * @param locale The locale to get the components of.
-   * @return The array of {@link BaseComponent}.
-   */
-  public BaseComponent[] getComponents(String locale) {
+  @Override
+  public BaseComponent[] getComponents(Locale locale) {
     List<BaseComponent> components = Lists.newArrayList();
     setColor(team.getColor());
     components.add(ChatUtil.getTextComponent(team.getName(), this));
@@ -90,13 +87,7 @@ public class TeamComponent extends BaseComponent {
             new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/join " + Strings.getFirstWord(team.getName())));
       }
     }
-    BaseComponent[] componentArray = new BaseComponent[components.size()];
-    int j = 0;
-    for (Object component : components) {
-      componentArray[j] = (BaseComponent) component;
-      j++;
-    }
-    return componentArray;
+    return components.toArray(new BaseComponent[components.size()]);
   }
 
 }

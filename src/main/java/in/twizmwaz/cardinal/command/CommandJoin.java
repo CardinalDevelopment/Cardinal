@@ -23,50 +23,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard.slot;
+package in.twizmwaz.cardinal.command;
 
+import ee.ellytr.command.CommandContext;
+import ee.ellytr.command.argument.Optional;
+import ee.ellytr.command.command.Command;
+import ee.ellytr.command.command.PlayerCommand;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.util.Strings;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.entity.Player;
 
-import java.util.List;
-
-@Getter
-@AllArgsConstructor
-public class TeamScoreboardSlot implements EntryScoreboardSlot {
-
-  private final Team team;
-  private final String base;
-  private final int position;
-
-  @Override
-  public String getPrefix() {
-    return Strings.trim(getFormattedText(), 0, 16);
-  }
-
-  @Override
-  public String getSuffix() {
-    return Strings.trim(getFormattedText(), 16, 32);
-  }
-
-  private String getFormattedText() {
-    return team.getColor() + team.getName();
-  }
+public class CommandJoin {
 
   /**
-   * Gets the next slot base for a team, based on previously used values.
+   * Command for players to join the game.
    *
-   * @param team The team.
-   * @param used The used values.
-   * @return The next base.
+   * @param cmd  The context of this command.
+   * @param team The team to join, if specified.
    */
-  public static String getNextTeamBase(Team team, List<String> used) {
-    String base = team.getColor() + "";
-    while (used.contains(base)) {
-      base += team.getColor();
+  @Command(aliases = "join", description = "Join the game")
+  @PlayerCommand
+  public static void join(CommandContext cmd, @Optional Team team) {
+    if (team == null) {
+      //TODO: Get least-filled team
+    } else {
+      team.addPlayer((Player) cmd.getSender(), false, true);
     }
-    return base;
   }
 
 }

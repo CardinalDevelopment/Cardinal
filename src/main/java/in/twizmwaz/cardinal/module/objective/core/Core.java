@@ -27,11 +27,10 @@ package in.twizmwaz.cardinal.module.objective.core;
 
 import com.google.common.collect.Lists;
 import ee.ellytr.chat.ChatConstant;
-import ee.ellytr.chat.component.LocalizedComponent;
-import ee.ellytr.chat.component.LocalizedComponentBuilder;
-import ee.ellytr.chat.component.NameComponent;
-import ee.ellytr.chat.component.UnlocalizedComponent;
-import ee.ellytr.chat.component.UnlocalizedComponentBuilder;
+import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
+import ee.ellytr.chat.component.formattable.LocalizedComponent;
+import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
@@ -137,8 +136,10 @@ public class Core extends Objective implements Listener {
         touchedPlayers.add(player);
         showMessage = true;
         Channels.getTeamChannel(team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
-            ChatConstant.getConstant("objective.core.touched"), new TeamComponent(this.team),
-            new UnlocalizedComponent(name), new NameComponent(player))));
+            ChatConstant.getConstant("objective.core.touched"),
+            new TeamComponent(this.team),
+            new UnlocalizedComponent(name),
+            Components.getNameComponentBuilder(player).flairs(false).build())));
       }
       Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }

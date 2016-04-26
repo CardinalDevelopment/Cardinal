@@ -25,48 +25,12 @@
 
 package in.twizmwaz.cardinal.module.scoreboard.slot;
 
-import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.util.Strings;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardSlot;
 
-import java.util.List;
+public interface EntryScoreboardSlot extends ScoreboardSlot {
 
-@Getter
-@AllArgsConstructor
-public class TeamScoreboardSlot implements EntryScoreboardSlot {
+  String getPrefix();
 
-  private final Team team;
-  private final String base;
-  private final int position;
-
-  @Override
-  public String getPrefix() {
-    return Strings.trim(getFormattedText(), 0, 16);
-  }
-
-  @Override
-  public String getSuffix() {
-    return Strings.trim(getFormattedText(), 16, 32);
-  }
-
-  private String getFormattedText() {
-    return team.getColor() + team.getName();
-  }
-
-  /**
-   * Gets the next slot base for a team, based on previously used values.
-   *
-   * @param team The team.
-   * @param used The used values.
-   * @return The next base.
-   */
-  public static String getNextTeamBase(Team team, List<String> used) {
-    String base = team.getColor() + "";
-    while (used.contains(base)) {
-      base += team.getColor();
-    }
-    return base;
-  }
+  String getSuffix();
 
 }

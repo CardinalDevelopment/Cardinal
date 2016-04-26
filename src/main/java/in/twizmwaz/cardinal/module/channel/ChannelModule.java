@@ -30,6 +30,7 @@ import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
 import in.twizmwaz.cardinal.module.channel.channels.PlayerChannel;
 import in.twizmwaz.cardinal.module.channel.channels.TeamChannel;
@@ -47,14 +48,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.List;
 import java.util.Map;
 
+@ModuleEntry
 public class ChannelModule extends AbstractModule implements Listener {
 
   private GlobalChannel globalChannel;
   private Map<Match, List<TeamChannel>> teamChannels = Maps.newHashMap();
   private Map<Player, PlayerChannel> playerChannels = Maps.newHashMap();
 
+  /**
+   * Constructor for the channel module.
+   */
   public ChannelModule() {
     this.depends = new Class[]{TeamModule.class};
+
+    Cardinal.registerEvents(this);
   }
 
   /**

@@ -38,16 +38,6 @@ public class BlankScoreboardSlot implements ScoreboardSlot {
   private final String base;
   private final int position;
 
-  @Override
-  public String getPrefix() {
-    return "";
-  }
-
-  @Override
-  public String getSuffix() {
-    return "";
-  }
-
   /**
    * Gets the next slot base for a blank slot, based on previously used values.
    *

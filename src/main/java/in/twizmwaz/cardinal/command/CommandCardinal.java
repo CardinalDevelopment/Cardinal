@@ -25,8 +25,8 @@
 
 package in.twizmwaz.cardinal.command;
 
-import ee.ellytr.command.Command;
 import ee.ellytr.command.CommandContext;
+import ee.ellytr.command.command.Command;
 import in.twizmwaz.cardinal.Cardinal;
 import net.md_5.bungee.api.ChatColor;
 

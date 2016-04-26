@@ -32,6 +32,7 @@ import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
 import in.twizmwaz.cardinal.module.scoreboard.slot.BlankScoreboardSlot;
+import in.twizmwaz.cardinal.module.scoreboard.slot.EntryScoreboardSlot;
 import in.twizmwaz.cardinal.module.scoreboard.slot.ObjectiveScoreboardSlot;
 import in.twizmwaz.cardinal.module.scoreboard.slot.TeamScoreboardSlot;
 import in.twizmwaz.cardinal.module.scoreboard.slot.objective.CoreScoreboardSlot;
@@ -128,25 +129,26 @@ public class CardinalScoreboard implements Listener {
   }
 
   private void updateSlot(@NonNull ScoreboardSlot slot) {
-    String id;
-    if (slot instanceof TeamScoreboardSlot) {
-      id = ((TeamScoreboardSlot) slot).getTeam().getId() + "-t";
-    } else if (slot instanceof ObjectiveScoreboardSlot) {
-      id = ((ObjectiveScoreboardSlot) slot).getObjective().getId() + "-o";
-    } else {
-      id = "blank";
-    }
-    org.bukkit.scoreboard.Team team = scoreboard.getTeam(id);
-    if (team == null) {
-      team = scoreboard.registerNewTeam(id);
-    }
     String base = slot.getBase();
-    if (!team.hasEntry(base)) {
-      team.addEntry(base);
+    if (slot instanceof EntryScoreboardSlot) {
+      String id = null;
+      if (slot instanceof TeamScoreboardSlot) {
+        id = ((TeamScoreboardSlot) slot).getTeam().getId() + "-t";
+      } else if (slot instanceof ObjectiveScoreboardSlot) {
+        id = ((ObjectiveScoreboardSlot) slot).getObjective().getId() + "-o";
+      }
+      org.bukkit.scoreboard.Team team = scoreboard.getTeam(id);
+      if (team == null) {
+        team = scoreboard.registerNewTeam(id);
+      }
+      if (!team.hasEntry(base)) {
+        team.addEntry(base);
+      }
+      EntryScoreboardSlot entrySlot = (EntryScoreboardSlot) slot;
+      team.setPrefix(entrySlot.getPrefix());
+      team.setSuffix(entrySlot.getSuffix());
     }
-    team.setPrefix(slot.getPrefix());
     getObjective().getScore(base).setScore(slot.getPosition());
-    team.setSuffix(slot.getSuffix());
   }
 
   @NonNull

@@ -26,13 +26,12 @@
 package in.twizmwaz.cardinal.util;
 
 import ee.ellytr.chat.component.NameComponent;
-import ee.ellytr.chat.component.NameComponentBuilder;
-import ee.ellytr.chat.component.UnlocalizedComponentBuilder;
+import ee.ellytr.chat.component.builder.NameComponentBuilder;
+import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
 import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.ServerOperator;
 
@@ -56,7 +55,7 @@ public class Components {
    */
   public static NameComponentBuilder getNameComponentBuilder(@NonNull ServerOperator who) {
     NameComponentBuilder builder = new NameComponentBuilder(who);
-    if (who instanceof OfflinePlayer && ((OfflinePlayer) who).isOnline()) {
+    if (who instanceof Player) {
       return builder.color(Team.getTeamColor((Player) who));
     }
     return builder;

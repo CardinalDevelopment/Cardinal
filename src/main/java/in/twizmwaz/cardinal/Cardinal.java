@@ -31,12 +31,15 @@ import ee.ellytr.command.CommandRegistry;
 import ee.ellytr.command.exception.CommandException;
 import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.command.CommandCycle;
+import in.twizmwaz.cardinal.command.CommandJoin;
+import in.twizmwaz.cardinal.command.provider.TeamProvider;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleHandler;
 import in.twizmwaz.cardinal.module.ModuleLoader;
 import in.twizmwaz.cardinal.module.ModuleRegistry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
+import in.twizmwaz.cardinal.module.team.Team;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -49,6 +52,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 @Getter
@@ -74,13 +78,8 @@ public final class Cardinal extends JavaPlugin {
     instance = this;
     this.matchThread = new MatchThread();
 
-    commandRegistry = new CommandRegistry(this);
-    commandRegistry.addClass(CommandCardinal.class);
-    commandRegistry.addClass(CommandCycle.class);
-    commandExecutor = new CommandExecutor(commandRegistry.getFactory());
-
+    registerCommands();
     registerLocales();
-
   }
 
   @Override
@@ -137,9 +136,21 @@ public final class Cardinal extends JavaPlugin {
     Bukkit.getPluginManager().registerEvents(listener, getInstance());
   }
 
+  private void registerCommands() {
+    commandRegistry = new CommandRegistry(this);
+    commandRegistry.addClass(CommandCardinal.class);
+    commandRegistry.addClass(CommandCycle.class);
+    commandRegistry.addClass(CommandJoin.class);
+    commandRegistry.getFactory().build();
+
+    commandExecutor = new CommandExecutor(commandRegistry.getFactory());
+
+    commandRegistry.getProviderRegistry().registerProvider(new TeamProvider(), Team.class);
+  }
+
   private void registerLocales() {
     LocaleRegistry registry = new LocaleRegistry();
-    registry.addLocaleFile("en", getResource("lang/cardinal/en.properties"));
+    registry.addLocaleFile(new Locale("en", "US"), getResource("lang/cardinal/en_US.properties"));
     registry.register();
   }
 

@@ -29,12 +29,17 @@ package in.twizmwaz.cardinal.module.team;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import ee.ellytr.chat.ChatConstant;
+import ee.ellytr.chat.component.NameComponent;
+import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
+import in.twizmwaz.cardinal.util.Channels;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -86,7 +91,9 @@ public class Team implements Iterable<Player> {
     PlayerChangeTeamEvent event = new PlayerChangeTeamEvent(player, getTeam(player), this);
     Bukkit.getServer().getPluginManager().callEvent(event);
     if (message && event.getNewTeam() != null) {
-      //TODO: join message
+      Channels.getPlayerChannel(player).sendMessage(new NameComponent(player));
+      Channels.getPlayerChannel(player).sendMessage(new LocalizedComponent(ChatConstant.getConstant("team.join"),
+          new TeamComponent(event.getNewTeam())));
     }
     if (!event.isCancelled()) {
       if (event.getOldTeam() != null) {
