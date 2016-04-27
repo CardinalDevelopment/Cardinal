@@ -34,6 +34,12 @@ import in.twizmwaz.cardinal.module.countdown.CycleCountdown;
 
 public class CommandCycle {
 
+  /**
+   * Cycles to the next map.
+   *
+   * @param cmd  The context of this command.
+   * @param time The time until cycle, defaults to 30.
+   */
   @Command(aliases = "cycle", description = "Cycles to the next map")
   public static void cycle(CommandContext cmd, @Optional Integer time) {
     if (time == null) {

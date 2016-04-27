@@ -35,7 +35,7 @@ import org.bukkit.entity.Player;
 public class CommandJoin {
 
   /**
-   * Command for players to join the game.
+   * Join the game.
    *
    * @param cmd  The context of this command.
    * @param team The team to join, if specified.
