@@ -23,37 +23,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.kit.type;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.module.kit.KitRemovable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.Map;
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+@AllArgsConstructor
+public class KitShield implements KitRemovable {
 
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
+  @Getter
+  private static final Map<Player, ShieldData> players = Maps.newHashMap();
 
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
+  private final ShieldData data;
 
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
+  @Override
+  public void apply(Player player, boolean force) {
+    players.put(player, data);
   }
 
   @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  public void remove(Player player) {
+    players.remove(player);
   }
 
+  @Data
+  public static class ShieldData {
+    private final double health;
+    private final double delay;
+  }
 }

@@ -23,37 +23,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.kit.type;
 
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import in.twizmwaz.cardinal.module.kit.Kit;
+import in.twizmwaz.cardinal.util.ArmorType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Set;
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+@AllArgsConstructor
+public class KitArmor implements Kit {
 
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
+  private final Set<Armor> armor;
 
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
-
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
+  @Override
+  public void apply(Player player, boolean force) {
+    for (Armor armor : this.armor) {
+      switch (armor.getType()) {
+        case HELMET:
+          player.getInventory().setHelmet(armor.getItem());
+          break;
+        case CHESTPLATE:
+          player.getInventory().setChestplate(armor.getItem());
+          break;
+        case LEGGINGS:
+          player.getInventory().setLeggings(armor.getItem());
+          break;
+        case BOOTS:
+          player.getInventory().setBoots(armor.getItem());
+          break;
+        default:
+          break;
+      }
     }
   }
 
-  @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  @Data
+  public static class Armor {
+    private final ItemStack item;
+    private final ArmorType type;
+    private final boolean locked;
   }
-
 }

@@ -23,37 +23,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.kit.listener;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.module.kit.type.KitShield;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.bukkit.event.Listener;
 
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+//TODO: finish this
+public class ShieldListener implements Listener {
 
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
+  @Getter
+  private static final Map<UUID, KitShield.ShieldData> players = Maps.newHashMap();
+  @Getter
+  private static final Map<UUID, Long> times = Maps.newHashMap();
 
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
 
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
-  }
 
 }

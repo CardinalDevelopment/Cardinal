@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.dependency;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.Cardinal;
 
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,10 @@ public final class DependencyGraph<T> {
    * @param dependency The dependency object.
    */
   public void addDependency(T object, T dependency) {
+    if (object == null || dependency == null) {
+      Cardinal.getPluginLogger().warning("Dependency cannot be null, ignoring.");
+      return;
+    }
     add(object);
     add(dependency);
     nodes.putIfAbsent(dependency, new DependencyNode<>(dependency));

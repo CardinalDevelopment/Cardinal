@@ -23,37 +23,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.kit.type;
 
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import in.twizmwaz.cardinal.module.kit.KitRemovable;
+import lombok.AllArgsConstructor;
+import org.bukkit.entity.Player;
 
-import java.util.List;
+@AllArgsConstructor
+public class KitWalkSpeed implements KitRemovable {
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+  private final float walkSpeed;
 
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
-
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
-
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
+  @Override
+  public void apply(Player player, boolean force) {
+    player.setWalkSpeed(walkSpeed);
   }
 
   @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  public void remove(Player player) {
+    player.setWalkSpeed(0.2f);
   }
-
 }

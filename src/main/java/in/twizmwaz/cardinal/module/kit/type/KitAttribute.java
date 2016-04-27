@@ -23,37 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.kit.type;
 
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import in.twizmwaz.cardinal.module.kit.KitRemovable;
+import lombok.AllArgsConstructor;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.Set;
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+@AllArgsConstructor
+public class KitAttribute implements KitRemovable {
 
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
+  private final Set<AttributeModifier> attributes;
 
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
-
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
+  @Override
+  public void apply(Player player, boolean force) {
+    for (AttributeModifier modifier : attributes) {
+      player.getAttribute(Attribute.byName(modifier.getName())).addModifier(modifier);
     }
   }
 
   @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  public void remove(Player player) {
+    for (AttributeModifier modifier : attributes) {
+      player.getAttribute(Attribute.byName(modifier.getName())).removeModifier(modifier);
+    }
   }
 
 }

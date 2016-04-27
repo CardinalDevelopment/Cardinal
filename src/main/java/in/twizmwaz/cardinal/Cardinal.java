@@ -33,6 +33,7 @@ import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.command.CommandCycle;
 import in.twizmwaz.cardinal.command.CommandJoin;
 import in.twizmwaz.cardinal.command.provider.TeamProvider;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.Module;
 import in.twizmwaz.cardinal.module.ModuleHandler;
@@ -48,6 +49,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -146,6 +148,11 @@ public final class Cardinal extends JavaPlugin {
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());
 
     commandRegistry.getProviderRegistry().registerProvider(new TeamProvider(), Team.class);
+  }
+
+  public static Match getMatch(Player player) {
+    //fixme: this should later actually support getting the match
+    return getInstance().getMatchThread().getCurrentMatch();
   }
 
   private void registerLocales() {

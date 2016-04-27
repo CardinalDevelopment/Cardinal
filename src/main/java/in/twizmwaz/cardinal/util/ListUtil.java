@@ -25,13 +25,27 @@
 
 package in.twizmwaz.cardinal.util;
 
+import lombok.NonNull;
+
 import java.util.List;
 import java.util.Random;
 
+//fixme: I don't like this name. Google took Lists already.
 public class ListUtil {
 
-  public static <T> T getRandom(List<T> list) {
-    return list.get(new Random().nextInt(list.size()));
+  /**
+   * Returns a random object from a given list. An empty list will return null.
+   *
+   * @param list The lists to return a random object from.
+   * @param <T> The list type.
+   * @return A random value from the list, if it exists.
+   */
+  public static <T> T getRandom(@NonNull List<T> list) {
+    if (list.size() > 0) {
+      return list.get(new Random().nextInt(list.size()));
+    } else {
+      return null;
+    }
   }
 
 }

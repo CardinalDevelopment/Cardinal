@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.util;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.DyeColor;
 
 public class Colors {
@@ -73,6 +74,64 @@ public class Colors {
       default:
         return ChatColor.RESET;
     }
+  }
+
+
+  /**
+   * Converts a Bungee {@link ChatColor} to a Bukkit {@link DyeColor}
+   *
+   * @param chatColor The chat color to convert.
+   * @return The dye color to convert.
+   */
+  public static DyeColor convertChatColorToDyeColor(ChatColor chatColor) {
+    switch (chatColor) {
+      case WHITE:
+        return DyeColor.WHITE;
+      case AQUA:
+        return DyeColor.LIGHT_BLUE;
+      case GOLD:
+        return DyeColor.ORANGE;
+      case LIGHT_PURPLE:
+        return DyeColor.MAGENTA;
+      case YELLOW:
+        return DyeColor.YELLOW;
+      case GREEN:
+        return DyeColor.LIME;
+      case RED:
+        return DyeColor.PINK;
+      case GRAY:
+        return DyeColor.SILVER;
+      case DARK_GRAY:
+        return DyeColor.GRAY;
+      case DARK_AQUA:
+        return DyeColor.CYAN;
+      case DARK_PURPLE:
+        return DyeColor.PURPLE;
+      case DARK_BLUE:
+        return DyeColor.BLUE;
+      case BLUE:
+        return DyeColor.BLUE;
+      case DARK_GREEN:
+        return DyeColor.GREEN;
+      case DARK_RED:
+        return DyeColor.RED;
+      case BLACK:
+        return DyeColor.BLACK;
+      default:
+        return DyeColor.WHITE;
+    }
+  }
+
+  /**
+   * Converts a RGB color string to a {@link Color}.
+   *
+   * @param color The input RGB string.
+   * @return The corresponding color.
+   */
+  public static Color convertHexToRgb(String color) {
+    return Color.fromRGB(Integer.valueOf(color.substring(0, 2), 16),
+        Integer.valueOf(color.substring(2, 4), 16),
+        Integer.valueOf(color.substring(4, 6), 16));
   }
 
 }

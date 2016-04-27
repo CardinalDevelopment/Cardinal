@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +54,7 @@ public final class ModuleLoader {
   private static final String MODULE_DESCRIPTOR = Type.getDescriptor(ModuleEntry.class);
 
   @Getter
-  private final Set<Class> moduleEntries = Sets.newHashSet();
+  private final Set<Class> moduleEntries = Sets.newLinkedHashSet();
 
   /**
    * Loads entries from a specified package.
@@ -63,8 +64,8 @@ public final class ModuleLoader {
   @SuppressWarnings("unchecked")
   public void findEntries(@NonNull File file) throws IOException {
     Cardinal.getPluginLogger().info("Loading modules from " + file.getAbsolutePath());
-    Set<String> classStrings = Sets.newHashSet();
-    Set<Class> found = Sets.newHashSet();
+    Set<String> classStrings = Sets.newLinkedHashSet();
+    Set<Class> found = Sets.newLinkedHashSet();
     // The Jar to load modules from
     ZipFile zipFile = new ZipFile(file);
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -117,7 +118,7 @@ public final class ModuleLoader {
    */
   @NonNull
   @SuppressWarnings("unchecked")
-  public Map<Class, Module> makeModules(@NonNull Set<Class> entries) {
+  public Map<Class, Module> makeModules(@NonNull Collection<Class> entries) {
     Map<Class, Module> results = Maps.newHashMap();
     entries.forEach(entry -> {
       try {

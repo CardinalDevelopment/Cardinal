@@ -26,9 +26,9 @@
 package in.twizmwaz.cardinal.module.filter;
 
 import com.google.common.collect.Maps;
-import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.filter.exception.FilterPropertyException;
 import in.twizmwaz.cardinal.module.filter.exception.property.InvalidFilterPropertyException;
@@ -57,6 +57,7 @@ import org.jdom2.Element;
 
 import java.util.Map;
 
+@ModuleEntry
 public class FilterModule extends AbstractModule {
 
   private Map<Match, Map<String, Filter>> filters = Maps.newHashMap();
@@ -67,6 +68,7 @@ public class FilterModule extends AbstractModule {
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
+    filters.put(match, Maps.newHashMap());
     for (Element filtersElement : match.getMap().getDocument().getRootElement().getChildren("filters")) {
       for (Element filterElement : filtersElement.getChildren()) {
         try {
@@ -84,8 +86,8 @@ public class FilterModule extends AbstractModule {
     filters.remove(match);
   }
 
-  public Filter getFilterById(@NonNull String id) {
-    return filters.get(Cardinal.getInstance().getMatchThread().getCurrentMatch()).get(id);
+  public Filter getFilter(@NonNull Match match, @NonNull String id) {
+    return filters.get(match).get(id);
   }
 
   /**
@@ -165,7 +167,7 @@ public class FilterModule extends AbstractModule {
         for (String alternateAttribute : alternateAttributes) {
           String filterValue = element.getAttributeValue(alternateAttribute);
           if (filterValue != null) {
-            Filter filter = getFilterById(filterValue);
+            Filter filter = getFilter(match, filterValue);
             if (filter != null) {
               return checkFilter(match, id, filter);
             }
@@ -174,7 +176,7 @@ public class FilterModule extends AbstractModule {
 
         String filterValue = element.getAttributeValue("id");
         if (filterValue != null) {
-          Filter filter = getFilterById(filterValue);
+          Filter filter = getFilter(match, filterValue);
           if (filter != null) {
             return checkFilter(match, id, filter);
           }

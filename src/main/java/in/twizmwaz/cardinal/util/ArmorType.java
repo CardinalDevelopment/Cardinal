@@ -23,37 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.util;
 
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+public enum ArmorType {
 
-import java.util.List;
-
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
-
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
-
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
-
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
-  }
+  HELMET(),
+  CHESTPLATE(),
+  LEGGINGS(),
+  BOOTS();
 
 }

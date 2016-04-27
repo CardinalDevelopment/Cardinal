@@ -23,37 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.dependency;
+package in.twizmwaz.cardinal.module.kit.type;
 
-import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import in.twizmwaz.cardinal.module.kit.KitRemovable;
+import in.twizmwaz.cardinal.module.kit.listener.DoubleJumpListener;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.bukkit.entity.Player;
 
-import java.util.List;
+@AllArgsConstructor
+public class KitDoubleJump implements KitRemovable {
 
-@RequiredArgsConstructor
-@Getter
-final class DependencyNode<T> {
+  private final DoubleJumpData data;
 
-  @NonNull
-  private final T value;
-  @NonNull
-  private final List<DependencyNode<T>> dependencies = Lists.newArrayList();
-
-  void addDependency(DependencyNode<T> node) {
-    dependencies.add(node);
-  }
-
-  void addDependencies(DependencyNode<T>[] nodes) {
-    for (DependencyNode<T> node : nodes) {
-      addDependency(node);
-    }
+  @Override
+  public void apply(Player player, boolean force) {
+    DoubleJumpListener.getPlayers().put(player.getUniqueId(), data);
   }
 
   @Override
-  public String toString() {
-    return "DependencyNode{value=" + value + "}";
+  public void remove(Player player) {
+    DoubleJumpListener.getPlayers().remove(player.getUniqueId());
   }
 
+  @Data
+  public static class DoubleJumpData {
+    private final boolean enabled;
+    private final int power;
+    private final double rechargeTime;
+    private final boolean rechargeBeforeLanding;
+  }
 }

@@ -58,11 +58,13 @@ public class ModuleHandler {
       Cardinal.getInstance().getLogger().info("Loading module \"" + module.getClass().getSimpleName() + "\"...");
       try {
         if (!module.loadMatch(match)) {
+          Cardinal.getInstance().getLogger().warning("An error occurred when attempting to load "
+              + module.getClass().getSimpleName() + " for " + match.getMap().getName());
           return false;
         }
       } catch (Throwable throwable) {
         throwable.printStackTrace();
-        return true;
+        continue;
       }
       for (ModuleError error : module.getErrors()) {
         Logger logger = Cardinal.getPluginLogger();
@@ -72,6 +74,7 @@ public class ModuleHandler {
         }
       }
     }
+    Cardinal.getInstance().getLogger().info("Modules for " + match.getMap().getName() + " loaded successfully.");
     return true;
   }
 
