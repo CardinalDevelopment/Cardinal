@@ -25,13 +25,18 @@
 
 package in.twizmwaz.cardinal.util;
 
+import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.NameComponent;
+import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import ee.ellytr.chat.component.builder.NameComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
+import ee.ellytr.chat.component.formattable.LocalizedComponent;
+import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.ServerOperator;
 
@@ -74,6 +79,26 @@ public class Components {
         new TeamComponent(team)).color(team.getColor()).build();
     System.arraycopy(components, 0, newComponents, 1, components.length);
     return newComponents;
+  }
+
+  public static BaseComponent compress(@NonNull BaseComponent[] components) {
+    if (components.length == 0) {
+      throw new IllegalArgumentException("Array of components cannot be empty");
+    }
+    BaseComponent component = components[0];
+    for (int i = 1; i < components.length; i ++) {
+      component.addExtra(components[i]);
+    }
+    return component;
+  }
+
+  public static LocalizedComponent getTimeComponent(int seconds) {
+    return getTimeComponentBuilder(seconds).build();
+  }
+
+  public static LocalizedComponentBuilder getTimeComponentBuilder(int seconds) {
+    return new LocalizedComponentBuilder(ChatConstant.getConstant(seconds == 1 ? "time.second" : "time.seconds"),
+        new UnlocalizedComponent(seconds + ""));
   }
 
 }

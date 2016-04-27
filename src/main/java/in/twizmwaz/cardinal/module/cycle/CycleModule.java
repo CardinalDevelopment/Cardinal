@@ -32,8 +32,10 @@ import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -89,4 +91,9 @@ public final class CycleModule extends AbstractModule implements Listener {
     }
     return match;
   }
+
+  public LoadedMap getNextMap(@NonNull MatchThread matchThread) {
+    return nextCycle.get(matchThread).getMap();
+  }
+
 }

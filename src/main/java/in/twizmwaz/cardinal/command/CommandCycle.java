@@ -29,13 +29,20 @@ import ee.ellytr.command.CommandContext;
 import ee.ellytr.command.argument.Optional;
 import ee.ellytr.command.command.Command;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.module.cycle.CycleModule;
+import in.twizmwaz.cardinal.module.countdown.CountdownModule;
+import in.twizmwaz.cardinal.module.countdown.CycleCountdown;
 
 public class CommandCycle {
 
   @Command(aliases = "cycle", description = "Cycles to the next map")
   public static void cycle(CommandContext cmd, @Optional Integer time) {
-    Cardinal.getModule(CycleModule.class).cycle(Cardinal.getInstance().getMatchThread());
+    if (time == null) {
+      time = 30;
+    }
+    CycleCountdown countdown = Cardinal.getModule(CountdownModule.class)
+        .getCycleCountdown(Cardinal.getInstance().getMatchThread());
+    countdown.setTime(time);
+    countdown.setCancelled(false);
   }
 
 }
