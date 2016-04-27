@@ -28,11 +28,13 @@ package in.twizmwaz.cardinal.module.filter.exception;
 import in.twizmwaz.cardinal.module.filter.FilterException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jdom2.Element;
 
 @Getter
 @AllArgsConstructor
 public class FilterPropertyException extends FilterException {
 
   private final String property;
+  private final Element element;
 
 }

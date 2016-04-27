@@ -70,7 +70,7 @@ public class ModuleHandler {
         Logger logger = Cardinal.getPluginLogger();
         logger.info("Error loading module \"" + module.getClass().getSimpleName() + "\":");
         for (String message : error.getMessage()) {
-          logger.info(" " + message);
+          logger.info('\t' + message);
         }
       }
     }

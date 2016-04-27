@@ -48,12 +48,12 @@ public class SpawnFilterParser implements FilterParser {
   public SpawnFilterParser(Element element) throws FilterException {
     String spawnReasonProperty = element.getText();
     if (spawnReasonProperty == null) {
-      throw new MissingFilterPropertyException("spawn reason");
+      throw new MissingFilterPropertyException("spawn reason", element);
     }
     try {
       spawnReason = CreatureSpawnEvent.SpawnReason.valueOf(Strings.getTechnicalName(spawnReasonProperty));
     } catch (IllegalArgumentException e) {
-      throw new InvalidFilterPropertyException("spawn reason");
+      throw new InvalidFilterPropertyException("spawn reason", element);
     }
   }
 

@@ -47,6 +47,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,7 @@ public class WoolModule extends AbstractModule {
     Document document = match.getMap().getDocument();
     for (Element woolsElement : document.getRootElement().getChildren("wools")) {
       for (Element woolElement : woolsElement.getChildren("wool")) {
+        Located located = (Located) woolElement;
         String colorValue = ParseUtil.getFirstAttribute("color", woolElement, woolsElement);
         String id = ParseUtil.getFirstAttribute("id", woolElement, woolsElement);
         if (id == null) {
@@ -77,24 +79,28 @@ public class WoolModule extends AbstractModule {
 
         String teamValue = ParseUtil.getFirstAttribute("team", woolElement, woolsElement);
         if (teamValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         Team team = Cardinal.getModule(TeamModule.class).getTeamById(match, teamValue);
         if (team == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
         if (colorValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No color specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No color specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         DyeColor color;
         try {
           color = DyeColor.valueOf(Strings.getTechnicalName(colorValue));
         } catch (IllegalArgumentException e) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid color specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid color specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -107,11 +113,13 @@ public class WoolModule extends AbstractModule {
           }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{RegionModule.getRegionError(e, "monument", "wool")}, false));
+              new String[]{RegionModule.getRegionError(e, "monument", "wool"),
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         if (monument == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid monument specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid monument specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -123,13 +131,14 @@ public class WoolModule extends AbstractModule {
 
         String locationValue = ParseUtil.getFirstAttribute("location", woolElement, woolsElement);
         if (locationValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No location specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No location specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         String[] coordinates = locationValue.split(",");
         if (coordinates.length != 3) {
-          errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid location format specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location format specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         Vector location;
@@ -138,7 +147,8 @@ public class WoolModule extends AbstractModule {
               Double.parseDouble(coordinates[1].trim()),
               Double.parseDouble(coordinates[2].trim()));
         } catch (NumberFormatException e) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -150,7 +160,8 @@ public class WoolModule extends AbstractModule {
             woolProximityMetric = ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid wool proximity metric specified for wool"}, false));
+                new String[]{"Invalid wool proximity metric specified for wool",
+                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
             continue;
           }
         }
@@ -169,7 +180,8 @@ public class WoolModule extends AbstractModule {
                 Strings.getTechnicalName(monumentProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid monument proximity metric specified for wool"}, false));
+                new String[]{"Invalid monument proximity metric specified for wool",
+                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
             continue;
           }
         }

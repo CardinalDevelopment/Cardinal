@@ -47,12 +47,12 @@ public class MaterialFilterParser implements FilterParser {
   public MaterialFilterParser(Element element) throws FilterException {
     String blockProperty = element.getText();
     if (blockProperty == null) {
-      throw new MissingFilterPropertyException("block");
+      throw new MissingFilterPropertyException("block", element);
     }
     try {
       pattern = MaterialPattern.getSingleMaterialPattern(blockProperty);
     } catch (IllegalArgumentException e) {
-      throw new InvalidFilterPropertyException("block");
+      throw new InvalidFilterPropertyException("block", element);
     }
   }
 

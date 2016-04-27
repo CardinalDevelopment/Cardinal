@@ -47,12 +47,12 @@ public class ObjectiveFilterParser implements FilterParser {
   public ObjectiveFilterParser(Element element) throws FilterException {
     String objectiveProperty = element.getText();
     if (objectiveProperty == null) {
-      throw new MissingFilterPropertyException("objective");
+      throw new MissingFilterPropertyException("objective", element);
     }
     //TODO: Get objective by id
     Objective objective = null;
     if (objective == null) {
-      throw new InvalidFilterPropertyException("objective");
+      throw new InvalidFilterPropertyException("objective", element);
     }
     this.objective = objective;
   }

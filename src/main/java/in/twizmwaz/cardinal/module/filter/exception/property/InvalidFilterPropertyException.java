@@ -26,11 +26,12 @@
 package in.twizmwaz.cardinal.module.filter.exception.property;
 
 import in.twizmwaz.cardinal.module.filter.exception.FilterPropertyException;
+import org.jdom2.Element;
 
 public class InvalidFilterPropertyException extends FilterPropertyException {
 
-  public InvalidFilterPropertyException(String property) {
-    super(property);
+  public InvalidFilterPropertyException(String property, Element element) {
+    super(property, element);
   }
 
 }

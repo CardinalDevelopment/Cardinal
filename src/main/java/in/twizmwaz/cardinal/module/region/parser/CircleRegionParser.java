@@ -52,20 +52,20 @@ public class CircleRegionParser implements RegionParser {
   public CircleRegionParser(Element element) throws RegionException {
     String centerValue = element.getAttributeValue("center");
     if (centerValue == null) {
-      throw new MissingRegionAttributeException("center");
+      throw new MissingRegionAttributeException("center", element);
     }
     List<Double> coords = Vectors.getCoordinates(centerValue);
     if (coords == null || coords.size() != 2) {
-      throw new InvalidRegionAttributeException("center");
+      throw new InvalidRegionAttributeException("center", element);
     }
     center = new Vector(coords.get(0), 0, coords.get(1));
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {
-      throw new MissingRegionAttributeException("radius");
+      throw new MissingRegionAttributeException("radius", element);
     }
     if (!Numbers.isDecimal(radiusValue)) {
-      throw new InvalidRegionAttributeException("radius");
+      throw new InvalidRegionAttributeException("radius", element);
     }
     radius = Numbers.parseDouble(radiusValue);
   }

@@ -26,11 +26,12 @@
 package in.twizmwaz.cardinal.module.region.exception.property;
 
 import in.twizmwaz.cardinal.module.region.exception.RegionPropertyException;
+import org.jdom2.Element;
 
 public class InvalidRegionPropertyException extends RegionPropertyException {
 
-  public InvalidRegionPropertyException(String property) {
-    super(property);
+  public InvalidRegionPropertyException(String property, Element element) {
+    super(property, element);
   }
 
 }

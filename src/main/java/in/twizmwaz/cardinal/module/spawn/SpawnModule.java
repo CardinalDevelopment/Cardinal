@@ -53,6 +53,7 @@ import org.bukkit.event.player.PlayerInitialSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.List;
 import java.util.Map;
@@ -125,22 +126,26 @@ public class SpawnModule extends AbstractModule implements Listener {
       working = elements[0].getChild("regions").getChildren();
     }
     for (Element regionElement : working) {
+      Located located = (Located) regionElement;
       Region region;
       try {
         region = Cardinal.getModule(RegionModule.class).getRegion(match, regionElement);
       } catch (RegionException e) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{RegionModule.getRegionError(e, "region", "default spawn")}, false));
+            new String[]{RegionModule.getRegionError(e, "region", "default spawn"),
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
         continue;
       }
       if (region == null) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Invalid region specified for default spawn"}, false));
+            new String[]{"Invalid region specified for default spawn",
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
         continue;
       }
       if (!region.isRandomizable()) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Region specified for default spawn must be randomizable"}, false));
+            new String[]{"Region specified for default spawn must be randomizable",
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
         continue;
       }
       regions.add(region);

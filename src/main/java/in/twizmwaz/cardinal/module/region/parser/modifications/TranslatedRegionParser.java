@@ -63,11 +63,11 @@ public class TranslatedRegionParser implements RegionParser {
 
     String offsetValue = element.getAttributeValue("offset");
     if (offsetValue == null) {
-      throw new MissingRegionAttributeException("offset");
+      throw new MissingRegionAttributeException("offset", element);
     }
     offset = Vectors.getVector(offsetValue);
     if (offset == null) {
-      throw new InvalidRegionAttributeException("offset");
+      throw new InvalidRegionAttributeException("offset", element);
     }
   }
 

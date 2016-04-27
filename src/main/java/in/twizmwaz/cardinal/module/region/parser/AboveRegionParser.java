@@ -46,17 +46,17 @@ public class AboveRegionParser implements RegionParser {
   public AboveRegionParser(Element element) throws RegionException {
     String xAxisValue = element.getAttributeValue("x");
     if (xAxisValue != null && !Numbers.isDecimal(xAxisValue)) {
-      throw new InvalidRegionAttributeException("x");
+      throw new InvalidRegionAttributeException("x", element);
     }
 
     String yAxisValue = element.getAttributeValue("y");
     if (yAxisValue != null && !Numbers.isDecimal(yAxisValue)) {
-      throw new InvalidRegionAttributeException("y");
+      throw new InvalidRegionAttributeException("y", element);
     }
 
     String zAxisValue = element.getAttributeValue("z");
     if (zAxisValue != null && !Numbers.isDecimal(zAxisValue)) {
-      throw new InvalidRegionAttributeException("z");
+      throw new InvalidRegionAttributeException("z", element);
     }
 
     min = new Vector(

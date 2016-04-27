@@ -72,6 +72,7 @@ import in.twizmwaz.cardinal.module.region.type.modifications.TranslatedRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.UnionRegion;
 import lombok.NonNull;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.List;
 import java.util.Map;
@@ -203,21 +204,23 @@ public class RegionModule extends AbstractModule {
   public static String getRegionError(RegionException e, String name, String parent) {
     if (e instanceof RegionAttributeException) {
       RegionAttributeException exception = (RegionAttributeException) e;
+      Located located = (Located) exception.getElement();
       if (exception instanceof MissingRegionAttributeException) {
         return "Missing attribute \"" + exception.getAttribute() + "\"" + (name != null ? " for " + name : "")
-            + (parent != null ? " for " + parent : "");
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       } else if (exception instanceof InvalidRegionAttributeException) {
         return "Invalid attribute \"" + exception.getAttribute() + "\"" + (name != null ? " for " + name : "")
-            + (parent != null ? " for " + parent : "");
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       }
     } else if (e instanceof RegionPropertyException) {
       RegionPropertyException exception = (RegionPropertyException) e;
+      Located located = (Located) exception.getElement();
       if (exception instanceof MissingRegionPropertyException) {
         return "Missing property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
-            + (parent != null ? " for " + parent : "");
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       } else if (exception instanceof InvalidRegionPropertyException) {
         return "Invalid property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
-            + (parent != null ? " for " + parent : "");
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       }
     }
     return "Could not parse " + (name != null ? name : "region") + (parent != null ? " for " + parent : "")

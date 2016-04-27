@@ -57,6 +57,7 @@ public class TeamModule extends AbstractModule {
     Element element = match.getMap().getDocument().getRootElement().getChild("teams");
     if (element != null) {
       element.getChildren().forEach(child -> {
+        Located located = (Located) child;
         String name = child.getText();
 
         String id = child.getAttributeValue("id");
@@ -69,7 +70,7 @@ public class TeamModule extends AbstractModule {
         if (colorRaw == null) {
           Located locatedElement = (Located) child;
           String[] errorMessage = new String[]{"Color missing for " + name,
-              "Element: " + locatedElement.getLine() + ", " + locatedElement.getColumn()};
+              "Element at " + located.getLine() + ", " + located.getColumn()};
           errors.add(new ModuleError(this, match.getMap(), errorMessage, false));
           color = ChatColor.WHITE;
         } else {

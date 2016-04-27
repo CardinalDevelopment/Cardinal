@@ -47,11 +47,11 @@ public class TeamFilterParser implements FilterParser {
   public TeamFilterParser(Element element) throws FilterException {
     String teamProperty = element.getText();
     if (teamProperty == null) {
-      throw new MissingFilterPropertyException("team");
+      throw new MissingFilterPropertyException("team", element);
     }
     Team team = Team.getTeamById(teamProperty);
     if (team == null) {
-      throw new InvalidFilterPropertyException("team");
+      throw new InvalidFilterPropertyException("team", element);
     }
     this.team = team;
   }

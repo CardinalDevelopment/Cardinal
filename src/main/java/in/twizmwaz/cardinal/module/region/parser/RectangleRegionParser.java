@@ -50,21 +50,21 @@ public class RectangleRegionParser implements RegionParser {
   public RectangleRegionParser(Element element) throws RegionException {
     String minValue = element.getAttributeValue("min");
     if (minValue == null) {
-      throw new MissingRegionAttributeException("min");
+      throw new MissingRegionAttributeException("min", element);
     }
     List<Double> coords = Vectors.getCoordinates(minValue);
     if (coords == null || coords.size() != 2) {
-      throw new InvalidRegionAttributeException("min");
+      throw new InvalidRegionAttributeException("min", element);
     }
     min = new Vector(coords.get(0), Double.NEGATIVE_INFINITY, coords.get(1));
 
     String maxValue = element.getAttributeValue("max");
     if (maxValue == null) {
-      throw new MissingRegionAttributeException("max");
+      throw new MissingRegionAttributeException("max", element);
     }
     coords = Vectors.getCoordinates(maxValue);
     if (coords == null || coords.size() != 2) {
-      throw new InvalidRegionAttributeException("max");
+      throw new InvalidRegionAttributeException("max", element);
     }
     max = new Vector(coords.get(0), Double.POSITIVE_INFINITY, coords.get(1));
   }

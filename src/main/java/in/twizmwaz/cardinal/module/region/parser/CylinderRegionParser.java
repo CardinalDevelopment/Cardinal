@@ -51,28 +51,28 @@ public class CylinderRegionParser implements RegionParser {
   public CylinderRegionParser(Element element) throws RegionException {
     String baseValue = element.getAttributeValue("base");
     if (baseValue == null) {
-      throw new MissingRegionAttributeException("base");
+      throw new MissingRegionAttributeException("base", element);
     }
     base = Vectors.getVector(baseValue);
     if (base == null) {
-      throw new InvalidRegionAttributeException("base");
+      throw new InvalidRegionAttributeException("base", element);
     }
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {
-      throw new MissingRegionAttributeException("radius");
+      throw new MissingRegionAttributeException("radius", element);
     }
     if (!Numbers.isDecimal("radius")) {
-      throw new InvalidRegionAttributeException("radius");
+      throw new InvalidRegionAttributeException("radius", element);
     }
     radius = Numbers.parseDouble("radius");
 
     String heightValue = element.getAttributeValue("height");
     if (heightValue == null) {
-      throw new MissingRegionAttributeException("height");
+      throw new MissingRegionAttributeException("height", element);
     }
     if (!Numbers.isDecimal("height")) {
-      throw new InvalidRegionAttributeException("height");
+      throw new InvalidRegionAttributeException("height", element);
     }
     height = Numbers.parseDouble("height");
   }

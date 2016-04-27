@@ -50,19 +50,19 @@ public class SphereRegionParser implements RegionParser {
   public SphereRegionParser(Element element) throws RegionException {
     String originValue = element.getAttributeValue("origin");
     if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
+      throw new MissingRegionAttributeException("origin", element);
     }
     origin = Vectors.getVector(originValue);
     if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
+      throw new InvalidRegionAttributeException("origin", element);
     }
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {
-      throw new MissingRegionAttributeException("radius");
+      throw new MissingRegionAttributeException("radius", element);
     }
     if (!Numbers.isDecimal(radiusValue)) {
-      throw new InvalidRegionAttributeException("radius");
+      throw new InvalidRegionAttributeException("radius", element);
     }
     radius = Numbers.parseDouble(radiusValue);
   }

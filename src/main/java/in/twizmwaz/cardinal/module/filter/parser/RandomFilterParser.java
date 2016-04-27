@@ -47,7 +47,7 @@ public class RandomFilterParser implements FilterParser {
   public RandomFilterParser(Element element) throws FilterException {
     String chanceProperty = element.getText();
     if (chanceProperty == null) {
-      throw new MissingFilterPropertyException("chance");
+      throw new MissingFilterPropertyException("chance", element);
     }
     if (Numbers.isDecimal(chanceProperty)) {
       chance = Numbers.parseDouble(chanceProperty);
@@ -58,10 +58,10 @@ public class RandomFilterParser implements FilterParser {
         if (Numbers.isDecimal(range[0]) && Numbers.isDecimal(range[1])) {
           chance = Numbers.parseDouble(range[1]) - Numbers.parseDouble(range[0]);
         } else {
-          throw new InvalidFilterPropertyException("chance");
+          throw new InvalidFilterPropertyException("chance", element);
         }
       } else {
-        throw new InvalidFilterPropertyException("chance");
+        throw new InvalidFilterPropertyException("chance", element);
       }
     }
   }

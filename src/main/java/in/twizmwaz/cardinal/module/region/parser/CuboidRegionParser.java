@@ -50,20 +50,20 @@ public class CuboidRegionParser implements RegionParser {
   public CuboidRegionParser(Element element) throws RegionException {
     String minValue = element.getAttributeValue("min");
     if (minValue == null) {
-      throw new MissingRegionAttributeException("min");
+      throw new MissingRegionAttributeException("min", element);
     }
     Vector min = Vectors.getVector(minValue);
     if (min == null) {
-      throw new InvalidRegionAttributeException("min");
+      throw new InvalidRegionAttributeException("min", element);
     }
 
     String maxValue = element.getAttributeValue("max");
     if (maxValue == null) {
-      throw new MissingRegionAttributeException("max");
+      throw new MissingRegionAttributeException("max", element);
     }
     Vector max = Vectors.getVector(maxValue);
     if (max == null) {
-      throw new InvalidRegionAttributeException("max");
+      throw new InvalidRegionAttributeException("max", element);
     }
 
     this.min = Vector.getMinimum(min, max);

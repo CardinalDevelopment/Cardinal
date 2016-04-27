@@ -49,6 +49,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -69,6 +70,8 @@ public class CoreModule extends AbstractModule {
     Document document = match.getMap().getDocument();
     for (Element coresElement : document.getRootElement().getChildren("cores")) {
       for (Element coreElement : coresElement.getChildren("core")) {
+        Located located = (Located) coreElement;
+
         String id = ParseUtil.getFirstAttribute("id", coreElement, coresElement);
 
         String nameValue = ParseUtil.getFirstAttribute("name", coreElement, coresElement);
@@ -86,16 +89,19 @@ public class CoreModule extends AbstractModule {
           }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{RegionModule.getRegionError(e, "region", "core")}, false));
+              new String[]{RegionModule.getRegionError(e, "region", "core"),
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid region specified for core"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid region specified for core",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         if (!region.isBounded()) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Region specified for core must be a bounded region"}, false));
+              new String[]{"Region specified for core must be a bounded region",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -106,7 +112,8 @@ public class CoreModule extends AbstractModule {
             leak = Numbers.parseInteger(leakValue);
           } catch (NumberFormatException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid leak distance specified for core"}, false));
+                new String[]{"Invalid leak distance specified for core",
+                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
             continue;
           }
         }
@@ -119,18 +126,21 @@ public class CoreModule extends AbstractModule {
             material = MaterialPattern.getSingleMaterialPattern(materialValue);
           } catch (NumberFormatException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid data value of material specified for core"}, false));
+                new String[]{"Invalid data value of material specified for core",
+                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
             continue;
           }
         }
         String teamValue = ParseUtil.getFirstAttribute("team", coreElement, coresElement);
         if (teamValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         Team team = Cardinal.getModule(TeamModule.class).getTeamById(match, teamValue);
         if (team == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for core"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for core",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -148,7 +158,8 @@ public class CoreModule extends AbstractModule {
                 ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid proximity metric specified for core"}, false));
+                new String[]{"Invalid proximity metric specified for core",
+                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
             continue;
           }
         }

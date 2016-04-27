@@ -26,11 +26,12 @@
 package in.twizmwaz.cardinal.module.region.exception.attribute;
 
 import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
+import org.jdom2.Element;
 
 public class InvalidRegionAttributeException extends RegionAttributeException {
 
-  public InvalidRegionAttributeException(String attribute) {
-    super(attribute);
+  public InvalidRegionAttributeException(String attribute, Element element) {
+    super(attribute, element);
   }
 
 }

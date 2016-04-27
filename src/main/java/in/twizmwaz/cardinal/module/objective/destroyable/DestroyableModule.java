@@ -46,6 +46,7 @@ import lombok.NonNull;
 import org.bukkit.event.HandlerList;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.List;
 import java.util.Map;
@@ -65,11 +66,13 @@ public class DestroyableModule extends AbstractModule {
     List<Destroyable> destroyables = Lists.newArrayList();
     for (Element destroyablesElement : document.getRootElement().getChildren("destroyables")) {
       for (Element destroyableElement : destroyablesElement.getChildren("destroyable")) {
+        Located located = (Located) destroyableElement;
         String id = ParseUtil.getFirstAttribute("id", destroyableElement, destroyablesElement);
 
         String name = ParseUtil.getFirstAttribute("name", destroyableElement, destroyablesElement);
         if (name == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No name specified for destroyable"}, false));
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No name specified for destroyable",
+              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -85,17 +88,20 @@ public class DestroyableModule extends AbstractModule {
           }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{RegionModule.getRegionError(e, "region", "destroyable")}, false));
+              new String[]{RegionModule.getRegionError(e, "region", "destroyable"),
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         if (region == null) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid region specified for destroyable"}, false));
+              new String[]{"Invalid region specified for destroyable",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
         if (!region.isBounded()) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Region specified for destroyable must be a bounded region"}, false));
+              new String[]{"Region specified for destroyable must be a bounded region",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -114,7 +120,8 @@ public class DestroyableModule extends AbstractModule {
         Team owner = Cardinal.getModule(TeamModule.class).getTeamById(match, ownerValue);
         if (owner == null) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid owner specified for destroyable"}, false));
+              new String[]{"Invalid owner specified for destroyable",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
 
@@ -149,7 +156,8 @@ public class DestroyableModule extends AbstractModule {
                 ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
           } catch (IllegalArgumentException e) {
             errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid proximity metric specified for destroyable"}, false));
+                new String[]{"Invalid proximity metric specified for destroyable",
+                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
             continue;
           }
         }

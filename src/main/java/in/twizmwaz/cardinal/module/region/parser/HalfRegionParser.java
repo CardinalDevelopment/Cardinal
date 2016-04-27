@@ -49,20 +49,20 @@ public class HalfRegionParser implements RegionParser {
   public HalfRegionParser(Element element) throws RegionException {
     String normalValue = element.getAttributeValue("normal");
     if (normalValue == null) {
-      throw new MissingRegionAttributeException("normal");
+      throw new MissingRegionAttributeException("normal", element);
     }
     normal = Vectors.getVector(normalValue);
     if (normal == null) {
-      throw new InvalidRegionAttributeException("normal");
+      throw new InvalidRegionAttributeException("normal", element);
     }
 
     String originValue = element.getAttributeValue("origin");
     if (originValue == null) {
-      throw new MissingRegionAttributeException("origin");
+      throw new MissingRegionAttributeException("origin", element);
     }
     origin = Vectors.getVector(originValue);
     if (origin == null) {
-      throw new InvalidRegionAttributeException("origin");
+      throw new InvalidRegionAttributeException("origin", element);
     }
   }
 

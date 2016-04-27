@@ -69,17 +69,17 @@ public class MirroredRegionParser implements RegionParser {
     } else {
       origin = Vectors.getVector(originValue);
       if (origin == null) {
-        throw new InvalidRegionAttributeException("origin");
+        throw new InvalidRegionAttributeException("origin", element);
       }
     }
 
     String normalValue = element.getAttributeValue("normal");
     if (normalValue == null) {
-      throw new MissingRegionAttributeException("normal");
+      throw new MissingRegionAttributeException("normal", element);
     }
     normal = Vectors.getVector(normalValue);
     if (normal == null) {
-      throw new InvalidRegionAttributeException("normal");
+      throw new InvalidRegionAttributeException("normal", element);
     }
   }
 

@@ -54,6 +54,7 @@ import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
 import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.Map;
 
@@ -203,12 +204,13 @@ public class FilterModule extends AbstractModule {
   public static String getFilterError(FilterException e, String name, String parent) {
     if (e instanceof FilterPropertyException) {
       FilterPropertyException exception = (FilterPropertyException) e;
+      Located located = (Located) exception.getElement();
       if (exception instanceof MissingFilterPropertyException) {
         return "Missing property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
-            + (parent != null ? " for " + parent : "");
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       } else if (exception instanceof InvalidFilterPropertyException) {
         return "Invalid property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
-            + (parent != null ? " for " + parent : "");
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       }
     }
     return "Could not parse " + name + (parent != null ? " for " + parent : "");

@@ -48,12 +48,12 @@ public class EntityFilterParser implements FilterParser {
   public EntityFilterParser(Element element) throws FilterException {
     String entityProperty = element.getText();
     if (entityProperty == null) {
-      throw new MissingFilterPropertyException("entity name");
+      throw new MissingFilterPropertyException("entity name", element);
     }
     try {
       entityType = EntityType.valueOf(Strings.getTechnicalName(entityProperty));
     } catch (IllegalArgumentException e) {
-      throw new InvalidFilterPropertyException("entity name");
+      throw new InvalidFilterPropertyException("entity name", element);
     }
   }
 

@@ -47,11 +47,11 @@ public class BlockRegionParser implements RegionParser {
   public BlockRegionParser(Element element) throws RegionException {
     String text = element.getText();
     if (text == null) {
-      throw new MissingRegionPropertyException("location");
+      throw new MissingRegionPropertyException("location", element);
     }
     vector = Vectors.getVector(text);
     if (vector == null) {
-      throw new InvalidRegionPropertyException("location");
+      throw new InvalidRegionPropertyException("location", element);
     }
   }
 
