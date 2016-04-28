@@ -126,15 +126,19 @@ public class Numbers {
   }
 
   public static boolean isDecimal(String str) {
-    return str.matches("-?\\d+(\\.\\d+)?");
+    return str != null && str.matches("-?\\d+(\\.\\d+)?");
   }
 
   public static boolean isInteger(String str) {
-    return str.matches("\\d+");
+    return str != null && str.matches("\\d+");
+  }
+
+  public static boolean isInfinity(String str) {
+    return str != null && str.matches("[\\-\\+]?[oO][oO]");
   }
 
   public static boolean isNumber(String str) {
-    return isDecimal(str) || isInteger(str);
+    return isDecimal(str) || isInfinity(str);
   }
 
 }

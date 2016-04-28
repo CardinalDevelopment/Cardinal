@@ -46,6 +46,9 @@ public class BlockRegionParser implements RegionParser {
    */
   public BlockRegionParser(Element element) throws RegionException {
     String text = element.getText();
+    if (text == null || text.isEmpty()) {
+      text = element.getAttributeValue("location");
+    }
     if (text == null) {
       throw new MissingRegionPropertyException("location", element);
     }

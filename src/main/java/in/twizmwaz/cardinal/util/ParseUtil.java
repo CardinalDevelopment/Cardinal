@@ -28,6 +28,7 @@ package in.twizmwaz.cardinal.util;
 import lombok.NonNull;
 import org.jdom2.Element;
 
+//fixme: I don't like this name
 public class ParseUtil {
 
   /**
@@ -39,6 +40,22 @@ public class ParseUtil {
     for (Element element : elements) {
       String value = element.getAttributeValue(attribute);
       if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param element The element to get attributes from.
+   * @param strings The attribute names, in order, to check.
+   * @return The first non-null value, if it exists.
+   */
+  public static String getFirstNonNullAttributeValue(Element element, String... strings) {
+    for (String string : strings) {
+      String value = element.getAttributeValue(string);
+      if (value != null) {
+        System.out.println("return " + value);
         return value;
       }
     }

@@ -31,6 +31,7 @@ import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
+import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import lombok.Getter;
 import org.jdom2.Element;
 
@@ -53,7 +54,7 @@ public class IntersectRegionParser implements RegionParser {
           Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement));
     }
     if (regions.isEmpty()) {
-      throw new RegionException("No sub-regions specified for intersect region");
+      throw new MissingRegionPropertyException("No sub-regions specified for intersect region", element);
     }
   }
 

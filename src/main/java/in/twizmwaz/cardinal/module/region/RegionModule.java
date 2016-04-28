@@ -25,8 +25,8 @@
 
 package in.twizmwaz.cardinal.module.region;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -70,12 +70,13 @@ import in.twizmwaz.cardinal.module.region.type.modifications.MirroredRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.NegativeRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.TranslatedRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.UnionRegion;
+import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ModuleEntry
 public class RegionModule extends AbstractModule {
@@ -84,7 +85,8 @@ public class RegionModule extends AbstractModule {
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
-    regions.put(match, Maps.newHashMap());
+    Map<String, Region> matchRegions = Maps.newHashMap();
+    regions.put(match, matchRegions);
     for (Element regionsElement : match.getMap().getDocument().getRootElement().getChildren("regions")) {
       for (Element regionElement : regionsElement.getChildren()) {
         try {
@@ -114,7 +116,7 @@ public class RegionModule extends AbstractModule {
    * @throws RegionAttributeException Thrown if there are missing or invalid attributes for a region.
    */
   public Region getRegion(Match match, Element element, String... alternateAttributes) throws RegionException {
-    String id = element.getAttributeValue("id");
+    String id = ParseUtil.getFirstNonNullAttributeValue(element, "id", "name");
     switch (element.getName()) {
       case "cuboid":
         return checkRegion(match, id, new CuboidRegion(new CuboidRegionParser(element)));
@@ -141,7 +143,7 @@ public class RegionModule extends AbstractModule {
       case "everywhere":
         return checkRegion(match, id, new EverywhereRegion());
       case "region": {
-        List<String> attributes = Lists.newArrayList(alternateAttributes);
+        Set<String> attributes = Sets.newHashSet(alternateAttributes);
         attributes.add("id");
         Region region = fromAttributes(match, element, attributes);
         if (region != null) {
@@ -162,7 +164,7 @@ public class RegionModule extends AbstractModule {
       case "mirror":
         return checkRegion(match, id, new MirroredRegion(new MirroredRegionParser(element)));
       default: {
-        List<String> attributes = Lists.newArrayList(alternateAttributes);
+        Set<String> attributes = Sets.newHashSet(alternateAttributes);
         attributes.add("id");
         Region region = fromAttributes(match, element, attributes);
         if (region != null) {
@@ -173,7 +175,7 @@ public class RegionModule extends AbstractModule {
     return null;
   }
 
-  private Region fromAttributes(@NonNull Match match, @NonNull Element element, @NonNull List<String> attributes) {
+  private Region fromAttributes(@NonNull Match match, @NonNull Element element, @NonNull Set<String> attributes) {
     for (String attribute : attributes) {
       String regionValue = element.getAttributeValue(attribute);
       if (regionValue != null) {

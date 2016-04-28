@@ -62,19 +62,19 @@ public class CylinderRegionParser implements RegionParser {
     if (radiusValue == null) {
       throw new MissingRegionAttributeException("radius", element);
     }
-    if (!Numbers.isDecimal("radius")) {
+    if (!Numbers.isDecimal(radiusValue)) {
       throw new InvalidRegionAttributeException("radius", element);
     }
-    radius = Numbers.parseDouble("radius");
+    radius = Numbers.parseDouble(radiusValue);
 
     String heightValue = element.getAttributeValue("height");
     if (heightValue == null) {
       throw new MissingRegionAttributeException("height", element);
     }
-    if (!Numbers.isDecimal("height")) {
+    if (!Numbers.isDecimal(heightValue)) {
       throw new InvalidRegionAttributeException("height", element);
     }
-    height = Numbers.parseDouble("height");
+    height = Numbers.parseDouble(heightValue);
   }
 
 }

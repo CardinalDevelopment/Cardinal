@@ -32,6 +32,7 @@ import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
+import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
@@ -60,7 +61,11 @@ public class MirroredRegionParser implements RegionParser {
       }
     }
     if (region == null) {
-      throw new RegionException("No sub-region specified for mirrored region");
+      Cardinal.getModule(RegionModule.class).getRegionById(
+          Cardinal.getInstance().getMatchThread().getCurrentMatch(), element.getAttributeValue("region"));
+    }
+    if (region == null) {
+      throw new MissingRegionPropertyException("No sub-region specified for mirrored region", element);
     }
 
     String originValue = element.getAttributeValue("origin");

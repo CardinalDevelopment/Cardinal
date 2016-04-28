@@ -31,6 +31,7 @@ import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
+import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import lombok.Getter;
 import org.jdom2.Element;
 
@@ -61,10 +62,10 @@ public class ComplementRegionParser implements RegionParser {
       }
     }
     if (region == null) {
-      throw new RegionException("No sub-regions specified for complement region");
+      throw new MissingRegionPropertyException("No sub-regions specified for complement region", element);
     }
     if (complements.isEmpty()) {
-      throw new RegionException("No complements specified for complement region");
+      throw new MissingRegionPropertyException("No complements specified for complement region", element);
     }
   }
 

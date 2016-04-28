@@ -61,7 +61,7 @@ public class Vectors {
     if (str.contains(",")) {
       String[] rawCoords = str.split(",");
       for (String coordinate : rawCoords) {
-        if (!Numbers.isDecimal(coordinate.trim())) {
+        if (!Numbers.isNumber(coordinate.trim())) {
           return null;
         }
         coordinates.add(Numbers.parseDouble(coordinate.trim()));

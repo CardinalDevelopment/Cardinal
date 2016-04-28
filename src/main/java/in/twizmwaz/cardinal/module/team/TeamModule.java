@@ -74,7 +74,7 @@ public class TeamModule extends AbstractModule {
           errors.add(new ModuleError(this, match.getMap(), errorMessage, false));
           color = ChatColor.WHITE;
         } else {
-          color = ChatColor.valueOf(colorRaw.replace(" ", "_").toUpperCase());
+          color = ChatColor.valueOf(colorRaw.replace(" ", "_").replace("-", "_").toUpperCase());
         }
 
         String overheadRaw = child.getAttributeValue("overhead-color");
