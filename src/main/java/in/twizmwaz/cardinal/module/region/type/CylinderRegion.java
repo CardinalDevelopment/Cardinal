@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.type;
 
 import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CylinderRegionParser;
@@ -49,8 +50,8 @@ public class CylinderRegion extends AbstractRegion {
    * @param radius The radius.
    * @param height The height.
    */
-  public CylinderRegion(Vector base, double radius, double height) {
-    super(new RegionBounds(
+  public CylinderRegion(Match match, Vector base, double radius, double height) {
+    super(new RegionBounds(match,
         new Vector(base.getX() - radius, base.getY(), base.getZ() - radius),
         new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius)));
     this.base = base;
@@ -58,8 +59,8 @@ public class CylinderRegion extends AbstractRegion {
     this.height = height;
   }
 
-  public CylinderRegion(CylinderRegionParser parser) {
-    this(parser.getBase(), parser.getRadius(), parser.getHeight());
+  public CylinderRegion(Match match, CylinderRegionParser parser) {
+    this(match, parser.getBase(), parser.getRadius(), parser.getHeight());
   }
 
   @Override

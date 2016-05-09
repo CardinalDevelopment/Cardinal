@@ -84,17 +84,17 @@ public class CoreModule extends AbstractModule {
         Region region;
         try {
           region = regionModule.getRegion(match, coreElement);
-          if (region == null) {
-            region = regionModule.getRegion(match, coresElement);
-          }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{RegionModule.getRegionError(e, "region", "core"),
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
+        if (region == null && coresElement.getAttribute("region") != null) {
+          region = regionModule.getRegionById(match, coresElement.getAttributeValue("region"));
+        }
         if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid region specified for core",
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for core",
               "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }

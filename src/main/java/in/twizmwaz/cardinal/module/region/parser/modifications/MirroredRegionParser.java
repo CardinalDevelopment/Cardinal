@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.parser.modifications;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
@@ -52,17 +53,16 @@ public class MirroredRegionParser implements RegionParser {
    * @throws RegionException Thrown if no sub-region is specified, if the origin attribute is invalid, or if the normal
    *                         attribute is missing or invalid.
    */
-  public MirroredRegionParser(Element element) throws RegionException {
+  public MirroredRegionParser(Match match, Element element) throws RegionException {
+    RegionModule module = Cardinal.getModule(RegionModule.class);
     for (Element subRegionElement : element.getChildren()) {
-      region = Cardinal.getModule(RegionModule.class).getRegion(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement);
+      region = module.getRegion(match, subRegionElement);
       if (region != null) {
         break;
       }
     }
-    if (region == null) {
-      Cardinal.getModule(RegionModule.class).getRegionById(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch(), element.getAttributeValue("region"));
+    if (region == null && element.getAttribute("region") != null) {
+      region = module.getRegionById(match, element.getAttributeValue("region"));
     }
     if (region == null) {
       throw new MissingRegionPropertyException("No sub-region specified for mirrored region", element);

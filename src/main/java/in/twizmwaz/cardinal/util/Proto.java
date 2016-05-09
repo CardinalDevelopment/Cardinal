@@ -57,28 +57,44 @@ public class Proto {
    * @param proto The given proto.
    * @return If this proto is greater than the given proto.
    */
-  public boolean greaterThan(@NonNull Proto proto) {
+  public boolean isAfter(@NonNull Proto proto) {
     return this.major > proto.getMajor()
             || (this.major == proto.getMajor() && (this.minor > proto.getMinor()
             || (this.minor == proto.getMinor() && this.patch > proto.getPatch())));
   }
 
-  public boolean greaterThanOrEqualTo(@NonNull Proto proto) {
-    return this.equals(proto) || this.greaterThan(proto);
+  public boolean isAfterOrAt(@NonNull Proto proto) {
+    return this.equals(proto) || this.isAfter(proto);
   }
 
   /**
    * @param proto The given proto.
    * @return If this proto is less than the given proto.
    */
-  public boolean lessThan(@NonNull Proto proto) {
+  public boolean isBefore(@NonNull Proto proto) {
     return this.major < proto.getMajor()
             || (this.major == proto.getMajor() && (this.minor < proto.getMinor()
             || (this.minor == proto.getMinor() && this.patch < proto.getPatch())));
   }
 
-  public boolean lessThanOrEqualTo(@NonNull Proto proto) {
-    return this.equals(proto) || this.lessThan(proto);
+  public boolean isBeforeOrAt(double proto) {
+    return this.equals(proto) || this.isBefore(proto);
+  }
+
+  public boolean isAfter(double proto) {
+    return major + minor * 0.1 + patch * 0.01 > proto;
+  }
+
+  public boolean isAfterOrAt(double proto) {
+    return this.equals(proto) || this.isAfter(proto);
+  }
+
+  public boolean isBefore(double proto) {
+    return major + minor * 0.1 + patch * 0.01 < proto;
+  }
+
+  public boolean isBeforeOrAt(@NonNull Proto proto) {
+    return this.equals(proto) || this.isBefore(proto);
   }
 
 }

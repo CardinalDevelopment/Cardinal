@@ -40,6 +40,7 @@ import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
+import in.twizmwaz.cardinal.util.Proto;
 import in.twizmwaz.cardinal.util.Strings;
 import lombok.NonNull;
 import org.bukkit.DyeColor;
@@ -108,17 +109,17 @@ public class WoolModule extends AbstractModule {
         Region monument;
         try {
           monument = regionModule.getRegion(match, woolElement, "monument");
-          if (monument == null) {
-            monument = regionModule.getRegion(match, woolsElement, "monument");
-          }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{RegionModule.getRegionError(e, "monument", "wool"),
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
+        if (monument == null && woolsElement.getAttribute("monument") != null) {
+          monument = regionModule.getRegionById(match, woolsElement.getAttributeValue("monument"));
+        }
         if (monument == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid monument specified for wool",
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No monument specified for wool",
               "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
@@ -130,26 +131,33 @@ public class WoolModule extends AbstractModule {
         boolean show = showValue == null || Numbers.parseBoolean(showValue);
 
         String locationValue = ParseUtil.getFirstAttribute("location", woolElement, woolsElement);
-        if (locationValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No location specified for wool",
+        Proto proto = match.getMap().getProto();
+        if (locationValue != null && proto.isBefore(1.4)) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Attribute \"location\" is supported in proto 1.4.0 or later",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        } else if (locationValue == null && proto.isAfterOrAt(1.4)) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Attribute \"location\" should be specified for wool in proto 1.4.0 or later",
               "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          continue;
         }
-        String[] coordinates = locationValue.split(",");
-        if (coordinates.length != 3) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location format specified for wool",
-              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          continue;
-        }
-        Vector location;
-        try {
-          location = new Vector(Double.parseDouble(coordinates[0].trim()),
-              Double.parseDouble(coordinates[1].trim()),
-              Double.parseDouble(coordinates[2].trim()));
-        } catch (NumberFormatException e) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location specified for wool",
-              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          continue;
+        Vector location = null;
+        if (locationValue != null) {
+          String[] coordinates = locationValue.split(",");
+          if (coordinates.length != 3) {
+            errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location format specified for wool",
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+            continue;
+          }
+          try {
+            location = new Vector(Double.parseDouble(coordinates[0].trim()),
+                Double.parseDouble(coordinates[1].trim()),
+                Double.parseDouble(coordinates[2].trim()));
+          } catch (NumberFormatException e) {
+            errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid location specified for wool",
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+            continue;
+          }
         }
 
         ProximityMetric woolProximityMetric = ProximityMetric.CLOSEST_KILL;

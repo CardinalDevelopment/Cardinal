@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.type;
 
 import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.BlockRegionParser;
@@ -39,13 +40,13 @@ public class BlockRegion extends AbstractRegion {
 
   private final Vector vector;
 
-  public BlockRegion(Vector vector) {
-    super(new RegionBounds(vector, vector.plus(1, 1, 1)));
+  public BlockRegion(Match match, Vector vector) {
+    super(new RegionBounds(match, vector, vector.plus(1, 1, 1)));
     this.vector = vector;
   }
 
-  public BlockRegion(BlockRegionParser parser) {
-    this(parser.getVector());
+  public BlockRegion(Match match, BlockRegionParser parser) {
+    this(match, parser.getVector());
   }
 
   @Override

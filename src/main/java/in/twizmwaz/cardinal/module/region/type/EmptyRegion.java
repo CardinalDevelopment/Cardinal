@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import org.bukkit.block.Block;
@@ -34,8 +35,8 @@ import java.util.Collection;
 
 public class EmptyRegion extends AbstractRegion {
 
-  public EmptyRegion() {
-    super(RegionBounds.empty());
+  public EmptyRegion(Match match) {
+    super(RegionBounds.empty(match));
   }
 
   @Override

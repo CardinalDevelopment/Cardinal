@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.region.parser.modifications;
 
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
@@ -49,10 +50,13 @@ public class ComplementRegionParser implements RegionParser {
    * @param element The element.
    * @throws RegionException Thrown if no sub-regions are specified.
    */
-  public ComplementRegionParser(Element element) throws RegionException {
+  public ComplementRegionParser(Match match, Element element) throws RegionException {
+    RegionModule module = Cardinal.getModule(RegionModule.class);
+    if (element.getAttribute("region") != null) {
+      region = module.getRegionById(match, element.getAttributeValue("region"));
+    }
     for (Element subRegionElement : element.getChildren()) {
-      Region region = Cardinal.getModule(RegionModule.class).getRegion(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement);
+      Region region = module.getRegion(match, subRegionElement);
       if (region != null) {
         if (this.region == null) {
           this.region = region;

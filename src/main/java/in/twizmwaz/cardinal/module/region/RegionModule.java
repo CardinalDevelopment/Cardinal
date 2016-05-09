@@ -25,8 +25,8 @@
 
 package in.twizmwaz.cardinal.module.region;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -71,12 +71,13 @@ import in.twizmwaz.cardinal.module.region.type.modifications.NegativeRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.TranslatedRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.UnionRegion;
 import in.twizmwaz.cardinal.util.ParseUtil;
+import in.twizmwaz.cardinal.util.Proto;
 import lombok.NonNull;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @ModuleEntry
 public class RegionModule extends AbstractModule {
@@ -86,9 +87,14 @@ public class RegionModule extends AbstractModule {
   @Override
   public boolean loadMatch(@NonNull Match match) {
     Map<String, Region> matchRegions = Maps.newHashMap();
+    matchRegions.put("everywhere", new EverywhereRegion(match));
+    matchRegions.put("nowhere", new NowhereRegion(match));
     regions.put(match, matchRegions);
     for (Element regionsElement : match.getMap().getDocument().getRootElement().getChildren("regions")) {
       for (Element regionElement : regionsElement.getChildren()) {
+        if (regionElement.getName().equals("apply")) {
+          continue;
+        }
         try {
           getRegion(match, regionElement);
         } catch (RegionException e) {
@@ -116,76 +122,79 @@ public class RegionModule extends AbstractModule {
    * @throws RegionAttributeException Thrown if there are missing or invalid attributes for a region.
    */
   public Region getRegion(Match match, Element element, String... alternateAttributes) throws RegionException {
-    String id = ParseUtil.getFirstNonNullAttributeValue(element, "id", "name");
+    List<String> attributes = Lists.newArrayList(alternateAttributes);
+    attributes.add("id");
+    attributes.add("name");
+    Map.Entry<String, String> value = ParseUtil.getFirstNonNullAttributeValue(element, attributes);
+    String id = null;
+    if (value != null) {
+      String attr = value.getKey();
+      Proto proto = match.getMap().getProto();
+      if (attr.equals("id") && proto.isBefore(1.4)) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{"Attribute \"id\" should be \"name\" prior to proto 1.4.0"}, false));
+      } else if (attr.equals("name") && proto.isAfterOrAt(1.4)) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{"Attribute \"name\" should be \"id\" in proto 1.4.0 or later"}, false));
+      }
+      id = value.getValue();
+    }
     switch (element.getName()) {
       case "cuboid":
-        return checkRegion(match, id, new CuboidRegion(new CuboidRegionParser(element)));
+        return checkRegion(match, id, new CuboidRegion(match, new CuboidRegionParser(element)));
       case "cylinder":
-        return checkRegion(match, id, new CylinderRegion(new CylinderRegionParser(element)));
+        return checkRegion(match, id, new CylinderRegion(match, new CylinderRegionParser(element)));
       case "block":
-        return checkRegion(match, id, new BlockRegion(new BlockRegionParser(element)));
+        return checkRegion(match, id, new BlockRegion(match, new BlockRegionParser(element)));
       case "sphere":
-        return checkRegion(match, id, new SphereRegion(new SphereRegionParser(element)));
+        return checkRegion(match, id, new SphereRegion(match, new SphereRegionParser(element)));
       case "rectangle":
-        return checkRegion(match, id, new RectangleRegion(new RectangleRegionParser(element)));
+        return checkRegion(match, id, new RectangleRegion(match, new RectangleRegionParser(element)));
       case "circle":
-        return checkRegion(match, id, new CircleRegion(new CircleRegionParser(element)));
+        return checkRegion(match, id, new CircleRegion(match, new CircleRegionParser(element)));
       case "half":
-        return checkRegion(match, id, new HalfRegion(new HalfRegionParser(element)));
+        return checkRegion(match, id, new HalfRegion(match, new HalfRegionParser(element)));
       case "below":
-        return checkRegion(match, id, new BelowRegion(new BelowRegionParser(element)));
+        return checkRegion(match, id, new BelowRegion(match, new BelowRegionParser(element)));
       case "above":
-        return checkRegion(match, id, new AboveRegion(new AboveRegionParser(element)));
+        return checkRegion(match, id, new AboveRegion(match, new AboveRegionParser(element)));
       case "empty":
-        return checkRegion(match, id, new EmptyRegion());
+        return checkRegion(match, id, new EmptyRegion(match));
       case "nowhere":
-        return checkRegion(match, id, new NowhereRegion());
+        return checkRegion(match, id, new NowhereRegion(match));
       case "everywhere":
-        return checkRegion(match, id, new EverywhereRegion());
-      case "region": {
-        Set<String> attributes = Sets.newHashSet(alternateAttributes);
-        attributes.add("id");
-        Region region = fromAttributes(match, element, attributes);
-        if (region != null) {
-          return checkRegion(match, id, region);
-        }
-        return getRegion(match, element.getChildren().get(0));
-      }
+        return checkRegion(match, id, new EverywhereRegion(match));
       case "negative":
-        return checkRegion(match, id, new NegativeRegion(new NegativeRegionParser(element)));
+        return checkRegion(match, id, new NegativeRegion(match, new NegativeRegionParser(element)));
       case "union":
-        return checkRegion(match, id, new UnionRegion(new UnionRegionParser(element)));
+        return checkRegion(match, id, new UnionRegion(match, new UnionRegionParser(element)));
       case "complement":
-        return checkRegion(match, id, new ComplementRegion(new ComplementRegionParser(element)));
+        return checkRegion(match, id, new ComplementRegion(new ComplementRegionParser(match, element)));
       case "intersect":
-        return checkRegion(match, id, new IntersectRegion(new IntersectRegionParser(element)));
+        return checkRegion(match, id, new IntersectRegion(match, new IntersectRegionParser(element)));
       case "translate":
-        return checkRegion(match, id, new TranslatedRegion(new TranslatedRegionParser(element)));
+        return checkRegion(match, id, new TranslatedRegion(new TranslatedRegionParser(match, element)));
       case "mirror":
-        return checkRegion(match, id, new MirroredRegion(new MirroredRegionParser(element)));
-      default: {
-        Set<String> attributes = Sets.newHashSet(alternateAttributes);
-        attributes.add("id");
-        Region region = fromAttributes(match, element, attributes);
-        if (region != null) {
-          return checkRegion(match, id, region);
+        return checkRegion(match, id, new MirroredRegion(new MirroredRegionParser(match, element)));
+      default:
+        if (id != null) {
+          Region region = getRegionById(match, id);
+          if (region != null) {
+            return region;
+          }
         }
-      }
-    }
-    return null;
-  }
-
-  private Region fromAttributes(@NonNull Match match, @NonNull Element element, @NonNull Set<String> attributes) {
-    for (String attribute : attributes) {
-      String regionValue = element.getAttributeValue(attribute);
-      if (regionValue != null) {
-        Region region = getRegionById(match, regionValue);
-        if (region != null) {
-          return region;
+        List<Region> regions = Lists.newArrayList();
+        for (Element child : element.getChildren()) {
+          Region childRegion = getRegion(match, child);
+          if (childRegion != null) {
+            regions.add(childRegion);
+          }
         }
-      }
+        if (regions.isEmpty()) {
+          return null;
+        }
+        return checkRegion(match, id, new UnionRegion(match, regions));
     }
-    return null;
   }
 
   private Region checkRegion(Match match, String id, Region region) {

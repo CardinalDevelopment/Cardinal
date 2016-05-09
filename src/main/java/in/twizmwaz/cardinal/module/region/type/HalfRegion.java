@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.HalfRegionParser;
@@ -46,14 +47,14 @@ public class HalfRegion extends AbstractRegion {
    * @param origin The origin.
    * @param normal The normal.
    */
-  public HalfRegion(Vector origin, Vector normal) {
-    super(RegionBounds.unbounded());
+  public HalfRegion(Match match, Vector origin, Vector normal) {
+    super(RegionBounds.unbounded(match));
     this.origin = origin;
     this.normal = normal;
   }
 
-  public HalfRegion(HalfRegionParser parser) {
-    this(parser.getNormal(), parser.getOrigin());
+  public HalfRegion(Match match, HalfRegionParser parser) {
+    this(match, parser.getNormal(), parser.getOrigin());
   }
 
   @Override

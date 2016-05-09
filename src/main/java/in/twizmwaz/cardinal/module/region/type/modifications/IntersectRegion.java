@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.type.modifications;
 
 import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
@@ -42,13 +43,13 @@ public class IntersectRegion extends AbstractRegion {
 
   private final List<Region> regions;
 
-  public IntersectRegion(List<Region> regions) {
-    super(new RegionBounds(Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
+  public IntersectRegion(Match match, List<Region> regions) {
+    super(new RegionBounds(match, Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
     this.regions = regions;
   }
 
-  public IntersectRegion(IntersectRegionParser parser) {
-    this(parser.getRegions());
+  public IntersectRegion(Match match, IntersectRegionParser parser) {
+    this(match, parser.getRegions());
   }
 
   @Override

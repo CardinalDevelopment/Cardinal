@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.parser.modifications;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
@@ -47,13 +48,17 @@ public class TranslatedRegionParser implements RegionParser {
   /**
    * Parses an element for a translated region.
    *
+   * @param match The match that the region will be part of.
    * @param element The element.
    * @throws RegionException Thrown if no sub-region is specified or if the offset attribute is missing or invalid.
    */
-  public TranslatedRegionParser(Element element) throws RegionException {
+  public TranslatedRegionParser(Match match, Element element) throws RegionException {
     for (Element subRegionElement : element.getChildren()) {
-      region = Cardinal.getModule(RegionModule.class).getRegion(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement);
+      RegionModule module = Cardinal.getModule(RegionModule.class);
+      region = module.getRegion(match, subRegionElement);
+      if (region == null && element.getAttribute("region") != null) {
+        region = module.getRegionById(match, element.getAttributeValue("region"));
+      }
       if (region != null) {
         break;
       }

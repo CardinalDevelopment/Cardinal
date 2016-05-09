@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region;
 
 import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.type.BlockRegion;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Data;
@@ -42,19 +43,20 @@ import java.util.Collection;
 @Data
 public class RegionBounds {
 
+  private final Match match;
   private final Vector min;
   private final Vector max;
 
-  public static RegionBounds empty() {
-    return new RegionBounds(Vectors.max(), Vectors.min());
+  public static RegionBounds empty(Match match) {
+    return new RegionBounds(match, Vectors.max(), Vectors.min());
   }
 
-  public static RegionBounds unbounded() {
-    return new RegionBounds(Vectors.min(), Vectors.max());
+  public static RegionBounds unbounded(Match match) {
+    return new RegionBounds(match, Vectors.min(), Vectors.max());
   }
 
   public RegionBounds translate(Vector offset) {
-    return new RegionBounds(min.plus(offset), max.plus(offset));
+    return new RegionBounds(match, min.plus(offset), max.plus(offset));
   }
 
   /**
@@ -65,7 +67,7 @@ public class RegionBounds {
    * @return The mirrored region bounds.
    */
   public RegionBounds mirror(Vector origin, Vector normal) {
-    return new RegionBounds(
+    return new RegionBounds(match,
         Vectors.getMirroredVector(min, origin, normal),
         Vectors.getMirroredVector(max, origin, normal));
   }
@@ -89,7 +91,7 @@ public class RegionBounds {
   }
 
   public BlockRegion getCenterBlock() {
-    return new BlockRegion(getCenter());
+    return new BlockRegion(match, getCenter());
   }
 
   /**
@@ -108,7 +110,7 @@ public class RegionBounds {
     for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
       for (int y = min.getBlockY(); y < max.getBlockY(); y++) {
         for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
-          builder.add(new Vector(x, y, z).toLocation(null).getBlock()); //TODO: Get match world
+          builder.add(new Vector(x, y, z).toLocation(match.getWorld()).getBlock()); //TODO: Get match world
         }
       }
     }

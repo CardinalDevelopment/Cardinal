@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.AboveRegionParser;
@@ -38,13 +39,13 @@ public class AboveRegion extends AbstractRegion {
 
   private final Vector min;
 
-  public AboveRegion(Vector min) {
-    super(new RegionBounds(min, Vectors.max()));
+  public AboveRegion(Match match, Vector min) {
+    super(new RegionBounds(match, min, Vectors.max()));
     this.min = min;
   }
 
-  public AboveRegion(AboveRegionParser parser) {
-    this(parser.getMin());
+  public AboveRegion(Match match, AboveRegionParser parser) {
+    this(match, parser.getMin());
   }
 
   @Override

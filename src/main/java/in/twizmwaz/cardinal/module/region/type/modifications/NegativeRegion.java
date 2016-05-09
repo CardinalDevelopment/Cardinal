@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type.modifications;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
@@ -39,13 +40,13 @@ public class NegativeRegion extends AbstractRegion {
 
   private final Region region;
 
-  public NegativeRegion(Region region) {
-    super(new RegionBounds(Vectors.min(), Vectors.max()));
+  public NegativeRegion(Match match, Region region) {
+    super(new RegionBounds(match, Vectors.min(), Vectors.max()));
     this.region = region;
   }
 
-  public NegativeRegion(NegativeRegionParser parser) {
-    this(parser.getRegion());
+  public NegativeRegion(Match match, NegativeRegionParser parser) {
+    this(match, parser.getRegion());
   }
 
   @Override

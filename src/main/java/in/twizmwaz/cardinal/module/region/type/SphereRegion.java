@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.region.type;
 
 import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
@@ -46,16 +47,16 @@ public class SphereRegion extends AbstractRegion {
    * @param origin The origin.
    * @param radius The radius.
    */
-  public SphereRegion(Vector origin, double radius) {
-    super(new RegionBounds(
+  public SphereRegion(Match match, Vector origin, double radius) {
+    super(new RegionBounds(match,
         new Vector(origin.getX() - radius, origin.getY() - radius, origin.getZ() - radius),
         new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius)));
     this.origin = origin;
     this.radius = radius;
   }
 
-  public SphereRegion(SphereRegionParser parser) {
-    this(parser.getOrigin(), parser.getRadius());
+  public SphereRegion(Match match, SphereRegionParser parser) {
+    this(match, parser.getOrigin(), parser.getRadius());
   }
 
   @Override

@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.RectangleRegionParser;
@@ -42,8 +43,8 @@ public class RectangleRegion extends AbstractRegion {
    * @param min The rectangle's minimum bound.
    * @param max The rectangle's maximum bound.
    */
-  public RectangleRegion(Vector min, Vector max) {
-    super(new RegionBounds(min, max));
+  public RectangleRegion(Match match, Vector min, Vector max) {
+    super(new RegionBounds(match, min, max));
 
     this.min = Vector.getMinimum(min, max);
     this.min.setY(Double.NEGATIVE_INFINITY);
@@ -52,8 +53,8 @@ public class RectangleRegion extends AbstractRegion {
     this.max.setY(Double.POSITIVE_INFINITY);
   }
 
-  public RectangleRegion(RectangleRegionParser parser) {
-    this(parser.getMin(), parser.getMax());
+  public RectangleRegion(Match match, RectangleRegionParser parser) {
+    this(match, parser.getMin(), parser.getMax());
   }
 
   @Override

@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CircleRegionParser;
@@ -44,16 +45,16 @@ public class CircleRegion extends AbstractRegion {
    * @param center The center.
    * @param radius The radius.
    */
-  public CircleRegion(Vector center, double radius) {
-    super(new RegionBounds(
+  public CircleRegion(Match match, Vector center, double radius) {
+    super(new RegionBounds(match,
         new Vector(center.getX() - radius, Double.NEGATIVE_INFINITY, center.getZ() - radius),
         new Vector(center.getX() + radius, Double.POSITIVE_INFINITY, center.getZ() + radius)));
     this.center = center;
     this.radius = radius;
   }
 
-  public CircleRegion(CircleRegionParser parser) {
-    this(parser.getCenter(), parser.getRadius());
+  public CircleRegion(Match match, CircleRegionParser parser) {
+    this(match, parser.getCenter(), parser.getRadius());
   }
 
   @Override

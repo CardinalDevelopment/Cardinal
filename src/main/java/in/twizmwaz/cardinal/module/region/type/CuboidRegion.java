@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.region.type;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CuboidRegionParser;
@@ -45,14 +46,14 @@ public class CuboidRegion extends AbstractRegion {
    * @param min The min.
    * @param max The max.
    */
-  public CuboidRegion(Vector min, Vector max) {
-    super(new RegionBounds(min, max));
+  public CuboidRegion(Match match, Vector min, Vector max) {
+    super(new RegionBounds(match, min, max));
     this.min = min;
     this.max = max;
   }
 
-  public CuboidRegion(CuboidRegionParser parser) {
-    this(parser.getMin(), parser.getMax());
+  public CuboidRegion(Match match, CuboidRegionParser parser) {
+    this(match, parser.getMin(), parser.getMax());
   }
 
   @Override

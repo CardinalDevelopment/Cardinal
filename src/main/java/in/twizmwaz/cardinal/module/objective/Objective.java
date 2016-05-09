@@ -41,7 +41,6 @@ public abstract class Objective {
 
   @NonNull
   private final Match match;
-  @NonNull
   private final String id;
   private final boolean required;
   private final boolean show;

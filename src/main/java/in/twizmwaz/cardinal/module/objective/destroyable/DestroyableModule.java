@@ -83,18 +83,18 @@ public class DestroyableModule extends AbstractModule {
         Region region;
         try {
           region = regionModule.getRegion(match, destroyableElement);
-          if (region == null) {
-            region = regionModule.getRegion(match, destroyablesElement);
-          }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{RegionModule.getRegionError(e, "region", "destroyable"),
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
+        if (region == null && destroyablesElement.getAttribute("region") != null) {
+          region = regionModule.getRegionById(match, destroyablesElement.getAttributeValue("region"));
+        }
         if (region == null) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Invalid region specified for destroyable",
+              new String[]{"No region specified for destroyable",
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }

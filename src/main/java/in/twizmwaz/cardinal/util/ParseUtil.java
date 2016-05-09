@@ -28,6 +28,10 @@ package in.twizmwaz.cardinal.util;
 import lombok.NonNull;
 import org.jdom2.Element;
 
+import java.util.AbstractMap;
+import java.util.List;
+import java.util.Map;
+
 //fixme: I don't like this name
 public class ParseUtil {
 
@@ -48,15 +52,14 @@ public class ParseUtil {
 
   /**
    * @param element The element to get attributes from.
-   * @param strings The attribute names, in order, to check.
+   * @param attributes The attribute names, in order, to check.
    * @return The first non-null value, if it exists.
    */
-  public static String getFirstNonNullAttributeValue(Element element, String... strings) {
-    for (String string : strings) {
-      String value = element.getAttributeValue(string);
+  public static Map.Entry<String, String> getFirstNonNullAttributeValue(Element element, List<String> attributes) {
+    for (String attr : attributes) {
+      String value = element.getAttributeValue(attr);
       if (value != null) {
-        System.out.println("return " + value);
-        return value;
+        return new AbstractMap.SimpleEntry<>(attr, value);
       }
     }
     return null;
