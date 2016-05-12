@@ -32,6 +32,8 @@ import ee.ellytr.command.exception.CommandException;
 import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.command.CommandCycle;
 import in.twizmwaz.cardinal.command.CommandJoin;
+import in.twizmwaz.cardinal.command.CommandSetNext;
+import in.twizmwaz.cardinal.command.provider.LoadedMapProvider;
 import in.twizmwaz.cardinal.command.provider.TeamProvider;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
@@ -40,6 +42,7 @@ import in.twizmwaz.cardinal.module.ModuleHandler;
 import in.twizmwaz.cardinal.module.ModuleLoader;
 import in.twizmwaz.cardinal.module.ModuleRegistry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -143,11 +146,13 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.addClass(CommandCardinal.class);
     commandRegistry.addClass(CommandCycle.class);
     commandRegistry.addClass(CommandJoin.class);
+    commandRegistry.addClass(CommandSetNext.class);
     commandRegistry.getFactory().build();
 
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());
 
     commandRegistry.getProviderRegistry().registerProvider(new TeamProvider(), Team.class);
+    commandRegistry.getProviderRegistry().registerProvider(new LoadedMapProvider(), LoadedMap.class);
   }
 
   public static Match getMatch(Player player) {

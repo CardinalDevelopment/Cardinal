@@ -96,4 +96,8 @@ public final class CycleModule extends AbstractModule implements Listener {
     return nextCycle.get(matchThread).getMap();
   }
 
+  public CycleRunnable getNextCycle(@NonNull MatchThread thread) {
+    return getNextCycle().get(thread);
+  }
+
 }
