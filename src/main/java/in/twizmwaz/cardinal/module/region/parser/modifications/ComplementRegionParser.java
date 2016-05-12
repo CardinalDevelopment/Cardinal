@@ -34,6 +34,7 @@ import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jdom2.Element;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class ComplementRegionParser implements RegionParser {
    * @param element The element.
    * @throws RegionException Thrown if no sub-regions are specified.
    */
-  public ComplementRegionParser(Match match, Element element) throws RegionException {
+  public ComplementRegionParser(@NonNull Match match, Element element) throws RegionException {
     RegionModule module = Cardinal.getModule(RegionModule.class);
     if (element.getAttribute("region") != null) {
       region = module.getRegionById(match, element.getAttributeValue("region"));

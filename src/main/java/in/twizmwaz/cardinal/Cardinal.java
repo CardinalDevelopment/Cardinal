@@ -35,6 +35,7 @@ import in.twizmwaz.cardinal.command.CommandJoin;
 import in.twizmwaz.cardinal.command.CommandSetNext;
 import in.twizmwaz.cardinal.command.provider.LoadedMapProvider;
 import in.twizmwaz.cardinal.command.provider.TeamProvider;
+import in.twizmwaz.cardinal.event.matchthread.MatchThreadMakeEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.Module;
@@ -57,6 +58,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -69,7 +71,7 @@ public final class Cardinal extends JavaPlugin {
   private ModuleLoader moduleLoader;
   @Setter(AccessLevel.PRIVATE)
   private ModuleHandler moduleHandler;
-  private MatchThread matchThread;
+  private List<MatchThread> matchThreads;
   private CommandRegistry commandRegistry;
   private CommandExecutor commandExecutor;
 
@@ -81,7 +83,10 @@ public final class Cardinal extends JavaPlugin {
       throw new IllegalStateException("The Cardinal object has already been created.");
     }
     instance = this;
-    this.matchThread = new MatchThread();
+
+    MatchThread matchThread = new MatchThread();
+    matchThreads.add(matchThread);
+    Bukkit.getPluginManager().callEvent(new MatchThreadMakeEvent(matchThread));
 
     registerCommands();
     registerLocales();
@@ -155,9 +160,44 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.getProviderRegistry().registerProvider(new LoadedMapProvider(), LoadedMap.class);
   }
 
-  public static Match getMatch(Player player) {
-    //fixme: this should later actually support getting the match
-    return getInstance().getMatchThread().getCurrentMatch();
+  /**
+   * @param player The player.
+   * @return The match thread that contains this player.
+   */
+  @NonNull
+  public static MatchThread getMatchThread(@NonNull Player player) {
+    for (MatchThread matchThread : getInstance().getMatchThreads()) {
+      if (matchThread.hasPlayer(player)) {
+        return matchThread;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param match The match.
+   * @return The match thread that is running this match.
+   */
+  public static MatchThread getMatchThread(@NonNull Match match) {
+    for (MatchThread matchThread : getInstance().getMatchThreads()) {
+      if (matchThread.getCurrentMatch().equals(match)) {
+        return matchThread;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param player The player.
+   * @return The match that the player is in.
+   */
+  @NonNull
+  public static Match getMatch(@NonNull Player player) {
+    MatchThread matchThread = getMatchThread(player);
+    if (matchThread == null) {
+      return null;
+    }
+    return matchThread.getCurrentMatch();
   }
 
   private void registerLocales() {

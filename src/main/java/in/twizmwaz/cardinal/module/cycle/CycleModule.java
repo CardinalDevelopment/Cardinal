@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.cycle;
 
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.matchthread.MatchThreadMakeEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -58,15 +59,31 @@ public final class CycleModule extends AbstractModule implements Listener {
   /**
    * Creates a new cycle object for the initial server cycle.
    *
-   * @param event The event listened for.
+   * @param event The event.
    */
   @EventHandler
-  public void onModuleLoad(ModuleLoadCompleteEvent event) {
+  public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
+    Cardinal.getInstance().getMatchThreads().forEach(matchThread -> {
+      CycleRunnable runnable = new CycleRunnable(this, UUID.randomUUID());
+      runnable.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
+      nextCycle.put(matchThread, runnable);
+      cycle(matchThread);
+    });
+  }
+
+  /**
+   * Creates a new cycle runnable for every match thread that is made.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onMatchThreadMake(MatchThreadMakeEvent event) {
+    MatchThread matchThread = event.getMatchThread();
+
     CycleRunnable runnable = new CycleRunnable(this, UUID.randomUUID());
-    runnable.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(Cardinal.getInstance().getMatchThread())
-        .getNext());
-    nextCycle.put(Cardinal.getInstance().getMatchThread(), runnable);
-    cycle(Cardinal.getInstance().getMatchThread());
+    runnable.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
+    nextCycle.put(matchThread, runnable);
+    cycle(matchThread);
   }
 
   /**
@@ -74,18 +91,16 @@ public final class CycleModule extends AbstractModule implements Listener {
    *
    * @return If the cycle was successful.
    */
-  public Match cycle(MatchThread thread) {
-    World old = Cardinal.getInstance().getMatchThread().getCurrentMatch() != null
-        ? Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld() : null;
-    CycleRunnable cycle = nextCycle.get(thread);
+  public Match cycle(MatchThread matchThread) {
+    World old = matchThread.getCurrentMatch() != null ? matchThread.getCurrentMatch().getWorld() : null;
+    CycleRunnable cycle = nextCycle.get(matchThread);
     cycle.run();
-    Match match = new Match(Cardinal.getInstance().getMatchThread(), cycle.getUuid(), cycle.getMap(), cycle.getWorld());
-    thread.setCurrentMatch(match);
+    Match match = new Match(matchThread, cycle.getUuid(), cycle.getMap(), cycle.getWorld());
+    matchThread.setCurrentMatch(match);
     Cardinal.getInstance().getModuleHandler().loadMatch(match);
     CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
-    next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(Cardinal.getInstance().getMatchThread())
-        .getNext());
-    nextCycle.put(thread, next);
+    next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
+    nextCycle.put(matchThread, next);
     if (old != null) {
       Bukkit.unloadWorld(old, true);
     }

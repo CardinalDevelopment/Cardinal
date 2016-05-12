@@ -25,12 +25,14 @@
 
 package in.twizmwaz.cardinal.module.filter.parser;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.filter.FilterException;
 import in.twizmwaz.cardinal.module.filter.FilterParser;
 import in.twizmwaz.cardinal.module.filter.exception.property.InvalidFilterPropertyException;
 import in.twizmwaz.cardinal.module.filter.exception.property.MissingFilterPropertyException;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jdom2.Element;
 
 @Getter
@@ -44,12 +46,12 @@ public class TeamFilterParser implements FilterParser {
    * @param element The element.
    * @throws FilterException Thrown if the team property is missing or invalid.
    */
-  public TeamFilterParser(Element element) throws FilterException {
+  public TeamFilterParser(@NonNull Match match, Element element) throws FilterException {
     String teamProperty = element.getText();
     if (teamProperty == null) {
       throw new MissingFilterPropertyException("team", element);
     }
-    Team team = Team.getTeamById(teamProperty);
+    Team team = Team.getTeamById(match, teamProperty);
     if (team == null) {
       throw new InvalidFilterPropertyException("team", element);
     }

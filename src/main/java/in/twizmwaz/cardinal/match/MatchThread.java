@@ -25,8 +25,16 @@
 
 package in.twizmwaz.cardinal.match;
 
+import com.google.common.collect.Sets;
+import in.twizmwaz.cardinal.event.player.PlayerJoinMatchThreadEvent;
+import in.twizmwaz.cardinal.event.player.PlayerQuitMatchThreadEvent;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.Collection;
 
 /**
  * A MatchThread is an object representing a linear string of matches.
@@ -39,11 +47,28 @@ public class MatchThread {
   @Getter
   private final int id;
   @Getter
+  private final Collection<Player> players;
+  @Getter
   @Setter
   private Match currentMatch;
 
   public MatchThread() {
     id = counter++;
+    players = Sets.newHashSet();
+  }
+
+  public void addPlayer(@NonNull Player player) {
+    players.add(player);
+    Bukkit.getPluginManager().callEvent(new PlayerJoinMatchThreadEvent(player, this));
+  }
+
+  public void removePlayer(@NonNull Player player) {
+    players.remove(player);
+    Bukkit.getPluginManager().callEvent(new PlayerQuitMatchThreadEvent(player, this));
+  }
+
+  public boolean hasPlayer(@NonNull Player player) {
+    return players.contains(player);
   }
 
 }

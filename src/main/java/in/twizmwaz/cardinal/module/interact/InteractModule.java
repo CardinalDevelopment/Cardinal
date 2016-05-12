@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.interact;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.spawn.SpawnModule;
@@ -61,8 +62,7 @@ public class InteractModule extends AbstractModule implements Listener {
   }
 
   private boolean canInteract(@NonNull Player player) {
-    return Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()
-        && !Team.isObservers(Team.getTeam(player));
+    return Cardinal.getMatch(player).isRunning() && !Team.isObservers(Team.getTeam(player));
   }
 
   /**
@@ -72,9 +72,11 @@ public class InteractModule extends AbstractModule implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onPlayerMove(PlayerMoveEvent event) {
-    if (!canInteract(event.getPlayer()) && event.getTo().getY() < -64) {
-      event.setTo(ListUtil.getRandom(Cardinal.getModule(SpawnModule.class).getDefaultSpawn().getRegions())
-          .getRandomPoint().toLocation(Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+    Player player = event.getPlayer();
+    if (!canInteract(player) && event.getTo().getY() < -64) {
+      Match match = Cardinal.getMatch(player);
+      event.setTo(ListUtil.getRandom(Cardinal.getModule(SpawnModule.class).getDefaultSpawn(match).getRegions())
+          .getRandomPoint().toLocation(match.getWorld()));
     }
   }
 
@@ -85,9 +87,11 @@ public class InteractModule extends AbstractModule implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onPlayerTeleport(PlayerTeleportEvent event) {
-    if (!canInteract(event.getPlayer()) && event.getTo().getY() < -64) {
-      event.setTo(ListUtil.getRandom(Cardinal.getModule(SpawnModule.class).getDefaultSpawn().getRegions())
-          .getRandomPoint().toLocation(Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+    Player player = event.getPlayer();
+    if (!canInteract(player) && event.getTo().getY() < -64) {
+      Match match = Cardinal.getMatch(player);
+      event.setTo(ListUtil.getRandom(Cardinal.getModule(SpawnModule.class).getDefaultSpawn(match).getRegions())
+          .getRandomPoint().toLocation(match.getWorld()));
     }
   }
 

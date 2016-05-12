@@ -165,13 +165,13 @@ public class RegionModule extends AbstractModule {
       case "everywhere":
         return checkRegion(match, id, new EverywhereRegion(match));
       case "negative":
-        return checkRegion(match, id, new NegativeRegion(match, new NegativeRegionParser(element)));
+        return checkRegion(match, id, new NegativeRegion(match, new NegativeRegionParser(match, element)));
       case "union":
-        return checkRegion(match, id, new UnionRegion(match, new UnionRegionParser(element)));
+        return checkRegion(match, id, new UnionRegion(match, new UnionRegionParser(match, element)));
       case "complement":
         return checkRegion(match, id, new ComplementRegion(new ComplementRegionParser(match, element)));
       case "intersect":
-        return checkRegion(match, id, new IntersectRegion(match, new IntersectRegionParser(element)));
+        return checkRegion(match, id, new IntersectRegion(match, new IntersectRegionParser(match, element)));
       case "translate":
         return checkRegion(match, id, new TranslatedRegion(new TranslatedRegionParser(match, element)));
       case "mirror":

@@ -26,6 +26,8 @@
 package in.twizmwaz.cardinal.util;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.channel.ChannelModule;
 import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
 import in.twizmwaz.cardinal.module.channel.channels.PlayerChannel;
@@ -36,17 +38,17 @@ import org.bukkit.entity.Player;
 
 public class Channels {
 
-  public static GlobalChannel getGlobalChannel() {
-    return Cardinal.getModule(ChannelModule.class).getGlobalChannel();
+  public static GlobalChannel getGlobalChannel(@NonNull MatchThread matchThread) {
+    //TODO: Take match thread parameter to get global channel
+    return Cardinal.getModule(ChannelModule.class).getGlobalChannel(matchThread);
   }
 
   public static PlayerChannel getPlayerChannel(@NonNull Player player) {
     return Cardinal.getModule(ChannelModule.class).getPlayerChannel(player);
   }
 
-  public static TeamChannel getTeamChannel(@NonNull Team team) {
-    return Cardinal.getModule(ChannelModule.class).getTeamChannel(
-        Cardinal.getInstance().getMatchThread().getCurrentMatch(), team);
+  public static TeamChannel getTeamChannel(@NonNull Match match, @NonNull Team team) {
+    return Cardinal.getModule(ChannelModule.class).getTeamChannel(match, team);
   }
 
 }

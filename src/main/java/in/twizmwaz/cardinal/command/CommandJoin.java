@@ -29,6 +29,7 @@ import ee.ellytr.command.CommandContext;
 import ee.ellytr.command.argument.Optional;
 import ee.ellytr.command.command.Command;
 import ee.ellytr.command.command.PlayerCommand;
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.team.Team;
 import org.bukkit.entity.Player;
 
@@ -43,10 +44,11 @@ public class CommandJoin {
   @Command(aliases = "join", description = "Join the game")
   @PlayerCommand
   public static void join(CommandContext cmd, @Optional Team team) {
+    Player player = (Player) cmd.getSender();
     if (team == null) {
-      //TODO: Get least-filled team
+      Team.getEmptiestTeam(Team.getTeams(Cardinal.getMatch(player))).addPlayer(player, false, true);
     } else {
-      team.addPlayer((Player) cmd.getSender(), false, true);
+      team.addPlayer(player, false, true);
     }
   }
 

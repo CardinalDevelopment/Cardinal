@@ -161,9 +161,9 @@ public class SpawnModule extends AbstractModule implements Listener {
    */
   @EventHandler
   public void onPlayerInitialSpawn(PlayerInitialSpawnEvent event) {
-    List<Region> regions = getDefaultSpawn().getRegions();
-    event.setSpawnLocation(ListUtil.getRandom(regions).getRandomPoint().toLocation(
-        Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+    Match match = Cardinal.getMatch(event.getPlayer());
+    List<Region> regions = getDefaultSpawn(match).getRegions();
+    event.setSpawnLocation(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
   }
 
   @EventHandler
@@ -178,8 +178,9 @@ public class SpawnModule extends AbstractModule implements Listener {
    */
   @EventHandler
   public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
-    if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
-      Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(event.getPlayer()));
+    Player player = event.getPlayer();
+    if (Cardinal.getMatch(player).isRunning()) {
+      Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player));
     }
   }
 
@@ -207,24 +208,22 @@ public class SpawnModule extends AbstractModule implements Listener {
   public void onCardinalRespawn(CardinalRespawnEvent event) {
     Player player = event.getPlayer();
     Team team = Team.getTeam(player);
+    Match match = Cardinal.getMatch(player);
     if (team == null || !Team.isObservers(team)) {
       player.setGameMode(GameMode.SURVIVAL);
-      if (Cardinal.getInstance().getMatchThread().getCurrentMatch().isRunning()) {
-        List<Spawn> spawns = getSpawns(team);
+      if (match.isRunning()) {
+        List<Spawn> spawns = getSpawns(match, team);
         List<Region> regions = ListUtil.getRandom(spawns).getRegions();
-        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
-            Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
       } else {
-        List<Region> regions = getDefaultSpawn().getRegions();
-        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
-            Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+        List<Region> regions = getDefaultSpawn(match).getRegions();
+        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
       }
     } else {
       player.setGameMode(GameMode.CREATIVE);
 
-      List<Region> regions = getDefaultSpawn().getRegions();
-      player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch().getWorld()));
+      List<Region> regions = getDefaultSpawn(match).getRegions();
+      player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
     }
   }
 
@@ -234,8 +233,8 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @return The default spawn.
    */
   @NonNull
-  public Spawn getDefaultSpawn() {
-    for (Spawn spawn : spawns.get(Cardinal.getInstance().getMatchThread().getCurrentMatch())) {
+  public Spawn getDefaultSpawn(@NonNull Match match) {
+    for (Spawn spawn : spawns.get(match)) {
       if (spawn.isDefaultSpawn()) {
         return spawn;
       }
@@ -250,8 +249,8 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @param team The team for the spawns.
    * @return The list of spawns.
    */
-  private List<Spawn> getSpawns(Team team) {
-    return spawns.get(Cardinal.getInstance().getMatchThread().getCurrentMatch()).stream()
+  private List<Spawn> getSpawns(@NonNull Match match, @NonNull Team team) {
+    return spawns.get(match).stream()
         .filter(spawn -> (team == null && spawn.getTeam() == null) || spawn.getTeam().equals(team))
         .collect(Collectors.toList());
   }

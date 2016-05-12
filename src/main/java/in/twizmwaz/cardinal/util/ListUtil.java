@@ -37,7 +37,7 @@ public class ListUtil {
    * Returns a random object from a given list. An empty list will return null.
    *
    * @param list The lists to return a random object from.
-   * @param <T> The list type.
+   * @param <T>  The list type.
    * @return A random value from the list, if it exists.
    */
   public static <T> T getRandom(@NonNull List<T> list) {

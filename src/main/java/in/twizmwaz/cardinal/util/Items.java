@@ -42,7 +42,7 @@ public class Items {
    * Creates a new book item stack.
    *
    * @param amount The quanity requested.
-   * @param name The name of of the item.
+   * @param name   The name of of the item.
    * @param author The author to be used for the book.
    * @return The completed item stack.
    */
@@ -59,9 +59,9 @@ public class Items {
    * Creates a new piece of leather armor.
    *
    * @param material The material that represents the armor.
-   * @param name A custom set name for the armor.
-   * @param lore Custom set lore for the armor.
-   * @param color The color of the armor may be null.
+   * @param name     A custom set name for the armor.
+   * @param lore     Custom set lore for the armor.
+   * @param color    The color of the armor may be null.
    * @return The completed item stack.
    */
   public static ItemStack createLeatherArmor(@NonNull Material material, String name, String[] lore, Color color) {

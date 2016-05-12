@@ -42,5 +42,4 @@ public class ShieldListener implements Listener {
   private static final Map<UUID, Long> times = Maps.newHashMap();
 
 
-
 }

@@ -23,46 +23,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.util;
+package in.twizmwaz.cardinal.event.player;
 
-import lombok.NonNull;
-import org.jdom2.Element;
+import in.twizmwaz.cardinal.match.MatchThread;
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
 
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
+@Getter
+@Setter
+public class PlayerQuitMatchThreadEvent extends PlayerEvent {
 
-//fixme: I don't like this name
-public class ParseUtil {
+  @Getter
+  private static final HandlerList handlerList = new HandlerList();
 
-  /**
-   * @param attribute The attribute name that is checked from the elements.
-   * @param elements  The array of elements that are checked for the attribute.
-   * @return The value of the first attribute in the elements.
-   */
-  public static String getFirstAttribute(@NonNull String attribute, @NonNull Element... elements) {
-    for (Element element : elements) {
-      String value = element.getAttributeValue(attribute);
-      if (value != null) {
-        return value;
-      }
-    }
-    return null;
+  private MatchThread matchThread;
+
+  public PlayerQuitMatchThreadEvent(Player who, MatchThread matchThread) {
+    super(who);
+    this.matchThread = matchThread;
   }
 
-  /**
-   * @param element    The element to get attributes from.
-   * @param attributes The attribute names, in order, to check.
-   * @return The first non-null value, if it exists.
-   */
-  public static Map.Entry<String, String> getFirstNonNullAttributeValue(Element element, List<String> attributes) {
-    for (String attr : attributes) {
-      String value = element.getAttributeValue(attr);
-      if (value != null) {
-        return new AbstractMap.SimpleEntry<>(attr, value);
-      }
-    }
-    return null;
+  @Override
+  public HandlerList getHandlers() {
+    return handlerList;
   }
 
 }

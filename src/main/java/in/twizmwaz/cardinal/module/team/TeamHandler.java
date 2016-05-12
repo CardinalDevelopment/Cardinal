@@ -26,37 +26,35 @@
 package in.twizmwaz.cardinal.module.team;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.player.PlayerJoinMatchThreadEvent;
+import in.twizmwaz.cardinal.event.player.PlayerQuitMatchThreadEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 public class TeamHandler implements Listener {
 
   /**
-   * Puts the player on the Observers when they join.
+   * Puts the player on the Observers when they join a match thread.
    *
    * @param event The event.
    */
   @EventHandler(priority = EventPriority.LOWEST)
-  public void onPlayerJoin(PlayerJoinEvent event) {
-    Cardinal.getModule(TeamModule.class)
-        .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), "observers")
-        .addPlayer(event.getPlayer(), true, false);
+  public void onPlayerJoinMatchThread(PlayerJoinMatchThreadEvent event) {
+    Team.getObservers(event.getMatchThread().getCurrentMatch()).addPlayer(event.getPlayer(), true, false);
   }
 
   /**
-   * Removes the player from their team when they leave.
+   * Removes the player from their team when they quit a match thread.
    *
    * @param event The event.
    */
   @EventHandler(priority = EventPriority.HIGHEST)
-  public void onPlayerQuit(PlayerQuitEvent event) {
+  public void onPlayerQuitMatchThread(PlayerQuitMatchThreadEvent event) {
     Player player = event.getPlayer();
-    Cardinal.getModule(TeamModule.class)
-        .getTeamByPlayer(Cardinal.getInstance().getMatchThread().getCurrentMatch(), player).removePlayer(player);
+    Cardinal.getModule(TeamModule.class).getTeamByPlayer(event.getMatchThread().getCurrentMatch(), player)
+        .removePlayer(player);
   }
 
 }

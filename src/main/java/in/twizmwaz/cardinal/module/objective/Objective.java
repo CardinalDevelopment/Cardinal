@@ -52,10 +52,9 @@ public abstract class Objective {
    *
    * @return The list of objectives.
    */
-  public static List<Objective> getObjectives() {
+  public static List<Objective> getObjectives(@NonNull Match match) {
     List<Objective> objectives = Lists.newArrayList();
 
-    Match match = Cardinal.getInstance().getMatchThread().getCurrentMatch();
     Cardinal.getModule(CoreModule.class).getCores(match).forEach(objectives::add);
     Cardinal.getModule(DestroyableModule.class).getDestroyables(match).forEach(objectives::add);
     Cardinal.getModule(WoolModule.class).getWools(match).forEach(objectives::add);
@@ -68,9 +67,9 @@ public abstract class Objective {
    *
    * @return The class of the specific objective.
    */
-  public static Class getSpecificObjective() {
+  public static Class getSpecificObjective(@NonNull Match match) {
     Class specificObjective = null;
-    for (Objective objective : Objective.getObjectives()) {
+    for (Objective objective : getObjectives(match)) {
       Class objectiveClass = objective.getClass();
       if (specificObjective == null) {
         specificObjective = objectiveClass;

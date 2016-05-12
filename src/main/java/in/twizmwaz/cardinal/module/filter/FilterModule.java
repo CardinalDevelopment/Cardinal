@@ -104,7 +104,7 @@ public class FilterModule extends AbstractModule {
     String id = element.getAttributeValue("id");
     switch (element.getName()) {
       case "team": {
-        TeamFilterParser parser = new TeamFilterParser(element);
+        TeamFilterParser parser = new TeamFilterParser(match, element);
         return checkFilter(match, id, new TeamFilter(parser.getTeam()));
       }
       case "material": {

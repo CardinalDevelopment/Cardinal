@@ -26,12 +26,14 @@
 package in.twizmwaz.cardinal.module.region.parser.modifications;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jdom2.Element;
 
 @Getter
@@ -45,10 +47,9 @@ public class NegativeRegionParser implements RegionParser {
    * @param element The element.
    * @throws RegionException Thrown if no sub-region is specified.
    */
-  public NegativeRegionParser(Element element) throws RegionException {
+  public NegativeRegionParser(@NonNull Match match, Element element) throws RegionException {
     for (Element subRegionElement : element.getChildren()) {
-      region = Cardinal.getModule(RegionModule.class).getRegion(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement);
+      region = Cardinal.getModule(RegionModule.class).getRegion(match, subRegionElement);
       if (region != null) {
         break;
       }

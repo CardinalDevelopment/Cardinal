@@ -27,12 +27,14 @@ package in.twizmwaz.cardinal.module.region.parser.modifications;
 
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jdom2.Element;
 
 import java.util.List;
@@ -48,10 +50,9 @@ public class IntersectRegionParser implements RegionParser {
    * @param element The element.
    * @throws RegionException Thrown if no sub-regions are specified.
    */
-  public IntersectRegionParser(Element element) throws RegionException {
+  public IntersectRegionParser(@NonNull Match match, Element element) throws RegionException {
     for (Element subRegionElement : element.getChildren()) {
-      regions.add(Cardinal.getModule(RegionModule.class).getRegion(
-          Cardinal.getInstance().getMatchThread().getCurrentMatch(), subRegionElement));
+      regions.add(Cardinal.getModule(RegionModule.class).getRegion(match, subRegionElement));
     }
     if (regions.isEmpty()) {
       throw new MissingRegionPropertyException("No sub-regions specified for intersect region", element);

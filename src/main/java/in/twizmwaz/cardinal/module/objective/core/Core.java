@@ -135,7 +135,7 @@ public class Core extends Objective implements Listener {
       if (isShow() && !touchedPlayers.contains(player)) {
         touchedPlayers.add(player);
         showMessage = true;
-        Channels.getTeamChannel(team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
+        Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
             ChatConstant.getConstant("objective.core.touched"),
             new TeamComponent(this.team),
             new UnlocalizedComponent(name),
@@ -166,7 +166,7 @@ public class Core extends Objective implements Listener {
         int distance = getBottomBlock().getY() - to.getY();
         if (distance >= leak) {
           complete = true;
-          Channels.getGlobalChannel().sendMessage(new LocalizedComponentBuilder(
+          Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(new LocalizedComponentBuilder(
               ChatConstant.getConstant("objective.core.completed"), new TeamComponent(team),
               new UnlocalizedComponentBuilder(name).color(ChatColor.RED).build()).color(ChatColor.RED).build());
           Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, null));

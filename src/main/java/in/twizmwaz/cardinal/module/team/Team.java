@@ -35,6 +35,7 @@ import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
@@ -132,8 +133,27 @@ public class Team implements Iterable<Player> {
    *
    * @return The teams from the current match.
    */
-  public static Set<Team> getTeams() {
-    return Cardinal.getModule(TeamModule.class).getTeams(Cardinal.getInstance().getMatchThread().getCurrentMatch());
+  public static Set<Team> getTeams(@NonNull Match match) {
+    return Cardinal.getModule(TeamModule.class).getTeams(match);
+  }
+
+  /**
+   * Gets the least full team (relative) of a set of teams.
+   *
+   * @param teams The set of teams.
+   * @return The least full team.
+   */
+  public static Team getEmptiestTeam(@NonNull Set<Team> teams) {
+    Team emptiestTeam = null;
+    double emptiestFill = Integer.MAX_VALUE;
+    for (Team team : teams) {
+      double fill = (double) team.getPlayers().size() / team.getMax();
+      if (fill < emptiestFill) {
+        emptiestTeam = team;
+        emptiestFill = fill;
+      }
+    }
+    return emptiestTeam;
   }
 
   public static ChatColor getTeamColor(@NonNull Player player) {
@@ -148,7 +168,7 @@ public class Team implements Iterable<Player> {
    * @return The team that the player is on.
    */
   public static Team getTeam(@NonNull Player player) {
-    for (Team team : getTeams()) {
+    for (Team team : getTeams(Cardinal.getMatch(player))) {
       if (team.getPlayers().contains(player)) {
         return team;
       }
@@ -162,9 +182,8 @@ public class Team implements Iterable<Player> {
    * @param id The ID.
    * @return The team with the specified ID.
    */
-  public static Team getTeamById(@NonNull String id) {
-    return Cardinal.getModule(TeamModule.class)
-        .getTeamById(Cardinal.getInstance().getMatchThread().getCurrentMatch(), id);
+  public static Team getTeamById(@NonNull Match match, @NonNull String id) {
+    return Cardinal.getModule(TeamModule.class).getTeamById(match, id);
   }
 
   /**
@@ -172,8 +191,8 @@ public class Team implements Iterable<Player> {
    *
    * @return The observing team.
    */
-  public static Team getObservers() {
-    for (Team team : getTeams()) {
+  public static Team getObservers(@NonNull Match match) {
+    for (Team team : getTeams(match)) {
       if (isObservers(team)) {
         return team;
       }
@@ -197,13 +216,13 @@ public class Team implements Iterable<Player> {
    * @param team The team.
    * @return The team's objectives.
    */
-  public static List<Objective> getTeamObjectives(@NonNull Team team) {
+  public static List<Objective> getTeamObjectives(@NonNull Match match, @NonNull Team team) {
     List<Objective> objectives = Lists.newArrayList();
-    objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Core
+    objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Core
         && !((Core) objective).getTeam().equals(team)).collect(Collectors.toList()));
-    objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Destroyable
+    objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Destroyable
         && !((Destroyable) objective).getOwner().equals(team)).collect(Collectors.toList()));
-    objectives.addAll(Objective.getObjectives().stream().filter(objective -> objective instanceof Wool
+    objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Wool
         && ((Wool) objective).getTeam().equals(team)).collect(Collectors.toList()));
     return objectives;
   }

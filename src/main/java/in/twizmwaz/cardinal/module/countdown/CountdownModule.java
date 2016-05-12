@@ -48,7 +48,8 @@ public class CountdownModule extends AbstractModule implements Listener {
 
   @EventHandler
   public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
-    cycleCountdowns.put(Cardinal.getInstance().getMatchThread(), new CycleCountdown());
+    Cardinal.getInstance().getMatchThreads()
+        .forEach(matchThread -> cycleCountdowns.put(matchThread, new CycleCountdown(matchThread.getCurrentMatch())));
   }
 
   public CycleCountdown getCycleCountdown(@NonNull MatchThread matchThread) {

@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.command.provider;
 
 import com.google.common.collect.Lists;
 import ee.ellytr.command.argument.provider.ArgumentProvider;
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.team.Team;
 
 import java.util.List;
@@ -35,13 +36,15 @@ public class TeamProvider implements ArgumentProvider<Team> {
 
   @Override
   public Team getMatch(String input) {
-    return Team.getTeamById(input);
+    //TODO: Get match from player requesting command match
+    return Team.getTeamById(Cardinal.getInstance().getMatchThreads().get(0).getCurrentMatch(), input);
   }
 
   @Override
   public List<String> getSuggestions(String input) {
     List<String> suggestions = Lists.newArrayList();
-    for (Team team : Team.getTeams()) {
+    //TODO: Get match from player requesting suggestions
+    for (Team team : Team.getTeams(Cardinal.getInstance().getMatchThreads().get(0).getCurrentMatch())) {
       String id = team.getId();
       if (id.toLowerCase().startsWith(input.toLowerCase())) {
         suggestions.add(id);

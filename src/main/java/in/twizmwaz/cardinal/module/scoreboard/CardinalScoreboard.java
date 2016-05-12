@@ -28,6 +28,7 @@ package in.twizmwaz.cardinal.module.scoreboard;
 import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
@@ -50,6 +51,8 @@ import java.util.List;
 
 public class CardinalScoreboard implements Listener {
 
+  @NonNull
+  private final Match match;
   private final Team team;
   private final Scoreboard scoreboard;
   private final List<ScoreboardSlot> slots = Lists.newArrayList();
@@ -59,11 +62,12 @@ public class CardinalScoreboard implements Listener {
    *
    * @param team The team that is tracked by this scoreboard.
    */
-  protected CardinalScoreboard(Team team) {
+  protected CardinalScoreboard(Match match, Team team) {
+    this.match = match;
     this.team = team;
     scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 
-    Team.getTeams().forEach(scoreboardTeam -> {
+    Team.getTeams(match).forEach(scoreboardTeam -> {
       org.bukkit.scoreboard.Team registered = scoreboard.registerNewTeam(scoreboardTeam.getId());
       registered.setPrefix(scoreboardTeam.getColor() + "");
     });
@@ -72,7 +76,7 @@ public class CardinalScoreboard implements Listener {
       return;
     }
     org.bukkit.scoreboard.Objective objective = scoreboard.registerNewObjective("objectives", "dummy");
-    objective.setDisplayName(Cardinal.getModule(ScoreboardModule.class).getDisplayTitle());
+    objective.setDisplayName(Cardinal.getModule(ScoreboardModule.class).getDisplayTitle(match));
     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
     //TODO: Check for time limit module
@@ -80,8 +84,8 @@ public class CardinalScoreboard implements Listener {
 
     int position = 0;
     List<String> used = Lists.newArrayList();
-    for (Team scoreboardTeam : Team.getTeams()) {
-      List<Objective> objectives = Team.getTeamObjectives(scoreboardTeam);
+    for (Team scoreboardTeam : Team.getTeams(match)) {
+      List<Objective> objectives = Team.getTeamObjectives(match, scoreboardTeam);
       if (!Team.isObservers(scoreboardTeam) && objectives.size() > 0) {
         if (position != 0) {
           String base = BlankScoreboardSlot.getNextBlankBase(used);

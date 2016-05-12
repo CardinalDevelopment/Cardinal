@@ -29,8 +29,10 @@ import ee.ellytr.command.CommandContext;
 import ee.ellytr.command.argument.Optional;
 import ee.ellytr.command.command.Command;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.countdown.CountdownModule;
 import in.twizmwaz.cardinal.module.countdown.CycleCountdown;
+import org.bukkit.entity.Player;
 
 public class CommandCycle {
 
@@ -45,8 +47,9 @@ public class CommandCycle {
     if (time == null) {
       time = 30;
     }
-    CycleCountdown countdown = Cardinal.getModule(CountdownModule.class)
-        .getCycleCountdown(Cardinal.getInstance().getMatchThread());
+    MatchThread matchThread = cmd.getSender() instanceof Player
+        ? Cardinal.getMatchThread((Player) cmd.getSender()) : Cardinal.getInstance().getMatchThreads().get(0);
+    CycleCountdown countdown = Cardinal.getModule(CountdownModule.class).getCycleCountdown(matchThread);
     countdown.setTime(time);
     countdown.setCancelled(false);
   }

@@ -60,13 +60,13 @@ public class ScoreboardModule extends AbstractModule {
   public boolean loadMatch(@NonNull Match match) {
     scoreboards.put(match, Lists.newArrayList());
 
-    Team.getTeams().forEach(team -> {
-      CardinalScoreboard scoreboard = new CardinalScoreboard(team);
+    Team.getTeams(match).forEach(team -> {
+      CardinalScoreboard scoreboard = new CardinalScoreboard(match, team);
       Cardinal.registerEvents(scoreboard);
       scoreboards.get(match).add(scoreboard);
     });
 
-    CardinalScoreboard scoreboard = new CardinalScoreboard(null);
+    CardinalScoreboard scoreboard = new CardinalScoreboard(match, null);
     Cardinal.registerEvents(scoreboard);
     scoreboards.get(match).add(scoreboard);
 
@@ -85,15 +85,15 @@ public class ScoreboardModule extends AbstractModule {
    * @return The display title.
    */
   @NonNull
-  public String getDisplayTitle() {
+  public String getDisplayTitle(@NonNull Match match) {
     String displayTitle = null;
     boolean hasObjectives = false;
-    for (Objective objective : Objective.getObjectives()) {
+    for (Objective objective : Objective.getObjectives(match)) {
       if (objective.isShow()) {
         hasObjectives = true;
       }
     }
-    Class objective = Objective.getSpecificObjective();
+    Class objective = Objective.getSpecificObjective(match);
     if (hasObjectives) {
       if (objective != null) {
         if (objective.equals(Wool.class)) {

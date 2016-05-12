@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.channel.channels.GlobalChannel;
@@ -51,7 +52,7 @@ import java.util.Map;
 @ModuleEntry
 public class ChannelModule extends AbstractModule implements Listener {
 
-  private GlobalChannel globalChannel;
+  private Map<MatchThread, GlobalChannel> globalChannels;
   private Map<Match, List<TeamChannel>> teamChannels = Maps.newHashMap();
   private Map<Player, PlayerChannel> playerChannels = Maps.newHashMap();
 
@@ -71,10 +72,14 @@ public class ChannelModule extends AbstractModule implements Listener {
    */
   @EventHandler
   public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
-    GlobalChannel channel = new GlobalChannel();
-    Cardinal.registerEvents(channel);
-    globalChannel = channel;
+    Cardinal.getInstance().getMatchThreads().forEach(matchThread -> {
+      GlobalChannel channel = new GlobalChannel();
+      Cardinal.registerEvents(channel);
+      globalChannels.put(matchThread, channel);
+    });
   }
+
+  //TODO: Add new global channel when a new match thread is made
 
   /**
    * Adds a new player channel whenever a player joins the server.
@@ -100,7 +105,7 @@ public class ChannelModule extends AbstractModule implements Listener {
   @Override
   public boolean loadMatch(@NonNull Match match) {
     List<TeamChannel> teamChannels = Lists.newArrayList();
-    for (Team team : Team.getTeams()) {
+    for (Team team : Team.getTeams(match)) {
       TeamChannel channel = new TeamChannel(team);
       Cardinal.registerEvents(channel);
       teamChannels.add(channel);
@@ -114,8 +119,8 @@ public class ChannelModule extends AbstractModule implements Listener {
     teamChannels.remove(match);
   }
 
-  public GlobalChannel getGlobalChannel() {
-    return globalChannel;
+  public GlobalChannel getGlobalChannel(@NonNull MatchThread matchThread) {
+    return globalChannels.get(matchThread);
   }
 
   public PlayerChannel getPlayerChannel(@NonNull Player player) {

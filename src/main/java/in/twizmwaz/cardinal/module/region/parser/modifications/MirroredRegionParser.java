@@ -36,6 +36,7 @@ import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttri
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
 import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
@@ -53,7 +54,7 @@ public class MirroredRegionParser implements RegionParser {
    * @throws RegionException Thrown if no sub-region is specified, if the origin attribute is invalid, or if the normal
    *                         attribute is missing or invalid.
    */
-  public MirroredRegionParser(Match match, Element element) throws RegionException {
+  public MirroredRegionParser(@NonNull Match match, Element element) throws RegionException {
     RegionModule module = Cardinal.getModule(RegionModule.class);
     for (Element subRegionElement : element.getChildren()) {
       region = module.getRegion(match, subRegionElement);
