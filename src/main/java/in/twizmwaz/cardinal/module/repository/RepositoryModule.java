@@ -111,7 +111,7 @@ public class RepositoryModule extends AbstractModule {
   }
 
   private LoadedMap loadMap(@NonNull File file) {
-    System.out.println("Loading map from " + file.getAbsolutePath());
+    Cardinal.getPluginLogger().info("Loading map from " + file.getAbsolutePath());
     SAXBuilder builder = new SAXBuilder();
     builder.setJDOMFactory(new LocatedJDOMFactory());
     try {
