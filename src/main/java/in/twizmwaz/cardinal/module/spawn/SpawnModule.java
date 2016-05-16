@@ -28,10 +28,12 @@ package in.twizmwaz.cardinal.module.spawn;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.event.match.MatchStartEvent;
+import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
+import in.twizmwaz.cardinal.event.match.MatchLoadCompleteEvent;
 import in.twizmwaz.cardinal.event.player.CardinalRespawnEvent;
 import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchState;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
@@ -48,6 +50,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInitialSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -159,7 +162,7 @@ public class SpawnModule extends AbstractModule implements Listener {
    *
    * @param event The event.
    */
-  @EventHandler
+  @EventHandler(priority = EventPriority.HIGH)
   public void onPlayerInitialSpawn(PlayerInitialSpawnEvent event) {
     Match match = Cardinal.getMatch(event.getPlayer());
     List<Region> regions = getDefaultSpawn(match).getRegions();
@@ -168,7 +171,8 @@ public class SpawnModule extends AbstractModule implements Listener {
 
   @EventHandler
   public void onPlayerJoin(PlayerJoinEvent event) {
-    Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(event.getPlayer()));
+    Spawn spawn = getDefaultSpawn(Cardinal.getMatch(event.getPlayer()));
+    Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(event.getPlayer(), spawn));
   }
 
   /**
@@ -180,7 +184,9 @@ public class SpawnModule extends AbstractModule implements Listener {
   public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
     Player player = event.getPlayer();
     if (Cardinal.getMatch(player).isRunning()) {
-      Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player));
+      Match match = Cardinal.getMatch(event.getPlayer());
+      Spawn spawn = ListUtil.getRandom(getSpawns(match, event.getNewTeam()));
+      Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
     }
   }
 
@@ -190,13 +196,30 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @param event The event.
    */
   @EventHandler
-  public void onMatchStart(MatchStartEvent event) {
-    for (Player player : Bukkit.getOnlinePlayers()) {
-      Team team = Team.getTeam(player);
-      if (team == null || !Team.isObservers(team)) {
-        Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player));
+  public void onMatchStart(MatchChangeStateEvent event) {
+    if (event.getState() == MatchState.PLAYING) {
+      for (Player player : Bukkit.getOnlinePlayers()) {
+        Team team = Team.getTeam(player);
+        if (team == null || !Team.isObservers(team)) {
+          Spawn spawn = ListUtil.getRandom(getSpawns(event.getMatch(), Team.getTeam(player)));
+
+          Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
+        }
       }
     }
+  }
+
+  /**
+   * Called when a match loads. Teleports players in the thread to the new world.
+   *
+   * @param event The event.
+   */
+  @EventHandler
+  public void onMatchLoad(MatchLoadCompleteEvent event) {
+    event.getMatch().getThread().getPlayers().forEach(player -> {
+      CardinalRespawnEvent respawn = new CardinalRespawnEvent(player, getDefaultSpawn(event.getMatch()));
+      Bukkit.getPluginManager().callEvent(respawn);
+    });
   }
 
   /**

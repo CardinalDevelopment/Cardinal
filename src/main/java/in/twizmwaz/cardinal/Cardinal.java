@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal;
 
+import com.google.common.collect.Lists;
 import ee.ellytr.chat.LocaleRegistry;
 import ee.ellytr.command.CommandExecutor;
 import ee.ellytr.command.CommandRegistry;
@@ -83,7 +84,7 @@ public final class Cardinal extends JavaPlugin {
       throw new IllegalStateException("The Cardinal object has already been created.");
     }
     instance = this;
-
+    matchThreads = Lists.newArrayList();
     MatchThread matchThread = new MatchThread();
     matchThreads.add(matchThread);
     Bukkit.getPluginManager().callEvent(new MatchThreadMakeEvent(matchThread));

@@ -32,7 +32,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerInitialSpawnEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @ModuleEntry
@@ -43,12 +44,18 @@ public class ConnectionModule extends AbstractModule implements Listener {
   }
 
   @EventHandler(priority = EventPriority.LOWEST)
-  public void onPlayerJoin(PlayerJoinEvent event) {
+  public void onPlayerJoin(PlayerInitialSpawnEvent event) {
     Cardinal.getInstance().getMatchThreads().get(0).addPlayer(event.getPlayer());
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onPlayerQuit(PlayerQuitEvent event) {
+    Player player = event.getPlayer();
+    Cardinal.getMatchThread(player).removePlayer(player);
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onPlayerQuit(PlayerKickEvent event) {
     Player player = event.getPlayer();
     Cardinal.getMatchThread(player).removePlayer(player);
   }

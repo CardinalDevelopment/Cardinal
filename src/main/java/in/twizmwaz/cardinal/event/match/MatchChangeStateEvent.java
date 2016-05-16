@@ -27,19 +27,23 @@ package in.twizmwaz.cardinal.event.match;
 
 import in.twizmwaz.cardinal.event.MatchEvent;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchState;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.HandlerList;
 
 @Getter
 @Setter
-public class MatchStartEvent extends MatchEvent {
+public class MatchChangeStateEvent extends MatchEvent {
+
+  private final MatchState state;
 
   @Getter
   private static final HandlerList handlerList = new HandlerList();
 
-  public MatchStartEvent(Match match) {
+  public MatchChangeStateEvent(Match match, MatchState state) {
     super(match);
+    this.state = state;
   }
 
   @Override

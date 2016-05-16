@@ -52,7 +52,7 @@ import java.util.Map;
 @ModuleEntry
 public class ChannelModule extends AbstractModule implements Listener {
 
-  private Map<MatchThread, GlobalChannel> globalChannels;
+  private Map<MatchThread, GlobalChannel> globalChannels = Maps.newHashMap();
   private Map<Match, List<TeamChannel>> teamChannels = Maps.newHashMap();
   private Map<Player, PlayerChannel> playerChannels = Maps.newHashMap();
 

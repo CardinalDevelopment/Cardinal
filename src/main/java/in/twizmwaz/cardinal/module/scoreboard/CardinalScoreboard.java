@@ -120,7 +120,7 @@ public class CardinalScoreboard implements Listener {
   @EventHandler
   public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
     Team oldTeam = event.getOldTeam();
-    Player player = event.getPlayer();
+    final Player player = event.getPlayer();
     String entry = player.getName();
     if (oldTeam != null) {
       scoreboard.getTeam(oldTeam.getId()).removeEntry(entry);
@@ -128,7 +128,13 @@ public class CardinalScoreboard implements Listener {
     Team newTeam = event.getNewTeam();
     scoreboard.getTeam(newTeam.getId()).addEntry(entry);
     if (newTeam.equals(team)) {
-      player.setScoreboard(scoreboard);
+      try {
+        player.setScoreboard(scoreboard);
+      } catch (IllegalStateException e) {
+        //fixme: This is here for when the player initially joins the server
+        Bukkit.getScheduler().scheduleSyncDelayedTask(
+            Cardinal.getInstance(), () -> player.setScoreboard(scoreboard), 1L);
+      }
     }
   }
 

@@ -53,6 +53,8 @@ public class CycleCountdown implements Cancellable, Runnable {
 
   @NonNull
   private final Match match;
+  @NonNull
+  private final MatchThread matchThread;
   private final Map<Player, BossBar> bossBars = Maps.newHashMap();
 
   @Setter
@@ -61,8 +63,9 @@ public class CycleCountdown implements Cancellable, Runnable {
   private int time;
   private int originalTime;
 
-  public CycleCountdown(Match match) {
+  public CycleCountdown(Match match, MatchThread matchThread) {
     this.match = match;
+    this.matchThread = matchThread;
   }
 
   @Override
@@ -71,7 +74,6 @@ public class CycleCountdown implements Cancellable, Runnable {
       cancelled = true;
 
       CycleModule cycleModule = Cardinal.getModule(CycleModule.class);
-      MatchThread matchThread = Cardinal.getMatchThread(match);
       LoadedMap map = cycleModule.getNextMap(matchThread);
 
       cycleModule.cycle(matchThread);
@@ -80,8 +82,6 @@ public class CycleCountdown implements Cancellable, Runnable {
           new UnlocalizedComponentBuilder(map.getName()).color(ChatColor.AQUA).build())
           .color(ChatColor.DARK_AQUA).build());
     } else if (!cancelled) {
-      MatchThread matchThread = Cardinal.getMatchThread(match);
-
       Channels.getGlobalChannel(matchThread).sendMessage(new LocalizedComponentBuilder(
           ChatConstant.getConstant("cycle.cycling"),
           new UnlocalizedComponentBuilder(Cardinal.getModule(CycleModule.class)

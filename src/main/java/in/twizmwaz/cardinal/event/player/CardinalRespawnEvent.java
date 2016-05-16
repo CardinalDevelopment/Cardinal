@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.event.player;
 
+import in.twizmwaz.cardinal.module.spawn.Spawn;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -32,11 +33,14 @@ import org.bukkit.event.player.PlayerEvent;
 
 public class CardinalRespawnEvent extends PlayerEvent {
 
+  private Spawn spawn;
+
   @Getter
   private static final HandlerList handlerList = new HandlerList();
 
-  public CardinalRespawnEvent(Player who) {
+  public CardinalRespawnEvent(Player who, Spawn where) {
     super(who);
+    spawn = where;
   }
 
   @Override

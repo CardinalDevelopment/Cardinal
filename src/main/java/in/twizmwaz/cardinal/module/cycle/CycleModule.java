@@ -102,7 +102,7 @@ public final class CycleModule extends AbstractModule implements Listener {
     next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
     nextCycle.put(matchThread, next);
     if (old != null) {
-      Bukkit.unloadWorld(old, true);
+      Bukkit.getScheduler().scheduleSyncDelayedTask(Cardinal.getInstance(), () -> Bukkit.unloadWorld(old, true), 1);
     }
     return match;
   }
