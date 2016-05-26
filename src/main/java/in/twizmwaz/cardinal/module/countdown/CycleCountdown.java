@@ -25,13 +25,11 @@
 
 package in.twizmwaz.cardinal.module.countdown;
 
-import com.google.common.collect.Maps;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.match.MatchState;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.cycle.CycleModule;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
@@ -39,32 +37,18 @@ import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Components;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-
-import java.util.Map;
 
 @Getter
-public class CycleCountdown implements Cancellable, Runnable {
+public class CycleCountdown extends AbstractCountdown {
 
-  @NonNull
-  private final Match match;
   @NonNull
   private final MatchThread matchThread;
-  private final Map<Player, BossBar> bossBars = Maps.newHashMap();
-
-  @Setter
-  private MatchState originalState;
-  private boolean cancelled = true;
-  private int time;
-  private int originalTime;
 
   public CycleCountdown(Match match, MatchThread matchThread) {
-    this.match = match;
+    super(match);
     this.matchThread = matchThread;
   }
 
@@ -77,33 +61,27 @@ public class CycleCountdown implements Cancellable, Runnable {
       LoadedMap map = cycleModule.getNextMap(matchThread);
 
       cycleModule.cycle(matchThread);
-      Channels.getGlobalChannel(matchThread).sendMessage(new LocalizedComponentBuilder(
-          ChatConstant.getConstant("cycle.cycled"),
-          new UnlocalizedComponentBuilder(map.getName()).color(ChatColor.AQUA).build())
-          .color(ChatColor.DARK_AQUA).build());
+
+      BaseComponent mapName = new UnlocalizedComponentBuilder(map.getName()).color(ChatColor.AQUA).build();
+      ChatConstant cycled = ChatConstant.getConstant("cycle.cycled");
+      BaseComponent message = new LocalizedComponentBuilder(cycled, mapName).color(ChatColor.DARK_AQUA).build();
+      Channels.getGlobalChannel(matchThread).sendMessage(message);
+
     } else if (!cancelled) {
-      Channels.getGlobalChannel(matchThread).sendMessage(new LocalizedComponentBuilder(
-          ChatConstant.getConstant("cycle.cycling"),
-          new UnlocalizedComponentBuilder(Cardinal.getModule(CycleModule.class)
-              .getNextMap(matchThread).getName()).color(ChatColor.AQUA).build(),
-          Components.getTimeComponentBuilder(time).color(ChatColor.DARK_RED).build()
-      ).color(ChatColor.DARK_AQUA).build());
+
+      if (time % 20 == 0) {
+        BaseComponent mapName = new UnlocalizedComponentBuilder(Cardinal.getModule(CycleModule.class)
+            .getNextMap(matchThread).getName()).color(ChatColor.AQUA).build();
+        ChatConstant cycling = ChatConstant.getConstant("cycle.cycling");
+        BaseComponent timeComponent = Components.getTimeComponentBuilder(time / 20).color(ChatColor.DARK_RED).build();
+        BaseComponent message = new LocalizedComponentBuilder(cycling, mapName, timeComponent)
+            .color(ChatColor.DARK_AQUA).build();
+        Channels.getGlobalChannel(matchThread).sendMessage(message);
+      }
+
       time--;
-      Bukkit.getScheduler().runTaskLaterAsynchronously(Cardinal.getInstance(), this, 20);
+      Bukkit.getScheduler().runTaskLaterAsynchronously(Cardinal.getInstance(), this, 1);
     }
-  }
-
-  @Override
-  public void setCancelled(boolean cancelled) {
-    this.cancelled = cancelled;
-    if (!cancelled) {
-      Bukkit.getScheduler().runTaskAsynchronously(Cardinal.getInstance(), this);
-    }
-  }
-
-  public void setTime(int time) {
-    this.time = time;
-    originalTime = time;
   }
 
 }

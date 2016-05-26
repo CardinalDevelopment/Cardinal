@@ -34,6 +34,7 @@ import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.command.CommandCycle;
 import in.twizmwaz.cardinal.command.CommandJoin;
 import in.twizmwaz.cardinal.command.CommandSetNext;
+import in.twizmwaz.cardinal.command.CommandStart;
 import in.twizmwaz.cardinal.command.provider.LoadedMapProvider;
 import in.twizmwaz.cardinal.command.provider.TeamProvider;
 import in.twizmwaz.cardinal.event.matchthread.MatchThreadMakeEvent;
@@ -153,6 +154,7 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.addClass(CommandCycle.class);
     commandRegistry.addClass(CommandJoin.class);
     commandRegistry.addClass(CommandSetNext.class);
+    commandRegistry.addClass(CommandStart.class);
     commandRegistry.getFactory().build();
 
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());

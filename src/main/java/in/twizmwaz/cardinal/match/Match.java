@@ -25,9 +25,11 @@
 
 package in.twizmwaz.cardinal.match;
 
+import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.util.UUID;
@@ -69,6 +71,23 @@ public final class Match {
 
   public boolean isRunning() {
     return state.equals(MatchState.PLAYING);
+  }
+
+  /**
+   * Sets the match state.
+   *
+   * @param state The state to try and set.
+   * @return The final match state.
+   */
+  public MatchState setMatchState(MatchState state) {
+    MatchChangeStateEvent event = new MatchChangeStateEvent(this, state);
+    Bukkit.getPluginManager().callEvent(event);
+    if (event.isCancelled()) {
+      return this.state;
+    } else {
+      this.state = state;
+      return state;
+    }
   }
 
 }

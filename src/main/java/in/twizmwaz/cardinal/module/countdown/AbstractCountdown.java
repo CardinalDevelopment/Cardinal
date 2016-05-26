@@ -28,44 +28,40 @@ package in.twizmwaz.cardinal.module.countdown;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
+import in.twizmwaz.cardinal.match.MatchState;
+import in.twizmwaz.cardinal.util.Taskable;
+import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 
-@ModuleEntry
-public class CountdownModule extends AbstractModule implements Listener {
+@RequiredArgsConstructor
+public abstract class AbstractCountdown implements Taskable {
 
-  private Map<MatchThread, CycleCountdown> cycleCountdowns = Maps.newHashMap();
-  private Map<Match, StartCountdown> startCountdowns = Maps.newHashMap();
+  @NonNull
+  protected final Match match;
+  protected final Map<Player, BossBar> bossBars = Maps.newHashMap();
 
-  public CountdownModule() {
-    Cardinal.registerEvents(this);
-  }
-
-  @EventHandler
-  public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
-    Cardinal.getInstance().getMatchThreads().forEach(matchThread ->
-        cycleCountdowns.put(matchThread, new CycleCountdown(matchThread.getCurrentMatch(), matchThread)));
-  }
-
-  public CycleCountdown getCycleCountdown(@NonNull MatchThread matchThread) {
-    return cycleCountdowns.get(matchThread);
-  }
-
-  public StartCountdown getStartCountdown(@NonNull Match match) {
-    return startCountdowns.get(match);
-  }
+  @Setter
+  protected MatchState originalState;
+  @Getter
+  protected boolean cancelled = true;
+  @Setter
+  protected int time;
 
   @Override
-  public boolean loadMatch(@NonNull Match match) {
-    startCountdowns.put(match, new StartCountdown(match));
-    return true;
+  public void setCancelled(boolean cancelled) {
+    if (this.cancelled && !cancelled) {
+      Bukkit.getScheduler().runTaskAsynchronously(Cardinal.getInstance(), this);
+    }
+    this.cancelled = cancelled;
   }
+
+
 
 }

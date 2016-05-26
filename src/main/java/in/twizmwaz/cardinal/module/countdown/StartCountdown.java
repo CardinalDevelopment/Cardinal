@@ -25,47 +25,43 @@
 
 package in.twizmwaz.cardinal.module.countdown;
 
-import com.google.common.collect.Maps;
+import ee.ellytr.chat.ChatConstant;
+import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
-import lombok.NonNull;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import in.twizmwaz.cardinal.match.MatchState;
+import in.twizmwaz.cardinal.util.Channels;
+import in.twizmwaz.cardinal.util.Components;
+import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
-import java.util.Map;
+@Getter
+public class StartCountdown extends AbstractCountdown {
 
-@ModuleEntry
-public class CountdownModule extends AbstractModule implements Listener {
 
-  private Map<MatchThread, CycleCountdown> cycleCountdowns = Maps.newHashMap();
-  private Map<Match, StartCountdown> startCountdowns = Maps.newHashMap();
-
-  public CountdownModule() {
-    Cardinal.registerEvents(this);
-  }
-
-  @EventHandler
-  public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
-    Cardinal.getInstance().getMatchThreads().forEach(matchThread ->
-        cycleCountdowns.put(matchThread, new CycleCountdown(matchThread.getCurrentMatch(), matchThread)));
-  }
-
-  public CycleCountdown getCycleCountdown(@NonNull MatchThread matchThread) {
-    return cycleCountdowns.get(matchThread);
-  }
-
-  public StartCountdown getStartCountdown(@NonNull Match match) {
-    return startCountdowns.get(match);
+  public StartCountdown(Match match) {
+    super(match);
   }
 
   @Override
-  public boolean loadMatch(@NonNull Match match) {
-    startCountdowns.put(match, new StartCountdown(match));
-    return true;
+  public void run() {
+    if (time == 0) {
+      cancelled = true;
+      match.setMatchState(MatchState.PLAYING);
+
+      Channels.getGlobalChannel(match.getThread()).sendMessage(new LocalizedComponentBuilder(
+          ChatConstant.getConstant("match.start.started")).build());
+
+    } else if (!cancelled) {
+      if (time % 20 == 0) {
+        Channels.getGlobalChannel(match.getThread()).sendMessage(new LocalizedComponentBuilder(
+            ChatConstant.getConstant("match.start.countdown"), Components.getTimeComponentBuilder(time / 20)
+            .color(ChatColor.DARK_RED).build()).color(ChatColor.DARK_AQUA).build());
+      }
+      time--;
+      Bukkit.getScheduler().runTaskLaterAsynchronously(Cardinal.getInstance(), this, 1);
+    }
   }
 
 }

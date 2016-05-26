@@ -47,6 +47,7 @@ public class CommandCycle {
     if (time == null) {
       time = 30;
     }
+    time *= 20;
     MatchThread matchThread = cmd.getSender() instanceof Player
         ? Cardinal.getMatchThread((Player) cmd.getSender()) : Cardinal.getInstance().getMatchThreads().get(0);
     CycleCountdown countdown = Cardinal.getModule(CountdownModule.class).getCycleCountdown(matchThread);

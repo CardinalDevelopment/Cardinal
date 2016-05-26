@@ -23,49 +23,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.countdown;
+package in.twizmwaz.cardinal.command;
 
-import com.google.common.collect.Maps;
+import ee.ellytr.command.CommandContext;
+import ee.ellytr.command.argument.Optional;
+import ee.ellytr.command.command.Command;
+import ee.ellytr.command.command.PlayerCommand;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
-import in.twizmwaz.cardinal.module.ModuleEntry;
-import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
-import lombok.NonNull;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import in.twizmwaz.cardinal.module.countdown.AbstractCountdown;
+import in.twizmwaz.cardinal.module.countdown.CountdownModule;
+import org.bukkit.entity.Player;
 
-import java.util.Map;
+public class CommandStart {
 
-@ModuleEntry
-public class CountdownModule extends AbstractModule implements Listener {
-
-  private Map<MatchThread, CycleCountdown> cycleCountdowns = Maps.newHashMap();
-  private Map<Match, StartCountdown> startCountdowns = Maps.newHashMap();
-
-  public CountdownModule() {
-    Cardinal.registerEvents(this);
-  }
-
-  @EventHandler
-  public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
-    Cardinal.getInstance().getMatchThreads().forEach(matchThread ->
-        cycleCountdowns.put(matchThread, new CycleCountdown(matchThread.getCurrentMatch(), matchThread)));
-  }
-
-  public CycleCountdown getCycleCountdown(@NonNull MatchThread matchThread) {
-    return cycleCountdowns.get(matchThread);
-  }
-
-  public StartCountdown getStartCountdown(@NonNull Match match) {
-    return startCountdowns.get(match);
-  }
-
-  @Override
-  public boolean loadMatch(@NonNull Match match) {
-    startCountdowns.put(match, new StartCountdown(match));
-    return true;
+  /**
+   * Starts the map.
+   *
+   * @param cmd  The context of this command.
+   * @param time The time until start, defaults to 30.
+   */
+  @Command(aliases = "start", description = "Start the game", permissions = "cardinal.start")
+  @PlayerCommand
+  public static void start(CommandContext cmd, @Optional Integer time) {
+    if (time == null) {
+      time = 30;
+    }
+    time *= 20;
+    Match match = Cardinal.getMatch((Player) cmd.getSender());
+    AbstractCountdown countdown = Cardinal.getModule(CountdownModule.class).getStartCountdown(match);
+    countdown.setTime(time);
+    countdown.setCancelled(false);
   }
 
 }
