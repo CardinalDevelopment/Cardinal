@@ -132,7 +132,7 @@ public class Wool extends Objective implements Listener {
   public void onInventoryClick(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
     ItemStack item = event.getCurrentItem();
-    if (!complete && item.getType().equals(Material.WOOL)
+    if (!complete && item != null && item.getType().equals(Material.WOOL)
         && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
       touched = true;
       boolean showMessage = false;
