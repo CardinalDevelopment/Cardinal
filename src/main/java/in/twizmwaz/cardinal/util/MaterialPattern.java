@@ -89,15 +89,15 @@ public class MaterialPattern {
     MaterialPattern pattern = new MaterialPattern();
     if (in.contains(":")) {
       String[] parts = in.split(":");
-      Material type = Material.matchMaterial(parts[0]);
+      Material type = Material.matchMaterial(parts[0].trim());
       if (type == null) {
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("\"" + parts[0].trim() + "\"" + " cannot be mapped to a material");
       }
       pattern.add(type, Numbers.parseInteger(parts[1]));
     } else {
-      Material type = Material.matchMaterial(in);
+      Material type = Material.matchMaterial(in.trim());
       if (type == null) {
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("\"" + in.trim() + "\"" + " cannot be mapped to a material");
       }
       pattern.add(type, ANY_DATA_VALUE);
     }
