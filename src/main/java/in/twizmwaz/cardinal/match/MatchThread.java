@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.match;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.event.player.PlayerJoinMatchThreadEvent;
 import in.twizmwaz.cardinal.event.player.PlayerQuitMatchThreadEvent;
@@ -46,7 +47,6 @@ public class MatchThread {
 
   @Getter
   private final int id;
-  @Getter
   private final Collection<Player> players;
   @Getter
   @Setter
@@ -69,6 +69,10 @@ public class MatchThread {
 
   public boolean hasPlayer(@NonNull Player player) {
     return players.contains(player);
+  }
+
+  public Collection<Player> getPlayers() {
+    return ImmutableSet.copyOf(players);
   }
 
 }
