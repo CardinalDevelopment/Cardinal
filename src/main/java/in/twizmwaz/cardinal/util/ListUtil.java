@@ -44,7 +44,7 @@ public class ListUtil {
     if (list.size() > 0) {
       return list.get(new Random().nextInt(list.size()));
     } else {
-      return null;
+      throw new IllegalArgumentException("Cannot get random entry from an empty list.");
     }
   }
 
