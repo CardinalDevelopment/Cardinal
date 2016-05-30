@@ -132,11 +132,11 @@ public class WoolModule extends AbstractModule {
 
         String locationValue = ParseUtil.getFirstAttribute("location", woolElement, woolsElement);
         Proto proto = match.getMap().getProto();
-        if (locationValue != null && proto.isBefore(1.4)) {
+        if (locationValue != null && proto.isBefore("1.4.0")) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{"Attribute \"location\" is supported in proto 1.4.0 or later",
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-        } else if (locationValue == null && proto.isAfterOrAt(1.4)) {
+        } else if (locationValue == null && proto.isAfterOrAt("1.4.0")) {
           errors.add(new ModuleError(this, match.getMap(),
               new String[]{"Attribute \"location\" should be specified for wool in proto 1.4.0 or later",
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));

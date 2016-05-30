@@ -130,10 +130,10 @@ public class RegionModule extends AbstractModule {
     if (value != null) {
       String attr = value.getKey();
       Proto proto = match.getMap().getProto();
-      if (attr.equals("id") && proto.isBefore(1.4)) {
+      if (attr.equals("id") && proto.isBefore("1.4.0")) {
         errors.add(new ModuleError(this, match.getMap(),
             new String[]{"Attribute \"id\" should be \"name\" prior to proto 1.4.0"}, false));
-      } else if (attr.equals("name") && proto.isAfterOrAt(1.4)) {
+      } else if (attr.equals("name") && proto.isAfterOrAt("1.4.0")) {
         errors.add(new ModuleError(this, match.getMap(),
             new String[]{"Attribute \"name\" should be \"id\" in proto 1.4.0 or later"}, false));
       }

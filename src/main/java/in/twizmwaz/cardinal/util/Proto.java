@@ -63,16 +63,16 @@ public class Proto {
         || (this.minor == proto.getMinor() && this.patch > proto.getPatch())));
   }
 
-  public boolean isAfter(double proto) {
-    return major + minor * 0.1 + patch * 0.01 > proto;
+  public boolean isAfter(String proto) {
+    return isAfter(parseProto(proto));
   }
 
   public boolean isAfterOrAt(@NonNull Proto proto) {
     return this.equals(proto) || this.isAfter(proto);
   }
 
-  public boolean isAfterOrAt(double proto) {
-    return this.equals(proto) || this.isAfter(proto);
+  public boolean isAfterOrAt(String proto) {
+    return isAfterOrAt(parseProto(proto));
   }
 
   /**
@@ -85,16 +85,28 @@ public class Proto {
         || (this.minor == proto.getMinor() && this.patch < proto.getPatch())));
   }
 
-  public boolean isBefore(double proto) {
-    return major + minor * 0.1 + patch * 0.01 < proto;
+  public boolean isBefore(String proto) {
+    return isBefore(parseProto(proto));
   }
 
   public boolean isBeforeOrAt(@NonNull Proto proto) {
     return this.equals(proto) || this.isBefore(proto);
   }
 
-  public boolean isBeforeOrAt(double proto) {
-    return this.equals(proto) || this.isBefore(proto);
+  public boolean isBeforeOrAt(String proto) {
+    return isBeforeOrAt(parseProto(proto));
+  }
+
+  /**
+   * Returns if a Proto is within a given range.
+   * Note: The range is [min, max), a proto that equals the max will return false.
+   *
+   * @param min The minimum bound, inclusive.
+   * @param max The maximum bound, exclusive.
+   * @return If the proto is within the given range.
+   */
+  public boolean isInRange(Proto min, Proto max) {
+    return isAfterOrAt(min) && isBefore(max);
   }
 
 }
