@@ -32,6 +32,7 @@ import lombok.Setter;
 import org.bukkit.block.Block;
 
 import java.util.Collection;
+import java.util.Random;
 
 @Getter
 @Setter(AccessLevel.PROTECTED)
@@ -41,5 +42,7 @@ public abstract class AbstractRegion implements Region {
   private final RegionBounds bounds;
 
   private Collection<Block> blocks;
+
+  private Random random = new Random();
 
 }

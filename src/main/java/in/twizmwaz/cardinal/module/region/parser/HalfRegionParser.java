@@ -29,7 +29,7 @@ import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
@@ -51,7 +51,7 @@ public class HalfRegionParser implements RegionParser {
     if (normalValue == null) {
       throw new MissingRegionAttributeException("normal", element);
     }
-    normal = Vectors.getVector(normalValue);
+    normal = Numbers.getVector(normalValue);
     if (normal == null) {
       throw new InvalidRegionAttributeException("normal", element);
     }
@@ -60,7 +60,7 @@ public class HalfRegionParser implements RegionParser {
     if (originValue == null) {
       throw new MissingRegionAttributeException("origin", element);
     }
-    origin = Vectors.getVector(originValue);
+    origin = Numbers.getVector(originValue);
     if (origin == null) {
       throw new InvalidRegionAttributeException("origin", element);
     }

@@ -28,7 +28,7 @@ package in.twizmwaz.cardinal.module.region.type.modifications;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.parser.modifications.MirroredRegionParser;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Geometry;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -61,7 +61,7 @@ public class MirroredRegion extends AbstractRegion {
 
   @Override
   public boolean evaluate(Vector vector) {
-    return region.evaluate(Vectors.getMirroredVector(vector, origin, normal));
+    return region.evaluate(Geometry.getMirrored(vector, origin, normal));
   }
 
   @Override
@@ -93,7 +93,7 @@ public class MirroredRegion extends AbstractRegion {
     if (!isRandomizable()) {
       throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
     }
-    return Vectors.getMirroredVector(region.getRandomPoint(), origin, normal);
+    return Geometry.getMirrored(region.getRandomPoint(), origin, normal);
   }
 
 }

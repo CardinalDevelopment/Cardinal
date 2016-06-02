@@ -34,7 +34,7 @@ import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.util.Vector;
@@ -72,7 +72,7 @@ public class TranslatedRegionParser implements RegionParser {
     if (offsetValue == null) {
       throw new MissingRegionAttributeException("offset", element);
     }
-    offset = Vectors.getVector(offsetValue);
+    offset = Numbers.getVector(offsetValue);
     if (offset == null) {
       throw new InvalidRegionAttributeException("offset", element);
     }

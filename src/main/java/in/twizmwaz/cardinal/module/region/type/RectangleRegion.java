@@ -26,59 +26,25 @@
 package in.twizmwaz.cardinal.module.region.type;
 
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.region.AbstractRegion;
-import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.RectangleRegionParser;
-import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
-
-public class RectangleRegion extends AbstractRegion {
-
-  private final Vector min;
-  private final Vector max;
+public class RectangleRegion extends CuboidRegion {
 
   /**
    * @param min The rectangle's minimum bound.
    * @param max The rectangle's maximum bound.
    */
   public RectangleRegion(Match match, Vector min, Vector max) {
-    super(new RegionBounds(match, min, max));
+    super(match, Cuboid.between(min.add(0, Double.NEGATIVE_INFINITY, 0), max.add(0, Double.POSITIVE_INFINITY, 0)));
+  }
 
-    this.min = Vector.getMinimum(min, max);
-    this.min.setY(Double.NEGATIVE_INFINITY);
-
-    this.max = Vector.getMaximum(min, max);
-    this.max.setY(Double.POSITIVE_INFINITY);
+  public RectangleRegion(Match match, Cuboid cuboid) {
+    this(match, cuboid.minimum(), cuboid.maximum());
   }
 
   public RectangleRegion(Match match, RectangleRegionParser parser) {
-    this(match, parser.getMin(), parser.getMax());
-  }
-
-  @Override
-  public boolean evaluate(Vector vector) {
-    return vector.isInAABB(min, max);
-  }
-
-  @Override
-  public boolean isRandomizable() {
-    return false;
-  }
-
-  @Override
-  public boolean isBounded() {
-    return false;
-  }
-
-  @Override
-  public Collection<Block> getBlocks() {
-    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
-  }
-
-  @Override
-  public Vector getRandomPoint() {
-    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    this(match, parser.getCuboid().minimum(), parser.getCuboid().maximum());
   }
 }

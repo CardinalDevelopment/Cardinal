@@ -28,9 +28,10 @@ package in.twizmwaz.cardinal.module.region;
 import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.type.BlockRegion;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Geometry;
 import lombok.Data;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -44,19 +45,18 @@ import java.util.Collection;
 public class RegionBounds {
 
   private final Match match;
-  private final Vector min;
-  private final Vector max;
+  private final Cuboid cuboid;
 
   public static RegionBounds empty(Match match) {
-    return new RegionBounds(match, Vectors.max(), Vectors.min());
+    return new RegionBounds(match, Cuboid.empty());
   }
 
   public static RegionBounds unbounded(Match match) {
-    return new RegionBounds(match, Vectors.min(), Vectors.max());
+    return new RegionBounds(match, Cuboid.unbounded());
   }
 
   public RegionBounds translate(Vector offset) {
-    return new RegionBounds(match, min.plus(offset), max.plus(offset));
+    return new RegionBounds(match, cuboid.translate(offset));
   }
 
   /**
@@ -67,9 +67,9 @@ public class RegionBounds {
    * @return The mirrored region bounds.
    */
   public RegionBounds mirror(Vector origin, Vector normal) {
-    return new RegionBounds(match,
-        Vectors.getMirroredVector(min, origin, normal),
-        Vectors.getMirroredVector(max, origin, normal));
+    return new RegionBounds(match, Cuboid.between(
+        Geometry.getMirrored(cuboid.minimum(), origin, normal),
+        Geometry.getMirrored(cuboid.maximum(), origin, normal)));
   }
 
   /**
@@ -78,16 +78,11 @@ public class RegionBounds {
    * @return If the bounds are bounded.
    */
   public boolean isBounded() {
-    return !(Double.isInfinite(min.getX())
-        || Double.isInfinite(max.getX())
-        || Double.isInfinite(min.getY())
-        || Double.isInfinite(max.getY())
-        || Double.isInfinite(min.getZ())
-        || Double.isInfinite(max.getZ()));
+    return cuboid.isFinite();
   }
 
   public Vector getCenter() {
-    return min.midpoint(max);
+    return cuboid.center();
   }
 
   public BlockRegion getCenterBlock() {
@@ -100,17 +95,17 @@ public class RegionBounds {
    * @return The blocks.
    */
   public Collection<Block> getBlocks() {
-    if (!isBounded()) {
+    if (!cuboid.isBlockFinite()) {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
-    Vector min = Vectors.alignToBlock(this.min);
-    Vector max = Vectors.alignToBlock(this.max);
+    Vector min = Geometry.alignToBlock(this.cuboid.minimum());
+    Vector max = Geometry.alignToBlock(this.cuboid.maximum());
 
     ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
     for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
       for (int y = min.getBlockY(); y < max.getBlockY(); y++) {
         for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
-          builder.add(new Vector(x, y, z).toLocation(match.getWorld()).getBlock()); //TODO: Get match world
+          builder.add(new Vector(x, y, z).toLocation(match.getWorld()).getBlock());
         }
       }
     }

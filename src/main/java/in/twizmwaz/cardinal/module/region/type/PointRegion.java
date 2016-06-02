@@ -23,54 +23,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.modifications;
+package in.twizmwaz.cardinal.module.region.type;
 
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
-import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
-import in.twizmwaz.cardinal.module.region.parser.modifications.NegativeRegionParser;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
+public class PointRegion extends AbstractRegion {
 
-public class NegativeRegion extends AbstractRegion {
+  private final Location location;
 
-  private final Region region;
-
-  public NegativeRegion(Match match, Region region) {
-    super(new RegionBounds(match, Cuboid.unbounded()));
-    this.region = region;
-  }
-
-  public NegativeRegion(Match match, NegativeRegionParser parser) {
-    this(match, parser.getRegion());
+  public PointRegion(Match match, Location location) {
+    super(new RegionBounds(match, Cuboid.enclosing(location)));
+    this.location = location;
   }
 
   @Override
   public boolean isRandomizable() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isBounded() {
-    return false;
-  }
-
-  @Override
-  public Collection<Block> getBlocks() {
-    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    return true;
   }
 
   @Override
   public Vector getRandomPoint() {
-    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    return location;
   }
 
   @Override
   public boolean evaluate(Vector evaluating) {
-    return !region.evaluate(evaluating);
+    return evaluating != null && evaluating.equals(location.toVector());
   }
 }
