@@ -40,12 +40,16 @@ public class ListUtil {
    * @param <T>  The list type.
    * @return A random value from the list, if it exists.
    */
-  public static <T> T getRandom(@NonNull List<T> list) {
+  public static <T> T getRandom(@NonNull Random random, @NonNull List<T> list) {
     if (list.size() > 0) {
-      return list.get(new Random().nextInt(list.size()));
+      return list.get(random.nextInt(list.size()));
     } else {
       throw new IllegalArgumentException("Cannot get random entry from an empty list.");
     }
+  }
+
+  public static <T> T getRandom(@NonNull List<T> list) {
+    return getRandom(new Random(), list);
   }
 
 }

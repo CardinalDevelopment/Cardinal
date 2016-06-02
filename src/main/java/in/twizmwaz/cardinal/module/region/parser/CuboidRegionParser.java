@@ -30,16 +30,16 @@ import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
 @Getter
 public class CuboidRegionParser implements RegionParser {
 
-  private final Vector min;
-  private final Vector max;
+  private final Cuboid cuboid;
 
   /**
    * Parses an element for a cuboid region.
@@ -52,7 +52,7 @@ public class CuboidRegionParser implements RegionParser {
     if (minValue == null) {
       throw new MissingRegionAttributeException("min", element);
     }
-    Vector min = Vectors.getVector(minValue);
+    Vector min = Numbers.getVector(minValue);
     if (min == null) {
       throw new InvalidRegionAttributeException("min", element);
     }
@@ -61,13 +61,12 @@ public class CuboidRegionParser implements RegionParser {
     if (maxValue == null) {
       throw new MissingRegionAttributeException("max", element);
     }
-    Vector max = Vectors.getVector(maxValue);
+    Vector max = Numbers.getVector(maxValue);
     if (max == null) {
       throw new InvalidRegionAttributeException("max", element);
     }
 
-    this.min = Vector.getMinimum(min, max);
-    this.max = Vector.getMaximum(min, max);
+    this.cuboid = Cuboid.between(min, max);
   }
 
 }

@@ -44,6 +44,7 @@ import in.twizmwaz.cardinal.module.region.parser.CircleRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.CuboidRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.CylinderRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.HalfRegionParser;
+import in.twizmwaz.cardinal.module.region.parser.PointRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.RectangleRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
 import in.twizmwaz.cardinal.module.region.parser.modifications.ComplementRegionParser;
@@ -176,6 +177,8 @@ public class RegionModule extends AbstractModule {
         return checkRegion(match, id, new TranslatedRegion(new TranslatedRegionParser(match, element)));
       case "mirror":
         return checkRegion(match, id, new MirroredRegion(new MirroredRegionParser(match, element)));
+      case "point":
+        return checkRegion(match, id, PointRegionParser.generateRegion(match, element));
       default:
         if (id != null) {
           Region region = getRegionById(match, id);
@@ -199,7 +202,12 @@ public class RegionModule extends AbstractModule {
 
   private Region checkRegion(Match match, String id, Region region) {
     if (id != null) {
-      regions.get(match).put(id, region);
+      if (!regions.get(match).containsKey(id)) {
+        regions.get(match).put(id, region);
+      } else {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[] {"Cannot have two regions assigned to the same id."}, false));
+      }
     }
     return region;
   }

@@ -31,20 +31,19 @@ import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.modifications.IntersectRegionParser;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Geometry;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class IntersectRegion extends AbstractRegion {
 
-  private final List<Region> regions;
+  private final Collection<Region> regions;
 
-  public IntersectRegion(Match match, List<Region> regions) {
-    super(new RegionBounds(match, Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
+  public IntersectRegion(Match match, Collection<Region> regions) {
+    super(new RegionBounds(match, Geometry.getCuboidEnclosing(regions)));
     this.regions = regions;
   }
 

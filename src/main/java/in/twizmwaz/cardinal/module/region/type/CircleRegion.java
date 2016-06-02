@@ -30,6 +30,7 @@ import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CircleRegionParser;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -46,9 +47,9 @@ public class CircleRegion extends AbstractRegion {
    * @param radius The radius.
    */
   public CircleRegion(Match match, Vector center, double radius) {
-    super(new RegionBounds(match,
+    super(new RegionBounds(match, Cuboid.between(
         new Vector(center.getX() - radius, Double.NEGATIVE_INFINITY, center.getZ() - radius),
-        new Vector(center.getX() + radius, Double.POSITIVE_INFINITY, center.getZ() + radius)));
+        new Vector(center.getX() + radius, Double.POSITIVE_INFINITY, center.getZ() + radius))));
     this.center = center;
     this.radius = radius;
   }

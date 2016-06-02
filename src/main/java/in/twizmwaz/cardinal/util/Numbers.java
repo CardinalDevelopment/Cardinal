@@ -25,6 +25,10 @@
 
 package in.twizmwaz.cardinal.util;
 
+import lombok.NonNull;
+import org.bukkit.util.ImmutableVector;
+import org.bukkit.util.Vector;
+
 import java.util.Random;
 
 public class Numbers {
@@ -73,6 +77,31 @@ public class Numbers {
 
   /**
    * @param in       The input string.
+   * @param fallback The float fallback if parsing fails.
+   * @return The parsed float based on the input string.
+   */
+  public static float parseFloat(String in, float fallback) {
+    if (in == null) {
+      return fallback;
+    } else if (in.equalsIgnoreCase("oo")) {
+      return Float.POSITIVE_INFINITY;
+    } else if (in.equalsIgnoreCase("-oo")) {
+      return Float.NEGATIVE_INFINITY;
+    } else {
+      return Float.parseFloat(in);
+    }
+  }
+
+  /**
+   * @param in The input string.
+   * @return The parsed float based on the input string.
+   */
+  public static float parseFloat(String in) {
+    return parseFloat(in, 0);
+  }
+
+  /**
+   * @param in       The input string.
    * @param fallback Fallback value if the input is null.
    * @return The parsed integer based on the input string.
    */
@@ -99,7 +128,7 @@ public class Numbers {
   /**
    * @param in       The input string.
    * @param fallback Fallback value if the input is null.
-   * @return The parsed integer based on the input string.
+   * @return The parsed short based on the input string.
    */
   public static short parseShort(String in, short fallback) {
     if (in == null) {
@@ -115,10 +144,35 @@ public class Numbers {
 
   /**
    * @param in The input string.
-   * @return The parsed integer based on the input string.
+   * @return The parsed short based on the input string.
    */
   public static short parseShort(String in) {
     return parseShort(in, (short) 0);
+  }
+
+  /**
+   * @param in       The input string.
+   * @param fallback Fallback value if the input is null.
+   * @return The parsed long based on the input string.
+   */
+  public static long parseLong(String in, long fallback) {
+    if (in == null) {
+      return fallback;
+    } else if (in.equalsIgnoreCase("oo")) {
+      return Long.MAX_VALUE;
+    } else if (in.equalsIgnoreCase("-oo")) {
+      return Long.MIN_VALUE;
+    } else {
+      return Long.parseLong(in);
+    }
+  }
+
+  /**
+   * @param in The input string.
+   * @return The parsed long based on the input string.
+   */
+  public static long parseLong(String in) {
+    return parseLong(in, (long) 0);
   }
 
   public static double getRandom(double min, double max) {
@@ -139,6 +193,49 @@ public class Numbers {
 
   public static boolean isNumber(String str) {
     return isDecimal(str) || isInfinity(str);
+  }
+
+  /**
+   * Gets a vector based on coordinates from a given string.
+   *
+   * @param str The string.
+   * @return The vector.
+   */
+  public static Vector getVector(@NonNull String str) {
+    double[] coordinates = parseCoordinates(str);
+    if (coordinates == null || coordinates.length != 3) {
+      return null;
+    }
+    return ImmutableVector.of(coordinates[0], coordinates[1], coordinates[2]);
+  }
+
+  /**
+   * Gets a list of coordinates based on a string.
+   *
+   * @param str The string.
+   * @return The list of coordinates.
+   */
+  public static double[] parseCoordinates(@NonNull String str) {
+    double[] coordinates;
+
+    if (str.contains(",")) {
+      String[] rawCoords = str.split(",");
+      coordinates = new double[rawCoords.length];
+      for (int i = 0; i < rawCoords.length; i++) {
+        if (!Numbers.isNumber(rawCoords[i].trim())) {
+          return null;
+        }
+        coordinates[i] = Numbers.parseDouble(rawCoords[i].trim());
+      }
+    } else {
+      if (!Numbers.isDecimal(str.trim())) {
+        return null;
+      }
+      coordinates = new double[1];
+      coordinates[0] = Numbers.parseDouble(str.trim());
+    }
+
+    return coordinates;
   }
 
 }

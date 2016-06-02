@@ -29,8 +29,9 @@ import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.BelowRegionParser;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Geometry;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ public class BelowRegion extends AbstractRegion {
   private final Vector max;
 
   public BelowRegion(Match match, Vector max) {
-    super(new RegionBounds(match, Vectors.min(), max));
+    super(new RegionBounds(match, Cuboid.between(Geometry.MINIMUM_VECTOR, max)));
     this.max = max;
   }
 

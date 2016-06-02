@@ -34,7 +34,7 @@ import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.util.Vector;
@@ -73,7 +73,7 @@ public class MirroredRegionParser implements RegionParser {
     if (originValue == null) {
       origin = new Vector(0, 0, 0);
     } else {
-      origin = Vectors.getVector(originValue);
+      origin = Numbers.getVector(originValue);
       if (origin == null) {
         throw new InvalidRegionAttributeException("origin", element);
       }
@@ -83,7 +83,7 @@ public class MirroredRegionParser implements RegionParser {
     if (normalValue == null) {
       throw new MissingRegionAttributeException("normal", element);
     }
-    normal = Vectors.getVector(normalValue);
+    normal = Numbers.getVector(normalValue);
     if (normal == null) {
       throw new InvalidRegionAttributeException("normal", element);
     }

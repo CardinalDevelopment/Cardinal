@@ -29,36 +29,35 @@ import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CuboidRegionParser;
-import in.twizmwaz.cardinal.util.Numbers;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.Random;
 
 public class CuboidRegion extends AbstractRegion {
 
-  private final Vector min;
-  private final Vector max;
+  private final Cuboid cuboid;
+  private final Random random = new Random();
 
   /**
    * Creates a cuboid region with a given min and max.
    *
-   * @param min The min.
-   * @param max The max.
+   * @param cuboid The cuboid which the region represents.
    */
-  public CuboidRegion(Match match, Vector min, Vector max) {
-    super(new RegionBounds(match, min, max));
-    this.min = min;
-    this.max = max;
+  public CuboidRegion(Match match, Cuboid cuboid) {
+    super(new RegionBounds(match, cuboid));
+    this.cuboid = cuboid;
   }
 
   public CuboidRegion(Match match, CuboidRegionParser parser) {
-    this(match, parser.getMin(), parser.getMax());
+    this(match, parser.getCuboid());
   }
 
   @Override
   public boolean evaluate(Vector vector) {
-    return vector.isInAABB(min, max);
+    return cuboid.contains(vector);
   }
 
   @Override
@@ -89,10 +88,7 @@ public class CuboidRegion extends AbstractRegion {
     if (!isRandomizable()) {
       throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
     }
-    return new Vector(
-        Numbers.getRandom(min.getX(), max.getX()),
-        Numbers.getRandom(min.getY(), max.getY()),
-        Numbers.getRandom(min.getZ(), max.getZ()));
+    return cuboid.randomPointInside(random);
   }
 
 }

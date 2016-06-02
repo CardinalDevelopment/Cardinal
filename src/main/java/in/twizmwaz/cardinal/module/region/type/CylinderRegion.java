@@ -32,6 +32,7 @@ import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.CylinderRegionParser;
 import in.twizmwaz.cardinal.util.Numbers;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -51,9 +52,9 @@ public class CylinderRegion extends AbstractRegion {
    * @param height The height.
    */
   public CylinderRegion(Match match, Vector base, double radius, double height) {
-    super(new RegionBounds(match,
+    super(new RegionBounds(match, Cuboid.between(
         new Vector(base.getX() - radius, base.getY(), base.getZ() - radius),
-        new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius)));
+        new Vector(base.getX() + radius, base.getY() + height, base.getZ() + radius))));
     this.base = base;
     this.radius = radius;
     this.height = height;

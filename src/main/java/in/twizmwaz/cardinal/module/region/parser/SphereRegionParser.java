@@ -30,7 +30,6 @@ import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.util.Numbers;
-import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
@@ -52,7 +51,7 @@ public class SphereRegionParser implements RegionParser {
     if (originValue == null) {
       throw new MissingRegionAttributeException("origin", element);
     }
-    origin = Vectors.getVector(originValue);
+    origin = Numbers.getVector(originValue);
     if (origin == null) {
       throw new InvalidRegionAttributeException("origin", element);
     }

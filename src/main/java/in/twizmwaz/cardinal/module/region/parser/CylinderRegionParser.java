@@ -30,7 +30,6 @@ import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.util.Numbers;
-import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
@@ -53,7 +52,7 @@ public class CylinderRegionParser implements RegionParser {
     if (baseValue == null) {
       throw new MissingRegionAttributeException("base", element);
     }
-    base = Vectors.getVector(baseValue);
+    base = Numbers.getVector(baseValue);
     if (base == null) {
       throw new InvalidRegionAttributeException("base", element);
     }

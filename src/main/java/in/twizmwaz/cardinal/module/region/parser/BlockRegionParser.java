@@ -29,7 +29,7 @@ import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.property.InvalidRegionPropertyException;
 import in.twizmwaz.cardinal.module.region.exception.property.MissingRegionPropertyException;
-import in.twizmwaz.cardinal.util.Vectors;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
@@ -52,7 +52,7 @@ public class BlockRegionParser implements RegionParser {
     if (text == null) {
       throw new MissingRegionPropertyException("location", element);
     }
-    vector = Vectors.getVector(text);
+    vector = Numbers.getVector(text);
     if (vector == null) {
       throw new InvalidRegionPropertyException("location", element);
     }

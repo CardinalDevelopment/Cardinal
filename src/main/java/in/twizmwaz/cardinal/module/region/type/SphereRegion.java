@@ -31,6 +31,7 @@ import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.SphereRegionParser;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -48,9 +49,9 @@ public class SphereRegion extends AbstractRegion {
    * @param radius The radius.
    */
   public SphereRegion(Match match, Vector origin, double radius) {
-    super(new RegionBounds(match,
+    super(new RegionBounds(match, Cuboid.between(
         new Vector(origin.getX() - radius, origin.getY() - radius, origin.getZ() - radius),
-        new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius)));
+        new Vector(origin.getX() + radius, origin.getY() + radius, origin.getZ() + radius))));
     this.origin = origin;
     this.radius = radius;
   }

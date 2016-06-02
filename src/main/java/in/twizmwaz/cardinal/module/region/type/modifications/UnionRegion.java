@@ -31,8 +31,8 @@ import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
 import in.twizmwaz.cardinal.module.region.parser.modifications.UnionRegionParser;
+import in.twizmwaz.cardinal.util.Geometry;
 import in.twizmwaz.cardinal.util.ListUtil;
-import in.twizmwaz.cardinal.util.Vectors;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -44,7 +44,7 @@ public class UnionRegion extends AbstractRegion {
   private final List<Region> regions;
 
   public UnionRegion(Match match, List<Region> regions) {
-    super(new RegionBounds(match, Vectors.getMinimumBound(regions), Vectors.getMaximumBound(regions)));
+    super(new RegionBounds(match, Geometry.getCuboidEnclosing(regions)));
     this.regions = regions;
   }
 
@@ -91,7 +91,7 @@ public class UnionRegion extends AbstractRegion {
     if (!isRandomizable()) {
       throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
     }
-    return ListUtil.getRandom(regions).getRandomPoint();
+    return ListUtil.getRandom(getRandom(), regions).getRandomPoint();
   }
 
   @Override

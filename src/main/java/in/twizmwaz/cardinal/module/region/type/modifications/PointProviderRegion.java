@@ -25,52 +25,53 @@
 
 package in.twizmwaz.cardinal.module.region.type.modifications;
 
-import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.RegionBounds;
-import in.twizmwaz.cardinal.module.region.parser.modifications.NegativeRegionParser;
-import org.bukkit.block.Block;
-import org.bukkit.util.Cuboid;
+import lombok.NonNull;
+import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
-
-public class NegativeRegion extends AbstractRegion {
+public class PointProviderRegion extends AbstractRegion {
 
   private final Region region;
+  private Vector direction;
+  private final float yaw;
+  private final float pitch;
 
-  public NegativeRegion(Match match, Region region) {
-    super(new RegionBounds(match, Cuboid.unbounded()));
+  /**
+   * @param region    The region to get points from.
+   * @param direction A vector to set direction.
+   * @param yaw       Yaw for direction.
+   * @param pitch     Pitch for direction.
+   */
+  public PointProviderRegion(@NonNull Region region, Vector direction, float yaw, float pitch) {
+    super(region.getBounds());
     this.region = region;
-  }
-
-  public NegativeRegion(Match match, NegativeRegionParser parser) {
-    this(match, parser.getRegion());
+    this.yaw = yaw;
+    this.pitch = pitch;
   }
 
   @Override
   public boolean isRandomizable() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isBounded() {
-    return false;
-  }
-
-  @Override
-  public Collection<Block> getBlocks() {
-    throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
+    return true;
   }
 
   @Override
   public Vector getRandomPoint() {
-    throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
+    Location location = region.getRandomPoint().toLocation(getBounds().getMatch().getWorld(), yaw, pitch);
+    if (direction != null) {
+      location.setDirection(direction);
+    }
+    return location;
   }
 
   @Override
   public boolean evaluate(Vector evaluating) {
-    return !region.evaluate(evaluating);
+    throw new UnsupportedOperationException("Cannot determine absolute location of PointProvider");
   }
 }

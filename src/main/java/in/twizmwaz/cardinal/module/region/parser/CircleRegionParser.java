@@ -30,12 +30,9 @@ import in.twizmwaz.cardinal.module.region.RegionParser;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttributeException;
 import in.twizmwaz.cardinal.util.Numbers;
-import in.twizmwaz.cardinal.util.Vectors;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
-
-import java.util.List;
 
 @Getter
 public class CircleRegionParser implements RegionParser {
@@ -54,11 +51,11 @@ public class CircleRegionParser implements RegionParser {
     if (centerValue == null) {
       throw new MissingRegionAttributeException("center", element);
     }
-    List<Double> coords = Vectors.getCoordinates(centerValue);
-    if (coords == null || coords.size() != 2) {
+    double[] coords = Numbers.parseCoordinates(centerValue);
+    if (coords == null || coords.length != 2) {
       throw new InvalidRegionAttributeException("center", element);
     }
-    center = new Vector(coords.get(0), 0, coords.get(1));
+    center = new Vector(coords[0], 0, coords[1]);
 
     String radiusValue = element.getAttributeValue("radius");
     if (radiusValue == null) {
