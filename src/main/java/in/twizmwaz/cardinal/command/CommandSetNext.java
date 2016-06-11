@@ -29,9 +29,9 @@ import com.google.common.base.Strings;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
+import ee.ellytr.command.Command;
 import ee.ellytr.command.CommandContext;
-import ee.ellytr.command.command.Command;
-import ee.ellytr.command.command.PlayerCommand;
+import ee.ellytr.command.PlayerCommand;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.cycle.CycleModule;
@@ -62,7 +62,7 @@ public class CommandSetNext {
     //Cardinal.getModule(CycleModule.class).getNextCycle().get(Cardinal.getInstance().getMatchThread()).setMap(map);
     Player player = (Player) cmd.getSender();
 
-    String input = StringUtils.join(cmd.getArgs(), ' ').toLowerCase();
+    String input = StringUtils.join(cmd.getArguments(), ' ').toLowerCase();
     Map<String, LoadedMap> maps = Cardinal.getModule(RepositoryModule.class).getLoadedMaps();
     Set<String> mapNames = maps.keySet();
     List<String> candidates = mapNames.stream().filter(m -> m.toLowerCase().startsWith(input))

@@ -26,22 +26,23 @@
 package in.twizmwaz.cardinal.command.provider;
 
 import com.google.common.collect.Lists;
-import ee.ellytr.command.argument.provider.ArgumentProvider;
+import ee.ellytr.command.argument.ArgumentProvider;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.team.Team;
+import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
 public class TeamProvider implements ArgumentProvider<Team> {
 
   @Override
-  public Team getMatch(String input) {
+  public Team getMatch(String input, CommandSender sender) {
     //TODO: Get match from player requesting command match
     return Team.getTeamById(Cardinal.getInstance().getMatchThreads().get(0).getCurrentMatch(), input);
   }
 
   @Override
-  public List<String> getSuggestions(String input) {
+  public List<String> getSuggestions(String input, CommandSender sender) {
     List<String> suggestions = Lists.newArrayList();
     //TODO: Get match from player requesting suggestions
     for (Team team : Team.getTeams(Cardinal.getInstance().getMatchThreads().get(0).getCurrentMatch())) {

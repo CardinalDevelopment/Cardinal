@@ -25,10 +25,11 @@
 
 package in.twizmwaz.cardinal.command.provider;
 
-import ee.ellytr.command.argument.provider.ArgumentProvider;
+import ee.ellytr.command.argument.ArgumentProvider;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.repository.RepositoryModule;
+import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
 
   @Override
-  public LoadedMap getMatch(String input) {
+  public LoadedMap getMatch(String input, CommandSender sender) {
     Map<String, LoadedMap> maps = Cardinal.getModule(RepositoryModule.class).getLoadedMaps();
     Set<String> mapNames = maps.keySet();
     for (String mapName : mapNames.stream().filter(m -> m.startsWith(input)).collect(Collectors.toList())) {
@@ -49,7 +50,7 @@ public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
   }
 
   @Override
-  public List<String> getSuggestions(String input) {
+  public List<String> getSuggestions(String input, CommandSender sender) {
     ;
     return Cardinal.getModule(RepositoryModule.class).getLoadedMaps().keySet().stream().filter(
         map -> map.toLowerCase().startsWith(input.toLowerCase())).collect(Collectors.toList());

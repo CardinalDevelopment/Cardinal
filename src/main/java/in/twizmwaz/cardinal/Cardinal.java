@@ -155,12 +155,12 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.addClass(CommandJoin.class);
     commandRegistry.addClass(CommandSetNext.class);
     commandRegistry.addClass(CommandStart.class);
-    commandRegistry.getFactory().build();
+    commandRegistry.register();
 
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());
 
-    commandRegistry.getProviderRegistry().registerProvider(new TeamProvider(), Team.class);
-    commandRegistry.getProviderRegistry().registerProvider(new LoadedMapProvider(), LoadedMap.class);
+    commandRegistry.getProviderRegistry().registerProvider(Team.class, new TeamProvider());
+    commandRegistry.getProviderRegistry().registerProvider(LoadedMap.class, new LoadedMapProvider());
   }
 
   /**

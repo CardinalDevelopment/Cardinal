@@ -25,10 +25,10 @@
 
 package in.twizmwaz.cardinal.command;
 
+import ee.ellytr.command.Command;
 import ee.ellytr.command.CommandContext;
+import ee.ellytr.command.PlayerCommand;
 import ee.ellytr.command.argument.Optional;
-import ee.ellytr.command.command.Command;
-import ee.ellytr.command.command.PlayerCommand;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.team.Team;
 import org.bukkit.entity.Player;
