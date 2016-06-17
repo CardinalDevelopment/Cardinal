@@ -26,7 +26,6 @@
 package in.twizmwaz.cardinal.util;
 
 import lombok.NonNull;
-import org.bukkit.util.ImmutableVector;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
@@ -206,7 +205,7 @@ public class Numbers {
     if (coordinates == null || coordinates.length != 3) {
       return null;
     }
-    return ImmutableVector.of(coordinates[0], coordinates[1], coordinates[2]);
+    return new Vector(coordinates[0], coordinates[1], coordinates[2]);
   }
 
   /**

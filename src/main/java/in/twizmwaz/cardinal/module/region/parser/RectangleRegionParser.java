@@ -32,7 +32,7 @@ import in.twizmwaz.cardinal.module.region.exception.attribute.MissingRegionAttri
 import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import org.bukkit.util.Cuboid;
-import org.bukkit.util.ImmutableVector;
+import org.bukkit.util.Vector;
 import org.bukkit.util.Vector;
 import org.jdom2.Element;
 
@@ -55,7 +55,7 @@ public class RectangleRegionParser implements RegionParser {
     if (coords == null || coords.length != 2) {
       throw new InvalidRegionAttributeException("min", element);
     }
-    Vector min = ImmutableVector.of(coords[0], Double.NEGATIVE_INFINITY, coords[1]);
+    Vector min = new Vector(coords[0], Double.NEGATIVE_INFINITY, coords[1]);
 
     String maxValue = element.getAttributeValue("max");
     if (maxValue == null) {
@@ -65,7 +65,7 @@ public class RectangleRegionParser implements RegionParser {
     if (coords == null || coords.length != 2) {
       throw new InvalidRegionAttributeException("max", element);
     }
-    Vector max = ImmutableVector.of(coords[0], Double.POSITIVE_INFINITY, coords[1]);
+    Vector max = new Vector(coords[0], Double.POSITIVE_INFINITY, coords[1]);
     cuboid = Cuboid.between(min, max);
   }
 

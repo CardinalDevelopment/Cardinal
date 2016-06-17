@@ -33,7 +33,7 @@ import in.twizmwaz.cardinal.module.region.parser.BlockRegionParser;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Cuboid;
-import org.bukkit.util.ImmutableVector;
+import org.bukkit.util.Vector;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -44,7 +44,7 @@ public class BlockRegion extends AbstractRegion {
 
   public BlockRegion(Match match, Vector vector) {
     super(new RegionBounds(match, Cuboid.between(vector, vector.plus(1, 1, 1))));
-    this.vector = ImmutableVector.copyOf(vector);
+    this.vector = vector;
   }
 
   public BlockRegion(Match match, BlockRegionParser parser) {

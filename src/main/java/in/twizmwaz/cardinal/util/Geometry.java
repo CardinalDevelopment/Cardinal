@@ -28,7 +28,6 @@ package in.twizmwaz.cardinal.util;
 import in.twizmwaz.cardinal.module.region.Region;
 import lombok.NonNull;
 import org.bukkit.util.Cuboid;
-import org.bukkit.util.ImmutableVector;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -36,8 +35,8 @@ import java.util.stream.Collectors;
 
 public class Geometry {
 
-  public static final Vector MINIMUM_VECTOR = ImmutableVector.of(Double.NEGATIVE_INFINITY);
-  public static final Vector MAXIMUM_VECTOR = ImmutableVector.of(Double.POSITIVE_INFINITY);
+  public static final Vector MINIMUM_VECTOR = new Vector(Double.NEGATIVE_INFINITY);
+  public static final Vector MAXIMUM_VECTOR = new Vector(Double.POSITIVE_INFINITY);
 
   /**
    * Mirrors a vector across a normal from an origin.
@@ -117,7 +116,7 @@ public class Geometry {
   }
 
   public static Vector floor(Vector vector) {
-    return ImmutableVector.of(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+    return new Vector(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
   }
 
   /**
@@ -133,7 +132,7 @@ public class Geometry {
   }
 
   public static Vector alignToBlock(Vector vector) {
-    return ImmutableVector.copyOf(floor(vector)).add(0.5d, 0.5d, 0.5d);
+    return floor(vector).add(0.5d, 0.5d, 0.5d);
   }
 
   /**
