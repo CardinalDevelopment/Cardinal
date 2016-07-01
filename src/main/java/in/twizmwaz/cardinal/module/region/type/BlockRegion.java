@@ -34,7 +34,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
-import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
