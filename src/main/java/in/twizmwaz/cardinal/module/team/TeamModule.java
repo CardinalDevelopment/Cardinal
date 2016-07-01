@@ -169,7 +169,7 @@ public class TeamModule extends AbstractModule {
       return null;
     }
     for (Team team : teams.get(match)) {
-      if (team.getName().replaceAll(" ", "").toLowerCase().startsWith(
+      if (team.getId().replaceAll(" ", "").toLowerCase().startsWith(
           name.replaceAll(" ", "").toLowerCase())) {
         return team;
       }
