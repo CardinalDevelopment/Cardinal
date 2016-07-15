@@ -139,7 +139,7 @@ public class Core extends Objective implements Listener {
             ChatConstant.getConstant("objective.core.touched"),
             new TeamComponent(this.team),
             new UnlocalizedComponent(name),
-            Components.getNameComponentBuilder(player).flairs(false).build())));
+            Components.getNameComponentBuilder(player).build())));
       }
       Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }

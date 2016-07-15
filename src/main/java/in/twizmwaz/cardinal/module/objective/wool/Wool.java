@@ -148,7 +148,7 @@ public class Wool extends Objective implements Listener {
                     .color(Colors.convertDyeToChatColor(color)).build()).build()));
         Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
             new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
-                Components.getNameComponentBuilder(player).flairs(false).build(),
+                Components.getNameComponentBuilder(player).build(),
                 new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
                 new TeamComponent(team)).build()));
       }
@@ -176,12 +176,12 @@ public class Wool extends Objective implements Listener {
         Match match = getMatch();
         Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
             new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
-                Components.getNameComponentBuilder(player).flairs(false).build(),
+                Components.getNameComponentBuilder(player).build(),
                 new UnlocalizedComponentBuilder(getName())
                     .color(Colors.convertDyeToChatColor(color)).build()).build()));
         Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
             new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
-                Components.getNameComponentBuilder(player).flairs(false).build(),
+                Components.getNameComponentBuilder(player).build(),
                 new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
                 new TeamComponent(team)).build()));
       }

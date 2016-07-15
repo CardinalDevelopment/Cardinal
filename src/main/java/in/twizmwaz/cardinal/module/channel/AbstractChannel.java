@@ -44,7 +44,7 @@ public class AbstractChannel implements Channel {
   public void sendMessage(BaseComponent... components) {
     for (Player player : players) {
       List<BaseComponent> toSend = Lists.newArrayList();
-      Locale locale = ChatUtil.getLocale(player);
+      Locale locale = ChatUtil.getLocale(player.getLocale());
       for (BaseComponent component : components) {
         if (component instanceof LanguageComponent) {
           toSend.addAll(Arrays.asList(((LanguageComponent) component).getComponents(locale)));
