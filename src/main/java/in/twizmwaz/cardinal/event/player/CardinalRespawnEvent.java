@@ -27,10 +27,13 @@ package in.twizmwaz.cardinal.event.player;
 
 import in.twizmwaz.cardinal.module.spawn.Spawn;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
+@Getter
+@Setter
 public class CardinalRespawnEvent extends PlayerEvent {
 
   private Spawn spawn;

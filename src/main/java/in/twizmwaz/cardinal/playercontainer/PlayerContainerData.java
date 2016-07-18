@@ -23,42 +23,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.event.player;
+package in.twizmwaz.cardinal.playercontainer;
 
-import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchThread;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerEvent;
 
 @Getter
-public class PlayerChangeTeamEvent extends PlayerEvent implements Cancellable {
+public class PlayerContainerData {
 
-  @Getter
-  private static final HandlerList handlerList = new HandlerList();
-  private final Team oldTeam;
-  private final Team newTeam;
-  @Setter
-  private boolean cancelled;
+  private final MatchThread matchThread;
+  private final Match match;
+  private final PlayingPlayerContainer playing;
 
-  /**
-   * Called when a player switches from one team to another.
-   *
-   * @param who     The player that is switching teams.
-   * @param oldTeam The team that the player is switching from.
-   * @param newTeam The team that the player is switching to.
-   */
-  public PlayerChangeTeamEvent(Player who, Team oldTeam, Team newTeam) {
-    super(who);
-    this.oldTeam = oldTeam;
-    this.newTeam = newTeam;
+  public PlayerContainerData(MatchThread matchThread, Match match, PlayingPlayerContainer playing) {
+    if (match != null && playing == null) {
+      throw new IllegalArgumentException("Playing cannot be null when match is not null");
+    }
+    this.matchThread = matchThread;
+    this.match = match;
+    this.playing = playing;
   }
 
-  @Override
-  public HandlerList getHandlers() {
-    return handlerList;
+  public static PlayerContainerData of(@NonNull Player player) {
+    MatchThread thread = Cardinal.getMatchThread(player);
+    if (thread.getCurrentMatch().hasPlayer(player)) {
+      PlayingPlayerContainer container = thread.getCurrentMatch().getPlayingContainer(player);
+      return new PlayerContainerData(thread, thread.getCurrentMatch(), container);
+    } else {
+      return new PlayerContainerData(thread, null, null);
+    }
+  }
+
+  public static PlayerContainerData empty() {
+    return new PlayerContainerData(null, null, null);
   }
 
 }

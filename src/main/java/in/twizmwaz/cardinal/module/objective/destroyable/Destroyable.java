@@ -39,6 +39,7 @@ import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.MaterialPattern;
@@ -135,13 +136,14 @@ public class Destroyable extends Objective implements Listener {
     if (match.hasPlayer(player)) {
       Block block = event.getBlock();
       if (isPartOf(block)) {
-        Team team = Team.getTeam(player);
+        PlayingPlayerContainer team = match.getPlayingContainer(player);
         if (team != null && !team.equals(owner)) {
           if (!touchedPlayers.contains(player)) {
             touchedPlayers.add(player);
 
             if (show) {
-              BaseComponent message = Components.getTeamComponent(team,
+              //fixme
+              /*BaseComponent message = Components.getTeamComponent(team,
                   new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.touched"),
                       new TeamComponent(owner),
                       new UnlocalizedComponent(name),
@@ -156,7 +158,7 @@ public class Destroyable extends Objective implements Listener {
                 } else {
                   Channels.getPlayerChannel(teamMember).sendMessage(message);
                 }
-              });
+              });*/
             }
           }
           broken++;

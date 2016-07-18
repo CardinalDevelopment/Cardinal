@@ -25,8 +25,10 @@
 
 package in.twizmwaz.cardinal.module.filter.type;
 
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.filter.Filter;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 
@@ -37,8 +39,8 @@ public class TeamFilter implements Filter<Player> {
 
   @Override
   public boolean evaluate(Player evaluating) {
-    Team team = Team.getTeam(evaluating);
-    return team != null && this.team.equals(team);
+    PlayingPlayerContainer container = Cardinal.getMatch(evaluating).getPlayingContainer(evaluating);
+    return container != null && team.equals(container);
   }
 
 }

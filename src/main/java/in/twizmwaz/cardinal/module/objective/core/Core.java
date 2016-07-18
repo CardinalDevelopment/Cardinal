@@ -34,12 +34,12 @@ import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
-import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.MaterialPattern;
@@ -66,7 +66,7 @@ public class Core extends Objective implements Listener {
   private final Region region;
   private final int leak;
   private final MaterialPattern material;
-  private final Team team;
+  private final PlayingPlayerContainer owner;
   private final boolean modeChanges;
   private final ProximityMetric proximityMetric;
   private final boolean proximityHorizontal;
@@ -86,7 +86,7 @@ public class Core extends Objective implements Listener {
    * @param region              The region that contains this core.
    * @param leak                The distance required for the lava to be from the core in order to be leaked.
    * @param material            The material that the core is made out of.
-   * @param team                The team that owns this core.
+   * @param owner                The owner that owns this core.
    * @param modeChanges         Determines if this core follows mode changes.
    * @param show                Determines if this core shows on the scoreboard.
    * @param proximityMetric     The proximity metric for proximity tracking of this core.
@@ -94,14 +94,14 @@ public class Core extends Objective implements Listener {
    *                            calculating proximity.
    */
   public Core(Match match, String id, String name, boolean required, Region region, int leak,
-              MaterialPattern material, Team team, boolean modeChanges,
+              MaterialPattern material, PlayingPlayerContainer owner, boolean modeChanges,
               boolean show, ProximityMetric proximityMetric, boolean proximityHorizontal) {
     super(match, id, required, show);
     this.name = name;
     this.region = region;
     this.leak = leak;
     this.material = material;
-    this.team = team;
+    this.owner = owner;
     this.modeChanges = modeChanges;
     this.proximityMetric = proximityMetric;
     this.proximityHorizontal = proximityHorizontal;
@@ -127,24 +127,24 @@ public class Core extends Objective implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();
-    if (match.hasPlayer(player)) {
-      Block block = event.getBlock();
-      Team team = Team.getTeam(player);
-      if (getBlocks().contains(block) && (team == null || !team.equals(this.team))) {
-        touched = true;
-        if (show && !touchedPlayers.contains(player)) {
-          touchedPlayers.add(player);
-          Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(
-              team,
-              new LocalizedComponent(
-                  ChatConstant.getConstant("objective.core.touched"),
-                  new TeamComponent(this.team),
-                  new UnlocalizedComponent(name),
-                  Components.getNameComponentBuilder(player).build()
-              )
-          ));
-        }
-        Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
+    Block block = event.getBlock();
+    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
+    if (!(container instanceof Team)) {
+      //fixme: does it?
+      throw new IllegalStateException("FFA does not support cores.");
+    }
+    Team team = (Team) container;
+    if (getBlocks().contains(block) && (team == null || !team.equals(this.owner))) {
+      touched = true;
+      boolean showMessage = false;
+      if (isShow() && !touchedPlayers.contains(player)) {
+        touchedPlayers.add(player);
+        showMessage = true;
+        Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
+            ChatConstant.getConstant("objective.core.touched"),
+            new TeamComponent((Team) this.owner),
+            new UnlocalizedComponent(name),
+            Components.getNameComponentBuilder(player).build())));
       }
     }
   }
@@ -156,26 +156,24 @@ public class Core extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockFromTo(BlockFromToEvent event) {
-    if (match.getWorld().equals(event.getWorld())) {
-      Block to = event.getToBlock();
-      if (lava.contains(to)) {
-        event.setCancelled(true);
-        return;
-      }
-      Material type = event.getBlock().getType();
-      if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA))
-          && to.getType().equals(Material.AIR) && Cardinal.getModule(CoreModule.class).getClosestCore(getMatch(),
-          to.getLocation().toVector()).equals(this) && !complete) {
-        Block bottomBlock = getBottomBlock();
-        if (bottomBlock != null) {
-          int distance = getBottomBlock().getY() - to.getY();
-          if (distance >= leak) {
-            complete = true;
-            Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(new LocalizedComponentBuilder(
-                ChatConstant.getConstant("objective.core.completed"), new TeamComponent(team),
-                new UnlocalizedComponentBuilder(name).color(ChatColor.RED).build()).color(ChatColor.RED).build());
-            Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, null));
-          }
+    Block to = event.getToBlock();
+    if (lava.contains(to)) {
+      event.setCancelled(true);
+      return;
+    }
+    Material type = event.getBlock().getType();
+    if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA))
+        && to.getType().equals(Material.AIR) && Cardinal.getModule(CoreModule.class).getClosestCore(getMatch(),
+        to.getLocation().toVector()).equals(this) && !complete) {
+      Block bottomBlock = getBottomBlock();
+      if (bottomBlock != null) {
+        int distance = getBottomBlock().getY() - to.getY();
+        if (distance >= leak) {
+          complete = true;
+          Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(new LocalizedComponentBuilder(
+              ChatConstant.getConstant("objective.core.completed"), new TeamComponent((Team) owner),
+              new UnlocalizedComponentBuilder(name).color(ChatColor.RED).build()).color(ChatColor.RED).build());
+          Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, null));
         }
       }
     }

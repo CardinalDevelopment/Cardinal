@@ -25,30 +25,38 @@
 
 package in.twizmwaz.cardinal.match;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
+import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
+import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.PlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
-public final class Match {
+@Getter
+public final class Match implements PlayerContainer {
 
   private static int matchCounter = -1;
 
   @Getter
   private final MatchThread matchThread;
-  @Getter
   private final UUID uuid;
-  @Getter
   private final LoadedMap map;
-  @Getter
   private final World world;
+  private final Set<Player> players;
+  private final Set<PlayingPlayerContainer> playerContainers;
 
-  @Getter
   private final int matchNumber;
 
   private MatchState state;
@@ -65,6 +73,8 @@ public final class Match {
     this.uuid = uuid;
     this.map = map;
     this.world = world;
+    players = Sets.newHashSet();
+    playerContainers = Sets.newHashSet();
     this.matchNumber = matchCounter++;
 
     state = MatchState.WAITING;
@@ -91,8 +101,59 @@ public final class Match {
     }
   }
 
-  public boolean hasPlayer(@NonNull Player player) {
-    return matchThread.hasPlayer(player);
+  public boolean isFfa() {
+    for (PlayingPlayerContainer container : playerContainers) {
+      if (container instanceof Team) {
+        return false;
+      }
+    }
+    return true;
   }
 
+  @Override
+  public ImmutableCollection<Player> getPlayers() {
+    return ImmutableSet.copyOf(players);
+  }
+
+  @Override
+  public boolean hasPlayer(@NonNull Player player) {
+    return players.contains(player);
+  }
+
+  @Override
+  public void addPlayer(@NonNull Player player) {
+    players.add(player);
+    if (isFfa()) {
+      playerContainers.add(SinglePlayerContainer.of(player));
+    }
+  }
+
+  @Override
+  public void removePlayer(@NonNull Player player) {
+    players.remove(player);
+    PlayingPlayerContainer container = getPlayingContainer(player);
+    if (isFfa()) {
+      playerContainers.remove(container);
+    } else {
+      container.removePlayer(player);
+    }
+  }
+
+  @Override
+  public Iterator<Player> iterator() {
+    return players.iterator();
+  }
+
+  public PlayingPlayerContainer getPlayingContainer(@NonNull Player player) {
+    if (!players.contains(player)) {
+      throw new IllegalArgumentException("Cannot get PlayingPlayerContainer of player not in match");
+    } else {
+      for (PlayingPlayerContainer container : playerContainers) {
+        if (container.hasPlayer(player)) {
+          return container;
+        }
+      }
+      throw new IllegalStateException("Player is in match but is missing a PlayingPlayerContainer.");
+    }
+  }
 }

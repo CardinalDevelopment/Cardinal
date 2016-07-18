@@ -31,7 +31,7 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
 import in.twizmwaz.cardinal.event.match.MatchLoadCompleteEvent;
 import in.twizmwaz.cardinal.event.player.CardinalRespawnEvent;
-import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
+import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchState;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -42,12 +42,12 @@ import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.ListUtil;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -60,7 +60,6 @@ import org.jdom2.located.Located;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ModuleEntry
 public class SpawnModule extends AbstractModule implements Listener {
@@ -83,11 +82,14 @@ public class SpawnModule extends AbstractModule implements Listener {
     for (Element spawnsElement : document.getRootElement().getChildren("spawns")) {
       Element defaultElement = spawnsElement.getChild("default");
       if (defaultElement != null) {
-        Spawn defaultSpawn = parseDefaultSpawn(match, defaultElement, spawnsElement);
+        Spawn defaultSpawn = parseSpawn(true, match, defaultElement, spawnsElement);
         if (defaultSpawn != null) {
           spawns.add(defaultSpawn);
           defaultPresent = true;
         }
+      }
+      for (Element spawnElement : spawnsElement.getChildren("spawn")) {
+        spawns.add(parseSpawn(false, match, spawnElement, spawnsElement));
       }
     }
     if (!defaultPresent) {
@@ -95,6 +97,8 @@ public class SpawnModule extends AbstractModule implements Listener {
       return false;
     }
     this.spawns.put(match, spawns);
+    StringBuilder builder = new StringBuilder().append("Spawns loaded : ").append(spawns.size());
+    errors.add(new ModuleError(this, match.getMap(), new String[]{builder.toString()}, false));
     return true;
   }
 
@@ -105,9 +109,14 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @param elements The given elements.
    * @return The created default spawn.
    */
-  private Spawn parseDefaultSpawn(Match match, Element... elements) {
+  private Spawn parseSpawn(boolean defaultSpawn, Match match, Element... elements) {
     String safeValue = ParseUtil.getFirstAttribute("safe", elements);
     boolean safe = safeValue != null && Numbers.parseBoolean(safeValue);
+
+    Team team = null;
+    if (!defaultSpawn) {
+      team = Cardinal.getModule(TeamModule.class).getTeamByName(match, ParseUtil.getFirstAttribute("team", elements));
+    }
 
     String sequentialValue = ParseUtil.getFirstAttribute("sequential", elements);
     boolean sequential = sequentialValue != null && Numbers.parseBoolean(sequentialValue);
@@ -141,7 +150,7 @@ public class SpawnModule extends AbstractModule implements Listener {
       }
       if (region == null) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Invalid region specified for default spawn",
+            new String[]{"Invalid region specified for a spawn",
                 "Element at " + located.getLine() + ", " + located.getColumn()}, false));
         continue;
       }
@@ -154,7 +163,7 @@ public class SpawnModule extends AbstractModule implements Listener {
       regions.add(region);
     }
 
-    return new Spawn(true, null, safe, sequential, spread, exclusive, persistent, regions);
+    return new Spawn(true, team, safe, sequential, spread, exclusive, persistent, regions);
   }
 
   /**
@@ -181,11 +190,11 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @param event The event.
    */
   @EventHandler
-  public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
+  public void onPlayerChangeTeam(PlayerContainerChangeStateEvent event) {
     Player player = event.getPlayer();
-    if (Cardinal.getMatch(player).isRunning()) {
+    if (event.getNewData().getMatchThread().getCurrentMatch().isRunning()) {
       Match match = Cardinal.getMatch(event.getPlayer());
-      Spawn spawn = ListUtil.getRandom(getSpawns(match, event.getNewTeam()));
+      Spawn spawn = ListUtil.getRandom(getSpawns(match, event.getNewData().getPlaying()));
       Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
     }
   }
@@ -198,13 +207,9 @@ public class SpawnModule extends AbstractModule implements Listener {
   @EventHandler
   public void onMatchStart(MatchChangeStateEvent event) {
     if (event.getState() == MatchState.PLAYING) {
-      for (Player player : Bukkit.getOnlinePlayers()) {
-        Team team = Team.getTeam(player);
-        if (team == null || !Team.isObservers(team)) {
-          Spawn spawn = ListUtil.getRandom(getSpawns(event.getMatch(), Team.getTeam(player)));
-
-          Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
-        }
+      for (Player player : event.getMatch()) {
+        Spawn spawn = ListUtil.getRandom(getSpawns(event.getMatch(), event.getMatch().getPlayingContainer(player)));
+        Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
       }
     }
   }
@@ -230,24 +235,8 @@ public class SpawnModule extends AbstractModule implements Listener {
   @EventHandler
   public void onCardinalRespawn(CardinalRespawnEvent event) {
     Player player = event.getPlayer();
-    Team team = Team.getTeam(player);
-    Match match = Cardinal.getMatch(player);
-    if (team == null || !Team.isObservers(team)) {
-      player.setGameMode(GameMode.SURVIVAL);
-      if (match.isRunning()) {
-        List<Spawn> spawns = getSpawns(match, team);
-        List<Region> regions = ListUtil.getRandom(spawns).getRegions();
-        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
-      } else {
-        List<Region> regions = getDefaultSpawn(match).getRegions();
-        player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
-      }
-    } else {
-      player.setGameMode(GameMode.CREATIVE);
-
-      List<Region> regions = getDefaultSpawn(match).getRegions();
-      player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
-    }
+    List<Region> regions = event.getSpawn().getRegions();
+    player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(player.getWorld()));
   }
 
   /**
@@ -269,13 +258,18 @@ public class SpawnModule extends AbstractModule implements Listener {
   /**
    * Gets a list of {@link Spawn} based on a team.
    *
-   * @param team The team for the spawns.
+   * @param container The container for the spawns.
    * @return The list of spawns.
    */
-  private List<Spawn> getSpawns(@NonNull Match match, @NonNull Team team) {
-    return spawns.get(match).stream()
-        .filter(spawn -> (team == null && spawn.getTeam() == null) || spawn.getTeam().equals(team))
-        .collect(Collectors.toList());
+  private List<Spawn> getSpawns(@NonNull Match match, @NonNull PlayingPlayerContainer container) {
+    List<Spawn> results = Lists.newArrayList();
+
+    for (Spawn spawn : spawns.get(match)) {
+      if (container.equals(spawn.getTeam())) {
+        results.add(spawn);
+      }
+    }
+    return results;
   }
 
 }

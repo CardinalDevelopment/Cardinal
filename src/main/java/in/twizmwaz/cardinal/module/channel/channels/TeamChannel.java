@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.channel.channels;
 
-import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
+import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
 import in.twizmwaz.cardinal.module.channel.AbstractChannel;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.AllArgsConstructor;
@@ -46,9 +46,9 @@ public class TeamChannel extends AbstractChannel implements Listener {
    * @param event The event.
    */
   @EventHandler
-  public void onPlayerChangeTeam(PlayerChangeTeamEvent event) {
+  public void onPlayerChangeTeam(PlayerContainerChangeStateEvent event) {
     Player player = event.getPlayer();
-    if (event.getNewTeam().equals(team)) {
+    if (event.getNewData().getPlaying() != null && event.getNewData().getPlaying().equals(team)) {
       addPlayer(player);
     } else {
       removePlayer(player);

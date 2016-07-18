@@ -23,29 +23,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard.slot;
+package in.twizmwaz.cardinal.module.team;
 
-import in.twizmwaz.cardinal.module.objective.Objective;
-import in.twizmwaz.cardinal.util.Strings;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Player;
 
-@Getter
-@AllArgsConstructor
-public abstract class ObjectiveScoreboardSlot implements EntryScoreboardSlot {
+import java.util.Iterator;
 
-  private final Objective objective;
-  private final int position;
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class SinglePlayerContainer implements PlayingPlayerContainer {
+
+  @NonNull
+  private final Player player;
 
   @Override
-  public String getBase() {
-    return ChatColor.WHITE + " " + Strings.trim(objective.getName(), 0, 37);
+  public ImmutableCollection<Player> getPlayers() {
+    return ImmutableSet.of(player);
   }
 
   @Override
-  public String getSuffix() {
-    return Strings.trim(objective.getName(), 37, 53);
+  public boolean hasPlayer(Player player) {
+    return this.player == player;
+  }
+
+  @Override
+  public void addPlayer(Player player) {
+    throw new IllegalArgumentException("Cannot add additional players to a SinglePlayerContainer");
+  }
+
+  @Override
+  public void removePlayer(Player player) {
+    throw new IllegalArgumentException("Cannot remove players to a SinglePlayerContainer");
+  }
+
+  @Override
+  public Iterator<Player> iterator() {
+    return ImmutableSet.of(player).iterator();
+  }
+
+  public static SinglePlayerContainer of(@NonNull Player player) {
+    return new SinglePlayerContainer(player);
   }
 
 }

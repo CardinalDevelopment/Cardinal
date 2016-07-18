@@ -23,38 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.team;
+package in.twizmwaz.cardinal.playercontainer;
 
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.event.player.PlayerJoinMatchThreadEvent;
-import in.twizmwaz.cardinal.event.player.PlayerQuitMatchThreadEvent;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-
-public class TeamHandler implements Listener {
-
-  /**
-   * Puts the player on the Observers when they join a match thread.
-   *
-   * @param event The event.
-   */
-  @EventHandler(priority = EventPriority.LOWEST)
-  public void onPlayerJoinMatchThread(PlayerJoinMatchThreadEvent event) {
-    Team.getObservers(event.getMatchThread().getCurrentMatch()).addPlayer(event.getPlayer(), true, false);
-  }
-
-  /**
-   * Removes the player from their team when they quit a match thread.
-   *
-   * @param event The event.
-   */
-  @EventHandler(priority = EventPriority.HIGHEST)
-  public void onPlayerQuitMatchThread(PlayerQuitMatchThreadEvent event) {
-    Player player = event.getPlayer();
-    Cardinal.getModule(TeamModule.class).getTeamByPlayer(event.getMatchThread().getCurrentMatch(), player)
-        .removePlayer(player);
-  }
-
+public interface PlayingPlayerContainer extends PlayerContainer {
 }

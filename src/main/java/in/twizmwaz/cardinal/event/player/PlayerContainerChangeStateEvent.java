@@ -23,50 +23,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard.slot;
+package in.twizmwaz.cardinal.event.player;
 
-import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.util.Strings;
-import lombok.AllArgsConstructor;
+import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
 import lombok.Getter;
-
-import java.util.List;
+import lombok.Setter;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
 
 @Getter
-@AllArgsConstructor
-public class TeamScoreboardSlot implements EntryScoreboardSlot {
+public class PlayerContainerChangeStateEvent extends PlayerEvent implements Cancellable {
 
-  private final Team team;
-  private final String base;
-  private final int position;
-
-  @Override
-  public String getPrefix() {
-    return Strings.trim(getFormattedText(), 0, 16);
-  }
-
-  @Override
-  public String getSuffix() {
-    return Strings.trim(getFormattedText(), 16, 32);
-  }
-
-  private String getFormattedText() {
-    return team.getColor() + team.getName();
-  }
+  @Getter
+  private static final HandlerList handlerList = new HandlerList();
+  private final PlayerContainerData oldData;
+  private final PlayerContainerData newData;
+  @Setter
+  private boolean cancelled;
 
   /**
-   * Gets the next slot base for a team, based on previously used values.
+   * Called when a player switches from one team to another.
    *
-   * @param team The team.
-   * @param used The used values.
-   * @return The next base.
+   * @param who           The player that is switching teams.
+   * @param oldData The containers that the player is switching from.
+   * @param newData The containers that the player is switching to.
    */
-  public static String getNextTeamBase(Team team, List<String> used) {
-    String base = team.getColor() + "";
-    while (used.contains(base)) {
-      base += team.getColor();
-    }
-    return base;
+  public PlayerContainerChangeStateEvent(
+      Player who, PlayerContainerData oldData, PlayerContainerData newData) {
+    super(who);
+    this.oldData = oldData;
+    this.newData = newData;
+  }
+
+  @Override
+  public HandlerList getHandlers() {
+    return handlerList;
   }
 
 }

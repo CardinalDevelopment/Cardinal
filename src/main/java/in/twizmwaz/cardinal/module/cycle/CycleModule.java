@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.cycle;
 
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.match.MatchLoadCompleteEvent;
 import in.twizmwaz.cardinal.event.matchthread.MatchThreadMakeEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
@@ -35,6 +36,8 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
+import in.twizmwaz.cardinal.playercontainer.Containers;
+import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -98,6 +101,12 @@ public final class CycleModule extends AbstractModule implements Listener {
     Match match = new Match(matchThread, cycle.getUuid(), cycle.getMap(), cycle.getWorld());
     matchThread.setCurrentMatch(match);
     Cardinal.getInstance().getModuleHandler().loadMatch(match);
+    matchThread.getPlayers().forEach(player -> {
+      PlayerContainerData oldData = PlayerContainerData.of(player);
+      PlayerContainerData newData = new PlayerContainerData(matchThread, null, null);
+      Containers.handleStateChangeEvent(player, oldData, newData);
+    });
+    Bukkit.getPluginManager().callEvent(new MatchLoadCompleteEvent(match));
     CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
     next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
     nextCycle.put(matchThread, next);
