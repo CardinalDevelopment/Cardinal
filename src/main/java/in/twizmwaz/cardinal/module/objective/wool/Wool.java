@@ -39,6 +39,7 @@ import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Colors;
 import in.twizmwaz.cardinal.util.Components;
@@ -132,8 +133,9 @@ public class Wool extends Objective implements Listener {
   public void onInventoryClick(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
     ItemStack item = event.getCurrentItem();
+    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
     if (!complete && item != null && item.getType().equals(Material.WOOL)
-        && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+        && item.getData().getData() == color.getData() && team.equals(container)) {
       touched = true;
       boolean showMessage = false;
       if (isShow() && !touchedPlayers.contains(player)) {
@@ -146,11 +148,12 @@ public class Wool extends Objective implements Listener {
                 new NameComponent(player),
                 new UnlocalizedComponentBuilder(getName())
                     .color(Colors.convertDyeToChatColor(color)).build()).build()));
-        Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
+        //fixme: new obs
+        /*Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
             new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
                 Components.getNameComponentBuilder(player).build(),
                 new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                new TeamComponent(team)).build()));
+                new TeamComponent(team)).build()));*/
       }
       Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }
@@ -165,8 +168,9 @@ public class Wool extends Objective implements Listener {
   public void onPlayerPickupItem(PlayerPickupItemEvent event) {
     Player player = event.getPlayer();
     ItemStack item = event.getItem().getItemStack();
+    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
     if (!complete && item.getType().equals(Material.WOOL)
-        && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+        && item.getData().getData() == color.getData() && team.equals(container)) {
       touched = true;
       boolean showMessage = false;
       if (isShow() && !touchedPlayers.contains(player)) {
@@ -179,11 +183,12 @@ public class Wool extends Objective implements Listener {
                 Components.getNameComponentBuilder(player).build(),
                 new UnlocalizedComponentBuilder(getName())
                     .color(Colors.convertDyeToChatColor(color)).build()).build()));
-        Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
+        //fixme: new obs
+        /*Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
             new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
                 Components.getNameComponentBuilder(player).build(),
                 new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                new TeamComponent(team)).build()));
+                new TeamComponent(team)).build()));*/
       }
       Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }
@@ -204,11 +209,13 @@ public class Wool extends Objective implements Listener {
           complete = true;
 
           if (isShow()) {
+            //fixme: unchecked cast
+            Team team = (Team) Cardinal.getMatch(player).getPlayingContainer(player);
             Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(
                 new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
                     Components.getNameComponentBuilder(player).build(),
                     new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                    new TeamComponent(Team.getTeam(player))).color(ChatColor.GRAY).build());
+                    new TeamComponent(team)).color(ChatColor.GRAY).build());
           }
 
           Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));

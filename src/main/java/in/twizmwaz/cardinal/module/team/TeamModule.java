@@ -27,7 +27,6 @@ package in.twizmwaz.cardinal.module.team;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -37,7 +36,6 @@ import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
@@ -48,12 +46,10 @@ import java.util.Set;
 public class TeamModule extends AbstractModule {
 
   private Map<Match, Set<Team>> teams = Maps.newHashMap();
-  private Map<Match, TeamHandler> teamHandlers = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
     Set<Team> teams = Sets.newHashSet();
-    teams.add(makeObserver());
     Element element = match.getMap().getDocument().getRootElement().getChild("teams");
     if (element != null) {
       element.getChildren().forEach(child -> {
@@ -107,9 +103,7 @@ public class TeamModule extends AbstractModule {
     }
     this.teams.put(match, teams);
 
-    TeamHandler teamHandler = new TeamHandler();
-    Cardinal.registerEvents(teamHandler);
-    teamHandlers.put(match, teamHandler);
+    match.getPlayerContainers().addAll(teams);
 
     return true;
   }
@@ -118,9 +112,6 @@ public class TeamModule extends AbstractModule {
   public void clearMatch(Match match) {
     teams.get(match).clear();
     teams.remove(match);
-
-    HandlerList.unregisterAll(teamHandlers.get(match));
-    teamHandlers.remove(match);
   }
 
   /**
@@ -152,12 +143,6 @@ public class TeamModule extends AbstractModule {
       }
     }
     return null;
-  }
-
-  private Team makeObserver() {
-    Team obs = new Team("observers", ChatColor.AQUA, ChatColor.AQUA, true, NameTagVisibility.TRUE, 0, Integer.MAX_VALUE,
-        Integer.MAX_VALUE, "Observers");
-    return obs;
   }
 
   /**

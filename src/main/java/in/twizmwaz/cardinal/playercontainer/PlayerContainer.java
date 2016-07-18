@@ -23,33 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.scoreboard.slot;
+package in.twizmwaz.cardinal.playercontainer;
 
-import in.twizmwaz.cardinal.module.scoreboard.ScoreboardSlot;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.google.common.collect.ImmutableCollection;
+import org.bukkit.entity.Player;
 
-import java.util.List;
+/**
+ * Represents a class that stores a collection of players.
+ */
+public interface PlayerContainer extends Iterable<Player> {
 
-@Getter
-@AllArgsConstructor
-public class BlankScoreboardSlot implements ScoreboardSlot {
+  ImmutableCollection<Player> getPlayers();
 
-  private final String base;
-  private final int position;
+  boolean hasPlayer(Player player);
 
-  /**
-   * Gets the next slot base for a blank slot, based on previously used values.
-   *
-   * @param used The used values.
-   * @return The next base.
-   */
-  public static String getNextBlankBase(List<String> used) {
-    String base = " ";
-    while (used.contains(base)) {
-      base += " ";
-    }
-    return base;
-  }
+  void addPlayer(Player player);
+
+  void removePlayer(Player player);
 
 }

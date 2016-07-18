@@ -27,10 +27,10 @@ package in.twizmwaz.cardinal.module.interact;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.spawn.SpawnModule;
-import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.ListUtil;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -62,7 +62,8 @@ public class InteractModule extends AbstractModule implements Listener {
   }
 
   private boolean canInteract(@NonNull Player player) {
-    return Cardinal.getMatch(player).isRunning() && !Team.isObservers(Team.getTeam(player));
+    MatchThread thread = Cardinal.getMatchThread(player);
+    return thread.getCurrentMatch().isRunning() && thread.getCurrentMatch().hasPlayer(player);
   }
 
   /**

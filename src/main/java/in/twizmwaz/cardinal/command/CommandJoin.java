@@ -30,7 +30,12 @@ import ee.ellytr.command.CommandContext;
 import ee.ellytr.command.PlayerCommand;
 import ee.ellytr.command.argument.Optional;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.Containers;
+import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import org.bukkit.entity.Player;
 
 public class CommandJoin {
@@ -45,11 +50,18 @@ public class CommandJoin {
   @PlayerCommand
   public static void join(CommandContext cmd, @Optional Team team) {
     Player player = (Player) cmd.getSender();
-    if (team == null) {
-      Team.getEmptiestTeam(Team.getTeams(Cardinal.getMatch(player))).addPlayer(player, false, true);
+    Match match = Cardinal.getMatch(player);
+    PlayingPlayerContainer playing = team;
+    if (!match.isFfa()) {
+      if (playing == null) {
+        playing = Team.getEmptiestTeam(Team.getTeams(Cardinal.getMatch(player)));
+      }
     } else {
-      team.addPlayer(player, false, true);
+      playing = SinglePlayerContainer.of(player);
     }
+    PlayerContainerData newData = new PlayerContainerData(match.getThread(), match, playing);
+    PlayerContainerData oldData = PlayerContainerData.of(player);
+    Containers.handleStateChangeEvent(player, oldData, newData);
   }
 
 }

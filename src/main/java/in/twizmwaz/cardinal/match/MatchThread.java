@@ -25,10 +25,12 @@
 
 package in.twizmwaz.cardinal.match;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.event.player.PlayerJoinMatchThreadEvent;
 import in.twizmwaz.cardinal.event.player.PlayerQuitMatchThreadEvent;
+import in.twizmwaz.cardinal.playercontainer.PlayerContainer;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -36,20 +38,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * A MatchThread is an object representing a linear string of matches.
  * This has nothing to do with a {@link java.lang.Thread}.
  */
-public class MatchThread {
+
+@Getter
+@Setter
+public class MatchThread implements PlayerContainer {
 
   private static int counter = -1;
 
-  @Getter
   private final int id;
   private final Collection<Player> players;
-  @Getter
-  @Setter
   private Match currentMatch;
 
   public MatchThread() {
@@ -57,22 +60,30 @@ public class MatchThread {
     players = Sets.newHashSet();
   }
 
+  @Override
   public void addPlayer(@NonNull Player player) {
     players.add(player);
     Bukkit.getPluginManager().callEvent(new PlayerJoinMatchThreadEvent(player, this));
   }
 
+  @Override
   public void removePlayer(@NonNull Player player) {
     players.remove(player);
     Bukkit.getPluginManager().callEvent(new PlayerQuitMatchThreadEvent(player, this));
   }
 
+  @Override
   public boolean hasPlayer(@NonNull Player player) {
     return players.contains(player);
   }
 
-  public Collection<Player> getPlayers() {
+  @Override
+  public ImmutableCollection<Player> getPlayers() {
     return ImmutableSet.copyOf(players);
   }
 
+  @Override
+  public Iterator<Player> iterator() {
+    return players.iterator();
+  }
 }

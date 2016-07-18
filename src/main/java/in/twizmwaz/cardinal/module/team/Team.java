@@ -26,26 +26,21 @@
 
 package in.twizmwaz.cardinal.module.team;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import ee.ellytr.chat.ChatConstant;
-import ee.ellytr.chat.component.NameComponent;
-import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.component.TeamComponent;
-import in.twizmwaz.cardinal.event.player.PlayerChangeTeamEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
-import in.twizmwaz.cardinal.util.Channels;
+import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Iterator;
@@ -53,9 +48,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+//TODO: blitz check, send team full message
+
 @Data
 @AllArgsConstructor
-public class Team implements Iterable<Player> {
+public class Team implements PlayingPlayerContainer {
 
   private final String id;
   private final ChatColor color;
@@ -75,52 +72,24 @@ public class Team implements Iterable<Player> {
     return "Team{id=\"" + id + "\"}";
   }
 
-  /**
-   * Attempts to add a player to a team.
-   *
-   * @param player  The player.
-   * @param force   If the join is being forced.
-   * @param message If a join message should be sent to the player.
-   * @return If the attempt was successful.
-   */
-  public boolean addPlayer(Player player, boolean force, boolean message) {
-    //TODO: blitz check
-    if (!force && players.size() >= max) {
-      //TODO: send team full message
-      return false;
-    }
-    PlayerChangeTeamEvent event = new PlayerChangeTeamEvent(player, getTeam(player), this);
-    Bukkit.getServer().getPluginManager().callEvent(event);
-    if (message && event.getNewTeam() != null) {
-      Channels.getPlayerChannel(player).sendMessage(new NameComponent(player));
-      Channels.getPlayerChannel(player).sendMessage(new LocalizedComponent(ChatConstant.getConstant("team.join"),
-          new TeamComponent(event.getNewTeam())));
-    }
-    if (!event.isCancelled()) {
-      if (event.getOldTeam() != null) {
-        event.getOldTeam().removePlayer(player);
-      }
-      players.add(player);
-    }
-    return !event.isCancelled() || force;
+  @Override
+  public void addPlayer(@NonNull Player player) {
+    players.add(player);
   }
 
-  /**
-   * Removes a player form the team.
-   *
-   * @param player The player to be removed from the team.
-   */
+  @Override
   public void removePlayer(Player player) {
     players.remove(player);
   }
 
-  /**
-   * Used to get a snapshot of a list of players on a team.
-   *
-   * @return An immutable set of players.
-   */
-  public Set<Player> getPlayers() {
+  @Override
+  public ImmutableCollection<Player> getPlayers() {
     return ImmutableSet.copyOf(players);
+  }
+
+  @Override
+  public boolean hasPlayer(@NonNull Player player) {
+    return players.contains(player);
   }
 
   @Override
@@ -157,23 +126,8 @@ public class Team implements Iterable<Player> {
   }
 
   public static ChatColor getTeamColor(@NonNull Player player) {
-    Team team = getTeam(player);
-    return team != null ? team.getColor() : ChatColor.YELLOW;
-  }
-
-  /**
-   * Returns the team that the specified player is on.
-   *
-   * @param player The player.
-   * @return The team that the player is on.
-   */
-  public static Team getTeam(@NonNull Player player) {
-    for (Team team : getTeams(Cardinal.getMatch(player))) {
-      if (team.getPlayers().contains(player)) {
-        return team;
-      }
-    }
-    return null;
+    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
+    return container instanceof Team  ? ((Team) container).getColor() : ChatColor.YELLOW;
   }
 
   /**
@@ -187,30 +141,6 @@ public class Team implements Iterable<Player> {
   }
 
   /**
-   * Gets the currently observing team.
-   *
-   * @return The observing team.
-   */
-  public static Team getObservers(@NonNull Match match) {
-    for (Team team : getTeams(match)) {
-      if (isObservers(team)) {
-        return team;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Test if a team is an observer team.
-   *
-   * @param team The team to be tested.
-   * @return If the team is an observer team.
-   */
-  public static boolean isObservers(@NonNull Team team) {
-    return team.getId().equals("observers");
-  }
-
-  /**
    * Gets the objectives required for a team to complete.
    *
    * @param team The team.
@@ -219,7 +149,7 @@ public class Team implements Iterable<Player> {
   public static List<Objective> getTeamObjectives(@NonNull Match match, @NonNull Team team) {
     List<Objective> objectives = Lists.newArrayList();
     objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Core
-        && !((Core) objective).getTeam().equals(team)).collect(Collectors.toList()));
+        && !((Core) objective).getOwner().equals(team)).collect(Collectors.toList()));
     objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Destroyable
         && !((Destroyable) objective).getOwner().equals(team)).collect(Collectors.toList()));
     objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Wool

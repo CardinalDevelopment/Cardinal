@@ -26,9 +26,11 @@
 package in.twizmwaz.cardinal.module.connection;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
-import org.bukkit.entity.Player;
+import in.twizmwaz.cardinal.playercontainer.Containers;
+import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,19 +47,24 @@ public class ConnectionModule extends AbstractModule implements Listener {
 
   @EventHandler(priority = EventPriority.LOWEST)
   public void onPlayerJoin(PlayerInitialSpawnEvent event) {
-    Cardinal.getInstance().getMatchThreads().get(0).addPlayer(event.getPlayer());
+    MatchThread thread = Cardinal.getInstance().getMatchThreads().get(0);
+    PlayerContainerData newData = new PlayerContainerData(thread, null, null);
+    PlayerContainerData oldData = PlayerContainerData.empty();
+    Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onPlayerQuit(PlayerQuitEvent event) {
-    Player player = event.getPlayer();
-    Cardinal.getMatchThread(player).removePlayer(player);
+    PlayerContainerData oldData = PlayerContainerData.of(event.getPlayer());
+    PlayerContainerData newData = PlayerContainerData.empty();
+    Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onPlayerQuit(PlayerKickEvent event) {
-    Player player = event.getPlayer();
-    Cardinal.getMatchThread(player).removePlayer(player);
+    PlayerContainerData oldData = PlayerContainerData.of(event.getPlayer());
+    PlayerContainerData newData = PlayerContainerData.empty();
+    Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
   }
 
 }
