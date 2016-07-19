@@ -77,13 +77,14 @@ import lombok.NonNull;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @ModuleEntry
 public class RegionModule extends AbstractModule {
 
-  private Map<Match, Map<String, Region>> regions = Maps.newHashMap();
+  private Map<Match, Map<String, Region>> regions = new HashMap<>();
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
@@ -142,43 +143,43 @@ public class RegionModule extends AbstractModule {
     }
     switch (element.getName()) {
       case "cuboid":
-        return checkRegion(match, id, new CuboidRegion(match, new CuboidRegionParser(element)));
+        return new CuboidRegion(match, new CuboidRegionParser(element));
       case "cylinder":
-        return checkRegion(match, id, new CylinderRegion(match, new CylinderRegionParser(element)));
+        return new CylinderRegion(match, new CylinderRegionParser(element));
       case "block":
-        return checkRegion(match, id, new BlockRegion(match, new BlockRegionParser(element)));
+        return new BlockRegion(match, new BlockRegionParser(element));
       case "sphere":
-        return checkRegion(match, id, new SphereRegion(match, new SphereRegionParser(element)));
+        return new SphereRegion(match, new SphereRegionParser(element));
       case "rectangle":
-        return checkRegion(match, id, new RectangleRegion(match, new RectangleRegionParser(element)));
+        return new RectangleRegion(match, new RectangleRegionParser(element));
       case "circle":
-        return checkRegion(match, id, new CircleRegion(match, new CircleRegionParser(element)));
+        return new CircleRegion(match, new CircleRegionParser(element));
       case "half":
-        return checkRegion(match, id, new HalfRegion(match, new HalfRegionParser(element)));
+        return new HalfRegion(match, new HalfRegionParser(element));
       case "below":
-        return checkRegion(match, id, new BelowRegion(match, new BelowRegionParser(element)));
+        return new BelowRegion(match, new BelowRegionParser(element));
       case "above":
-        return checkRegion(match, id, new AboveRegion(match, new AboveRegionParser(element)));
+        return new AboveRegion(match, new AboveRegionParser(element));
       case "empty":
-        return checkRegion(match, id, new EmptyRegion(match));
+        return new EmptyRegion(match);
       case "nowhere":
-        return checkRegion(match, id, new NowhereRegion(match));
+        return new NowhereRegion(match);
       case "everywhere":
-        return checkRegion(match, id, new EverywhereRegion(match));
+        return new EverywhereRegion(match);
       case "negative":
-        return checkRegion(match, id, new NegativeRegion(match, new NegativeRegionParser(match, element)));
+        return new NegativeRegion(match, new NegativeRegionParser(match, element));
       case "union":
-        return checkRegion(match, id, new UnionRegion(match, new UnionRegionParser(match, element)));
+        return new UnionRegion(match, new UnionRegionParser(match, element));
       case "complement":
-        return checkRegion(match, id, new ComplementRegion(new ComplementRegionParser(match, element)));
+        return new ComplementRegion(new ComplementRegionParser(match, element));
       case "intersect":
-        return checkRegion(match, id, new IntersectRegion(match, new IntersectRegionParser(match, element)));
+        return new IntersectRegion(match, new IntersectRegionParser(match, element));
       case "translate":
-        return checkRegion(match, id, new TranslatedRegion(new TranslatedRegionParser(match, element)));
+        return new TranslatedRegion(new TranslatedRegionParser(match, element));
       case "mirror":
-        return checkRegion(match, id, new MirroredRegion(new MirroredRegionParser(match, element)));
+        return new MirroredRegion(new MirroredRegionParser(match, element));
       case "point":
-        return checkRegion(match, id, PointRegionParser.generateRegion(match, element));
+        return PointRegionParser.generateRegion(match, element);
       default:
         if (id != null) {
           Region region = getRegionById(match, id);
@@ -196,20 +197,8 @@ public class RegionModule extends AbstractModule {
         if (regions.isEmpty()) {
           return null;
         }
-        return checkRegion(match, id, new UnionRegion(match, regions));
+        return new UnionRegion(match, regions);
     }
-  }
-
-  private Region checkRegion(Match match, String id, Region region) {
-    if (id != null) {
-      if (!regions.get(match).containsKey(id)) {
-        regions.get(match).put(id, region);
-      } else {
-        errors.add(new ModuleError(this, match.getMap(),
-            new String[] {"Cannot have two regions assigned to the same id."}, false));
-      }
-    }
-    return region;
   }
 
   /**
