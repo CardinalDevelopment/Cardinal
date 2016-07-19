@@ -26,7 +26,6 @@
 package in.twizmwaz.cardinal.module.region;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -88,17 +87,22 @@ public class RegionModule extends AbstractModule {
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
-    Map<String, Region> matchRegions = Maps.newHashMap();
-    matchRegions.put("everywhere", new EverywhereRegion(match));
-    matchRegions.put("nowhere", new NowhereRegion(match));
-    regions.put(match, matchRegions);
+    Map<String, Region> regions = new HashMap<>();
+    this.regions.put(match, regions);
+
+    regions.put("everywhere", new EverywhereRegion(match));
+    regions.put("nowhere", new NowhereRegion(match));
+
     for (Element regionsElement : match.getMap().getDocument().getRootElement().getChildren("regions")) {
       for (Element regionElement : regionsElement.getChildren()) {
         if (regionElement.getName().equals("apply")) {
           continue;
         }
         try {
-          getRegion(match, regionElement);
+          String id = regionElement.getAttributeValue("id");
+          if (id != null) {
+            regions.put(id, getRegion(match, regionElement));
+          }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{getRegionError(e, "region", null)}, false));
         }
