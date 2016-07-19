@@ -164,11 +164,16 @@ public final class Cardinal extends JavaPlugin {
   }
 
   /**
-   * @param player The player.
+   * @param who A command sender.
    * @return The match thread that contains this player.
    */
   @NonNull
-  public static MatchThread getMatchThread(@NonNull Player player) {
+  public static MatchThread getMatchThread(@NonNull CommandSender who) {
+    if (!(who instanceof Player)) {
+      return getInstance().getMatchThreads().get(0);
+    }
+
+    Player player = (Player) who;
     for (MatchThread matchThread : getInstance().getMatchThreads()) {
       if (matchThread.hasPlayer(player)) {
         return matchThread;

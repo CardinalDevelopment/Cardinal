@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-//fixme: this doesn't account for multiple matchthreads
 public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
 
   @Override
