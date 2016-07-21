@@ -72,7 +72,7 @@ public class CycleCountdown extends AbstractCountdown {
       if (time % 20 == 0) {
         BaseComponent mapName = new UnlocalizedComponentBuilder(Cardinal.getModule(CycleModule.class)
             .getNextMap(matchThread).getName()).color(ChatColor.AQUA).build();
-        ChatConstant cycling = ChatConstant.getConstant("cycle.cycling");
+        ChatConstant cycling = ChatConstant.getConstant("cycle.countdown");
         BaseComponent timeComponent = Components.getTimeComponentBuilder(time / 20).color(ChatColor.DARK_RED).build();
         BaseComponent message = new LocalizedComponentBuilder(cycling, mapName, timeComponent)
             .color(ChatColor.DARK_AQUA).build();

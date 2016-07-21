@@ -25,14 +25,38 @@
 
 package in.twizmwaz.cardinal.module.objective.destroyable;
 
+import ee.ellytr.chat.ChatConstant;
+import ee.ellytr.chat.component.NameComponent;
+import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.formattable.ListComponent;
+import ee.ellytr.chat.component.formattable.LocalizedComponent;
+import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
+import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
+import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.util.Channels;
+import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.Getter;
+import lombok.NonNull;
+import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Getter
 public class Destroyable extends Objective implements Listener {
@@ -48,6 +72,14 @@ public class Destroyable extends Objective implements Listener {
   private final boolean sparks;
   private final ProximityMetric proximityMetric;
   private final boolean proximityHorizontal;
+
+  private final List<Player> touchedPlayers = new ArrayList<>();
+  private final Map<UUID, Integer> playerContributions = new HashMap<>();
+
+  private int broken;
+  private long total;
+
+  private boolean completed;
 
   /**
    * @param match               The match the destroyable belongs to.
@@ -84,6 +116,86 @@ public class Destroyable extends Objective implements Listener {
     this.sparks = sparks;
     this.proximityMetric = proximityMetric;
     this.proximityHorizontal = proximityHorizontal;
+
+    total = region.getBlocks().stream().filter(this::isPartOf).count();
+  }
+
+  private boolean isPartOf(@NonNull Block block) {
+    return materials.contains(block.getType(), (int) block.getState().getMaterialData().getData());
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onBlockBreak(BlockBreakEvent event) {
+    Player player = event.getPlayer();
+    if (match.hasPlayer(player)) {
+      Block block = event.getBlock();
+      if (isPartOf(block)) {
+        Team team = Team.getTeam(player);
+        if (team != null && !team.equals(owner)) {
+          if (!touchedPlayers.contains(player)) {
+            touchedPlayers.add(player);
+
+            if (show) {
+              BaseComponent message = Components.getTeamComponent(team,
+                  new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.touched"),
+                      new TeamComponent(owner),
+                      new UnlocalizedComponent(name),
+                      new NameComponent(player)
+                  )
+              );
+              team.forEach(teamMember -> {
+                if (teamMember.equals(player)) {
+                  Channels.getPlayerChannel(player).sendMessage(
+                      new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.touched.self"))
+                  );
+                } else {
+                  Channels.getPlayerChannel(teamMember).sendMessage(message);
+                }
+              });
+            }
+          }
+          broken++;
+
+          UUID uuid = player.getUniqueId();
+          playerContributions.putIfAbsent(uuid, 0);
+          playerContributions.put(uuid, playerContributions.get(uuid) + 1);
+
+          if (!completed) {
+            if ((double) broken / total >= completion) {
+              completed = true;
+
+              Channels.getGlobalChannel(match.getMatchThread()).sendMessage(
+                  new LocalizedComponentBuilder(
+                      ChatConstant.getConstant("objective.destroyable.completed"),
+                      new TeamComponent(owner),
+                      new UnlocalizedComponent(name),
+                      getContributionList()
+                  ).build()
+              );
+
+              Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));
+            } else {
+              Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
+            }
+          }
+        } else {
+          event.setCancelled(true);
+          Channels.getPlayerChannel(player).sendMessage(Components.getWarningComponent(
+              new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.error.own"))
+          ));
+        }
+      }
+    }
+  }
+
+  private ListComponent getContributionList() {
+    List<BaseComponent> contributions = new ArrayList<>();
+    playerContributions.forEach((player, amount) -> {
+      contributions.add(
+          new UnlocalizedComponent("{0} (" + amount + "%)", new NameComponent(Bukkit.getOfflinePlayer(player)))
+      );
+    });
+    return new ListComponent(contributions);
   }
 
 }

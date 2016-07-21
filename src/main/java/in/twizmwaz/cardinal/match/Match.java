@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public final class Match {
   private static int matchCounter = -1;
 
   @Getter
-  private final MatchThread thread;
+  private final MatchThread matchThread;
   @Getter
   private final UUID uuid;
   @Getter
@@ -55,12 +56,12 @@ public final class Match {
   /**
    * Creates a new Match.
    *
-   * @param thread The {@link MatchThread} that this match will occur on.
+   * @param matchThread The {@link MatchThread} that this match will occur on.
    * @param uuid   The unique id of this match.
    * @param map    The {@link LoadedMap} this match will occur on.
    */
-  public Match(@NonNull MatchThread thread, @NonNull UUID uuid, @NonNull LoadedMap map, @NonNull World world) {
-    this.thread = thread;
+  public Match(@NonNull MatchThread matchThread, @NonNull UUID uuid, @NonNull LoadedMap map, @NonNull World world) {
+    this.matchThread = matchThread;
     this.uuid = uuid;
     this.map = map;
     this.world = world;
@@ -88,6 +89,10 @@ public final class Match {
       this.state = state;
       return state;
     }
+  }
+
+  public boolean hasPlayer(@NonNull Player player) {
+    return matchThread.hasPlayer(player);
   }
 
 }

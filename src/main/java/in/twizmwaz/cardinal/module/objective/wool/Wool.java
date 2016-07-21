@@ -119,8 +119,6 @@ public class Wool extends Objective implements Listener {
     this.woolProximityHorizontal = woolProximityHorizontal;
     this.monumentProximityMetric = monumentProximityMetric;
     this.monumentProximityHorizontal = monumentProximityHorizontal;
-
-    complete = false;
   }
 
   /**
@@ -131,28 +129,28 @@ public class Wool extends Objective implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onInventoryClick(InventoryClickEvent event) {
     Player player = (Player) event.getWhoClicked();
-    ItemStack item = event.getCurrentItem();
-    if (!complete && item != null && item.getType().equals(Material.WOOL)
-        && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
-      touched = true;
-      boolean showMessage = false;
-      if (isShow() && !touchedPlayers.contains(player)) {
-        touchedPlayers.add(player);
-        showMessage = true;
+    if (match.hasPlayer(player)) {
+      ItemStack item = event.getCurrentItem();
+      if (!complete && item != null && item.getType().equals(Material.WOOL)
+          && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+        touched = true;
+        if (show && !touchedPlayers.contains(player)) {
+          touchedPlayers.add(player);
 
-        Match match = getMatch();
-        Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
-                new NameComponent(player),
-                new UnlocalizedComponentBuilder(getName())
-                    .color(Colors.convertDyeToChatColor(color)).build()).build()));
-        Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
-                Components.getNameComponentBuilder(player).build(),
-                new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                new TeamComponent(team)).build()));
+          Match match = getMatch();
+          Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
+              new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
+                  new NameComponent(player),
+                  new UnlocalizedComponentBuilder(getName())
+                      .color(Colors.convertDyeToChatColor(color)).build()).build()));
+          Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
+              new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
+                  Components.getNameComponentBuilder(player).build(),
+                  new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
+                  new TeamComponent(team)).build()));
+        }
+        Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
       }
-      Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }
   }
 
@@ -164,28 +162,28 @@ public class Wool extends Objective implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onPlayerPickupItem(PlayerPickupItemEvent event) {
     Player player = event.getPlayer();
-    ItemStack item = event.getItem().getItemStack();
-    if (!complete && item.getType().equals(Material.WOOL)
-        && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
-      touched = true;
-      boolean showMessage = false;
-      if (isShow() && !touchedPlayers.contains(player)) {
-        touchedPlayers.add(player);
-        showMessage = true;
+    if (match.hasPlayer(player)) {
+      ItemStack item = event.getItem().getItemStack();
+      if (!complete && item.getType().equals(Material.WOOL)
+          && item.getData().getData() == color.getData() && team.equals(Team.getTeam(player))) {
+        touched = true;
+        if (show && !touchedPlayers.contains(player)) {
+          touchedPlayers.add(player);
 
-        Match match = getMatch();
-        Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
-                Components.getNameComponentBuilder(player).build(),
-                new UnlocalizedComponentBuilder(getName())
-                    .color(Colors.convertDyeToChatColor(color)).build()).build()));
-        Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
-                Components.getNameComponentBuilder(player).build(),
-                new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                new TeamComponent(team)).build()));
+          Match match = getMatch();
+          Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
+              new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
+                  Components.getNameComponentBuilder(player).build(),
+                  new UnlocalizedComponentBuilder(getName())
+                      .color(Colors.convertDyeToChatColor(color)).build()).build()));
+          Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
+              new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
+                  Components.getNameComponentBuilder(player).build(),
+                  new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
+                  new TeamComponent(team)).build()));
+        }
+        Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
       }
-      Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }
   }
 
@@ -196,38 +194,40 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
-    Block block = event.getBlock();
     Player player = event.getPlayer();
-    if (monument.evaluate(block.getLocation().toVector()) && !complete) {
-      if (block.getType().equals(Material.WOOL)) {
-        if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(color)) {
-          complete = true;
+    if (match.hasPlayer(player)) {
+      Block block = event.getBlock();
+      if (monument.evaluate(block.getLocation().toVector()) && !complete) {
+        if (block.getType().equals(Material.WOOL)) {
+          if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(color)) {
+            complete = true;
 
-          if (isShow()) {
-            Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(
-                new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
-                    Components.getNameComponentBuilder(player).build(),
-                    new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                    new TeamComponent(Team.getTeam(player))).color(ChatColor.GRAY).build());
+            if (show) {
+              Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(
+                  new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
+                      Components.getNameComponentBuilder(player).build(),
+                      new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
+                      new TeamComponent(Team.getTeam(player))).color(ChatColor.GRAY).build());
+            }
+
+            Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));
+          } else {
+            event.setCancelled(true);
+            if (show) {
+              Channels.getPlayerChannel(player).sendMessage(
+                  new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.error.wrongBlock"),
+                      new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build())
+                      .color(ChatColor.RED).build());
+            }
           }
-
-          Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));
         } else {
           event.setCancelled(true);
-          if (isShow()) {
+          if (show) {
             Channels.getPlayerChannel(player).sendMessage(
                 new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.error.wrongBlock"),
                     new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build())
                     .color(ChatColor.RED).build());
           }
-        }
-      } else {
-        event.setCancelled(true);
-        if (isShow()) {
-          Channels.getPlayerChannel(player).sendMessage(
-              new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.error.wrongBlock"),
-                  new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build())
-                  .color(ChatColor.RED).build());
         }
       }
     }
@@ -240,8 +240,10 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
-    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
-      event.setCancelled(true);
+    if (match.hasPlayer(event.getPlayer())) {
+      if (monument.evaluate(event.getBlock().getLocation().toVector())) {
+        event.setCancelled(true);
+      }
     }
   }
 
@@ -252,7 +254,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockForm(BlockFormEvent event) {
-    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
+    if (match.getWorld().equals(event.getWorld()) && monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
@@ -264,7 +266,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockSpread(BlockSpreadEvent event) {
-    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
+    if (match.getWorld().equals(event.getWorld()) && monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }
@@ -276,7 +278,7 @@ public class Wool extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-    if (monument.evaluate(event.getBlock().getLocation().toVector())) {
+    if (match.getWorld().equals(event.getWorld()) && monument.evaluate(event.getBlock().getLocation().toVector())) {
       event.setCancelled(true);
     }
   }

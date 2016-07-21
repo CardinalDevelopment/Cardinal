@@ -40,10 +40,10 @@ import java.util.List;
 public abstract class Objective {
 
   @NonNull
-  private final Match match;
+  protected final Match match;
   private final String id;
   private final boolean required;
-  private final boolean show;
+  protected final boolean show;
 
   public abstract String getName();
 

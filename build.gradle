@@ -60,7 +60,7 @@ shadowJar {
         relocate 'org.jdom2', 'in.twizmwaz.cardinal.libs.jdom2'
         include(dependency('org.ow2.asm:asm-all:5.0.4'))
         relocate 'org.objectweb.asm', 'in.twizmwaz.cardinal.libs.asm'
-        include(dependency('ee.ellytr.command:EllyCommand:2.0.3'))
+        include(dependency('ee.ellytr.command:EllyCommand:2.0.4'))
         include(dependency('ee.ellytr.chat:EllyChat:1.2.5'))
     }
 }

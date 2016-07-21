@@ -127,21 +127,21 @@ public class Core extends Objective implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();
-    Block block = event.getBlock();
-    Team team = Team.getTeam(player);
-    if (getBlocks().contains(block) && (team == null || !team.equals(this.team))) {
-      touched = true;
-      boolean showMessage = false;
-      if (isShow() && !touchedPlayers.contains(player)) {
-        touchedPlayers.add(player);
-        showMessage = true;
-        Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
-            ChatConstant.getConstant("objective.core.touched"),
-            new TeamComponent(this.team),
-            new UnlocalizedComponent(name),
-            Components.getNameComponentBuilder(player).build())));
+    if (match.hasPlayer(player)) {
+      Block block = event.getBlock();
+      Team team = Team.getTeam(player);
+      if (getBlocks().contains(block) && (team == null || !team.equals(this.team))) {
+        touched = true;
+        if (show && !touchedPlayers.contains(player)) {
+          touchedPlayers.add(player);
+          Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
+              ChatConstant.getConstant("objective.core.touched"),
+              new TeamComponent(this.team),
+              new UnlocalizedComponent(name),
+              Components.getNameComponentBuilder(player).build())));
+        }
+        Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
       }
-      Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player, showMessage));
     }
   }
 
@@ -152,24 +152,26 @@ public class Core extends Objective implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onBlockFromTo(BlockFromToEvent event) {
-    Block to = event.getToBlock();
-    if (lava.contains(to)) {
-      event.setCancelled(true);
-      return;
-    }
-    Material type = event.getBlock().getType();
-    if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA))
-        && to.getType().equals(Material.AIR) && Cardinal.getModule(CoreModule.class).getClosestCore(getMatch(),
-        to.getLocation().toVector()).equals(this) && !complete) {
-      Block bottomBlock = getBottomBlock();
-      if (bottomBlock != null) {
-        int distance = getBottomBlock().getY() - to.getY();
-        if (distance >= leak) {
-          complete = true;
-          Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(new LocalizedComponentBuilder(
-              ChatConstant.getConstant("objective.core.completed"), new TeamComponent(team),
-              new UnlocalizedComponentBuilder(name).color(ChatColor.RED).build()).color(ChatColor.RED).build());
-          Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, null));
+    if (match.getWorld().equals(event.getWorld())) {
+      Block to = event.getToBlock();
+      if (lava.contains(to)) {
+        event.setCancelled(true);
+        return;
+      }
+      Material type = event.getBlock().getType();
+      if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA))
+          && to.getType().equals(Material.AIR) && Cardinal.getModule(CoreModule.class).getClosestCore(getMatch(),
+          to.getLocation().toVector()).equals(this) && !complete) {
+        Block bottomBlock = getBottomBlock();
+        if (bottomBlock != null) {
+          int distance = getBottomBlock().getY() - to.getY();
+          if (distance >= leak) {
+            complete = true;
+            Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(new LocalizedComponentBuilder(
+                ChatConstant.getConstant("objective.core.completed"), new TeamComponent(team),
+                new UnlocalizedComponentBuilder(name).color(ChatColor.RED).build()).color(ChatColor.RED).build());
+            Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, null));
+          }
         }
       }
     }
@@ -182,7 +184,10 @@ public class Core extends Objective implements Listener {
    */
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent event) {
-    touchedPlayers.remove(event.getEntity());
+    Player player = event.getEntity();
+    if (match.hasPlayer(player)) {
+      touchedPlayers.remove(player);
+    }
   }
 
   /**

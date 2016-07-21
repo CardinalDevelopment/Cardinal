@@ -25,16 +25,14 @@
 
 package in.twizmwaz.cardinal.util;
 
-import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.NameComponent;
-import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import ee.ellytr.chat.component.builder.NameComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
-import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.ServerOperator;
@@ -97,13 +95,13 @@ public class Components {
     return component;
   }
 
-  public static LocalizedComponent getTimeComponent(int seconds) {
-    return getTimeComponentBuilder(seconds).build();
+  public static UnlocalizedComponent getWarningComponent(@NonNull BaseComponent component) {
+    component.setColor(ChatColor.RED);
+    return new UnlocalizedComponentBuilder(" ⚠ {0}", component).color(ChatColor.YELLOW).build();
   }
 
-  public static LocalizedComponentBuilder getTimeComponentBuilder(int seconds) {
-    return new LocalizedComponentBuilder(ChatConstant.getConstant(seconds == 1 ? "time.second" : "time.seconds"),
-        new UnlocalizedComponent(seconds + ""));
+  public static UnlocalizedComponent getTeamComponent(@NonNull Team team, @NonNull BaseComponent component) {
+    return new UnlocalizedComponentBuilder("[" + team.getName() + "] {0}", component).color(team.getColor()).build();
   }
 
 }
