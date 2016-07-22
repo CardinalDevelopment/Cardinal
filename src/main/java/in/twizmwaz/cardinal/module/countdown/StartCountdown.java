@@ -27,11 +27,11 @@ package in.twizmwaz.cardinal.module.countdown;
 
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.builder.TimeComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchState;
 import in.twizmwaz.cardinal.util.Channels;
-import in.twizmwaz.cardinal.util.Components;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -50,13 +50,13 @@ public class StartCountdown extends AbstractCountdown {
       cancelled = true;
       match.setMatchState(MatchState.PLAYING);
 
-      Channels.getGlobalChannel(match.getThread()).sendMessage(new LocalizedComponentBuilder(
+      Channels.getGlobalChannel(match.getMatchThread()).sendMessage(new LocalizedComponentBuilder(
           ChatConstant.getConstant("match.start.started")).build());
 
     } else if (!cancelled) {
       if (time % 20 == 0) {
-        Channels.getGlobalChannel(match.getThread()).sendMessage(new LocalizedComponentBuilder(
-            ChatConstant.getConstant("match.start.countdown"), Components.getTimeComponentBuilder(time / 20)
+        Channels.getGlobalChannel(match.getMatchThread()).sendMessage(new LocalizedComponentBuilder(
+            ChatConstant.getConstant("match.start.countdown"), new TimeComponentBuilder(time / 20)
             .color(ChatColor.DARK_RED).build()).color(ChatColor.DARK_AQUA).build());
       }
       time--;

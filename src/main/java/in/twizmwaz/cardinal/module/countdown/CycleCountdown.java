@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.module.countdown;
 
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.builder.TimeComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
@@ -34,7 +35,6 @@ import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.cycle.CycleModule;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.util.Channels;
-import in.twizmwaz.cardinal.util.Components;
 import lombok.Getter;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
@@ -73,7 +73,7 @@ public class CycleCountdown extends AbstractCountdown {
         BaseComponent mapName = new UnlocalizedComponentBuilder(Cardinal.getModule(CycleModule.class)
             .getNextMap(matchThread).getName()).color(ChatColor.AQUA).build();
         ChatConstant cycling = ChatConstant.getConstant("cycle.countdown");
-        BaseComponent timeComponent = Components.getTimeComponentBuilder(time / 20).color(ChatColor.DARK_RED).build();
+        BaseComponent timeComponent = new TimeComponentBuilder(time / 20).color(ChatColor.DARK_RED).build();
         BaseComponent message = new LocalizedComponentBuilder(cycling, mapName, timeComponent)
             .color(ChatColor.DARK_AQUA).build();
         Channels.getGlobalChannel(matchThread).sendMessage(message);

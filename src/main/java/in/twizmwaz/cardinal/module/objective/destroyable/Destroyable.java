@@ -124,6 +124,11 @@ public class Destroyable extends Objective implements Listener {
     return materials.contains(block.getType(), (int) block.getState().getMaterialData().getData());
   }
 
+  /**
+   * Checks the destroyable's state when a player breaks a block.
+   *
+   * @param event The event.
+   */
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();

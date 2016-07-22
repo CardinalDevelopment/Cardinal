@@ -134,11 +134,15 @@ public class Core extends Objective implements Listener {
         touched = true;
         if (show && !touchedPlayers.contains(player)) {
           touchedPlayers.add(player);
-          Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(team, new LocalizedComponent(
-              ChatConstant.getConstant("objective.core.touched"),
-              new TeamComponent(this.team),
-              new UnlocalizedComponent(name),
-              Components.getNameComponentBuilder(player).build())));
+          Channels.getTeamChannel(getMatch(), team).sendMessage(Components.appendTeamPrefix(
+              team,
+              new LocalizedComponent(
+                  ChatConstant.getConstant("objective.core.touched"),
+                  new TeamComponent(this.team),
+                  new UnlocalizedComponent(name),
+                  Components.getNameComponentBuilder(player).build()
+              )
+          ));
         }
         Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
       }

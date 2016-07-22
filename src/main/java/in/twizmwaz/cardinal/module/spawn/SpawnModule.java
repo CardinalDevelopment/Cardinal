@@ -216,7 +216,7 @@ public class SpawnModule extends AbstractModule implements Listener {
    */
   @EventHandler
   public void onMatchLoad(MatchLoadCompleteEvent event) {
-    event.getMatch().getThread().getPlayers().forEach(player -> {
+    event.getMatch().getMatchThread().getPlayers().forEach(player -> {
       CardinalRespawnEvent respawn = new CardinalRespawnEvent(player, getDefaultSpawn(event.getMatch()));
       Bukkit.getPluginManager().callEvent(respawn);
     });
