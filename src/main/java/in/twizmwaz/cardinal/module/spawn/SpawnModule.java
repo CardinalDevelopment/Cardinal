@@ -80,16 +80,12 @@ public class SpawnModule extends AbstractModule implements Listener {
     Document document = match.getMap().getDocument();
     boolean defaultPresent = false;
     for (Element spawnsElement : document.getRootElement().getChildren("spawns")) {
-      Element defaultElement = spawnsElement.getChild("default");
-      if (defaultElement != null) {
-        Spawn defaultSpawn = parseSpawn(true, match, defaultElement, spawnsElement);
-        if (defaultSpawn != null) {
-          spawns.add(defaultSpawn);
+      for (Element spawnElement : spawnsElement.getChildren("spawn")) {
+        Spawn spawn = parseSpawn(match, spawnElement, spawnsElement);
+        spawns.add(spawn);
+        if (spawn.isDefaultSpawn()) {
           defaultPresent = true;
         }
-      }
-      for (Element spawnElement : spawnsElement.getChildren("spawn")) {
-        spawns.add(parseSpawn(false, match, spawnElement, spawnsElement));
       }
     }
     if (!defaultPresent) {
@@ -109,14 +105,12 @@ public class SpawnModule extends AbstractModule implements Listener {
    * @param elements The given elements.
    * @return The created default spawn.
    */
-  private Spawn parseSpawn(boolean defaultSpawn, Match match, Element... elements) {
+  private Spawn parseSpawn(Match match, Element... elements) {
+    String defaultValue = ParseUtil.getFirstAttribute("default", elements);
+    boolean defaultSpawn = defaultValue != null && Numbers.parseBoolean(defaultValue);
+
     String safeValue = ParseUtil.getFirstAttribute("safe", elements);
     boolean safe = safeValue != null && Numbers.parseBoolean(safeValue);
-
-    Team team = null;
-    if (!defaultSpawn) {
-      team = Cardinal.getModule(TeamModule.class).getTeamByName(match, ParseUtil.getFirstAttribute("team", elements));
-    }
 
     String sequentialValue = ParseUtil.getFirstAttribute("sequential", elements);
     boolean sequential = sequentialValue != null && Numbers.parseBoolean(sequentialValue);
@@ -129,6 +123,11 @@ public class SpawnModule extends AbstractModule implements Listener {
 
     String persistentValue = ParseUtil.getFirstAttribute("persistent", elements);
     boolean persistent = persistentValue != null && Numbers.parseBoolean(persistentValue);
+
+    Team team = null;
+    if (!defaultSpawn) {
+      team = Cardinal.getModule(TeamModule.class).getTeamByName(match, ParseUtil.getFirstAttribute("team", elements));
+    }
 
     List<Region> regions = Lists.newArrayList();
     List<Element> working;
@@ -144,7 +143,7 @@ public class SpawnModule extends AbstractModule implements Listener {
         region = Cardinal.getModule(RegionModule.class).getRegion(match, regionElement);
       } catch (RegionException e) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{RegionModule.getRegionError(e, "region", "default spawn"),
+            new String[]{RegionModule.getRegionError(e, "region", (defaultSpawn ? "default" : team.getName()) + " spawn"),
                 "Element at " + located.getLine() + ", " + located.getColumn()}, false));
         continue;
       }
@@ -156,14 +155,14 @@ public class SpawnModule extends AbstractModule implements Listener {
       }
       if (!region.isRandomizable()) {
         errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Region specified for default spawn must be randomizable",
+            new String[]{"Region specified for " + (defaultSpawn ? "default" : team.getName()) + " spawn must be randomizable",
                 "Element at " + located.getLine() + ", " + located.getColumn()}, false));
         continue;
       }
       regions.add(region);
     }
 
-    return new Spawn(true, team, safe, sequential, spread, exclusive, persistent, regions);
+    return new Spawn(defaultSpawn, team, safe, sequential, spread, exclusive, persistent, regions);
   }
 
   /**
