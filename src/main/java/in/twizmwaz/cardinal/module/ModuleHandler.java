@@ -32,6 +32,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -61,23 +62,28 @@ public class ModuleHandler {
         if (!module.loadMatch(match)) {
           Cardinal.getInstance().getLogger().warning("An error occurred when attempting to load "
               + module.getClass().getSimpleName() + " for " + match.getMap().getName());
+          sendErrorMessages(match, module);
           return false;
         }
       } catch (Throwable throwable) {
         throwable.printStackTrace();
         continue;
       }
-      for (ModuleError moduleError : module.getErrors().stream().filter(error ->
-          error.getMap().equals(match.getMap())).collect(Collectors.toList())) {
-        Logger logger = Cardinal.getPluginLogger();
-        logger.info("Error loading module \"" + module.getClass().getSimpleName() + "\":");
-        for (String message : moduleError.getMessage()) {
-          logger.info('\t' + message);
-        }
-      }
+      sendErrorMessages(match, module);
     }
     Cardinal.getInstance().getLogger().info("Modules for " + match.getMap().getName() + " loaded successfully.");
     return true;
+  }
+
+  private void sendErrorMessages(Match match, Module module) {
+    for (ModuleError moduleError : module.getErrors().stream().filter(error ->
+      error.getMap().equals(match.getMap())).collect(Collectors.toList())) {
+      Logger logger = Cardinal.getPluginLogger();
+      logger.warning("Error loading module \"" + module.getClass().getSimpleName() + "\":");
+      for (String message : moduleError.getMessage()) {
+        logger.log(moduleError.isCritical() ? Level.SEVERE : Level.INFO, '\t' + message);
+      }
+    }
   }
 
 }
