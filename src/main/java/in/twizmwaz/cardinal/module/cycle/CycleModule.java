@@ -43,6 +43,7 @@ import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Map;
@@ -64,7 +65,7 @@ public final class CycleModule extends AbstractModule implements Listener {
    *
    * @param event The event.
    */
-  @EventHandler
+  @EventHandler(priority = EventPriority.LOW)
   public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {
     Cardinal.getInstance().getMatchThreads().forEach(matchThread -> {
       CycleRunnable runnable = new CycleRunnable(this, UUID.randomUUID());

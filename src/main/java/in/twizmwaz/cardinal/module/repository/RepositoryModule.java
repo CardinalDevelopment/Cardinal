@@ -43,6 +43,7 @@ import org.jdom2.located.LocatedJDOMFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,9 @@ public class RepositoryModule extends AbstractModule {
    */
   public RepositoryModule() {
     //TODO: support alternate repos
-    File repoRoot = new File(Cardinal.getInstance().getDataFolder().getAbsolutePath() + "/repo");
-    loadRepository(repoRoot);
+    String mapRepository = Cardinal.getInstance().getConfig().getString("mapRepository");
+    File mapRepositoryRoot = new File(Paths.get(mapRepository).isAbsolute() ? mapRepository : Cardinal.getInstance().getDataFolder().getAbsolutePath() + mapRepository);
+    loadRepository(mapRepositoryRoot);
   }
 
   /**
@@ -78,7 +80,11 @@ public class RepositoryModule extends AbstractModule {
     Map<String, LoadedMap> loaded = Maps.newHashMap();
     maps.forEach(map -> {
       LoadedMap loadedMap = loadMap(map);
-      loaded.put(loadedMap.getName(), loadedMap);
+      if (loadedMap != null) {
+        loaded.put(loadedMap.getName(), loadedMap);
+      } else {
+        Cardinal.getPluginLogger().warning("Failed to load map from " + map);
+      }
     });
     loadedMaps.putAll(loaded);
     Cardinal.getPluginLogger().info("Loaded " + maps.size()
@@ -138,8 +144,10 @@ public class RepositoryModule extends AbstractModule {
       return
           new LoadedMap(file, doc, proto, name, gamemode,
               edition, objective, authors, contributors, 0);
-    } catch (JDOMException | IOException ex) {
-      ex.printStackTrace();
+    } catch (NullPointerException | JDOMException | IOException ex) {
+      if (Cardinal.getInstance().getConfig().getBoolean("displayMapLoadErrors")) {
+        ex.printStackTrace();
+      }
       return null;
     }
   }
