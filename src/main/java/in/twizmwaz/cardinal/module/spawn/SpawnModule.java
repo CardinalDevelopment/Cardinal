@@ -61,7 +61,7 @@ import org.jdom2.located.Located;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry
+@ModuleEntry(depends = {TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class})
 public class SpawnModule extends AbstractModule implements Listener {
 
   private Map<Match, List<Spawn>> spawns = Maps.newHashMap();
@@ -70,7 +70,6 @@ public class SpawnModule extends AbstractModule implements Listener {
    * Default constructor to create the module.
    */
   public SpawnModule() {
-    this.depends = new Class[]{TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class};
     Cardinal.registerEvents(this);
   }
 

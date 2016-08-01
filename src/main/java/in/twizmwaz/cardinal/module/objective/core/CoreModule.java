@@ -55,14 +55,10 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry
+@ModuleEntry(depends = {TeamModule.class, RegionModule.class})
 public class CoreModule extends AbstractModule {
 
   private Map<Match, List<Core>> cores = Maps.newHashMap();
-
-  public CoreModule() {
-    this.depends = new Class[]{TeamModule.class, RegionModule.class};
-  }
 
   @Override
   public boolean loadMatch(Match match) {

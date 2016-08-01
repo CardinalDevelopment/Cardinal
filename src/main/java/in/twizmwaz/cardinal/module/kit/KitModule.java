@@ -75,12 +75,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@ModuleEntry
+@ModuleEntry(depends = {FilterModule.class})
 public class KitModule extends AbstractModule {
-
-  public KitModule() {
-    this.depends = new Class[]{FilterModule.class};
-  }
 
   @Getter
   private final Map<Match, Map<String, Kit>> kits = Maps.newHashMap();

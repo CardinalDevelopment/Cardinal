@@ -53,15 +53,12 @@ public final class ModuleRegistry {
     DependencyGraph<Module> graph = new DependencyGraph<Module>();
     this.modules.values().forEach(module -> {
       graph.add(module);
-      if (module.getDepends() != null) {
-        for (Class dep : module.getDepends()) {
-          graph.addDependency(module, modules.get(dep));
-        }
+      ModuleEntry moduleEntry = module.getClass().getAnnotation(ModuleEntry.class);
+      for (Class dep : moduleEntry.depends()) {
+        graph.addDependency(module, modules.get(dep));
       }
-      if (module.getLoadBefore() != null) {
-        for (Class dep : module.getLoadBefore()) {
-          graph.addDependency(modules.get(dep), module);
-        }
+      for (Class before : moduleEntry.loadBefore()) {
+        graph.addDependency(modules.get(before), module);
       }
     });
     loadOrder = graph.evaluateDependencies();

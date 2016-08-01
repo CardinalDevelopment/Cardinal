@@ -58,14 +58,10 @@ import org.jdom2.located.Located;
 
 import java.util.Map;
 
-@ModuleEntry
+@ModuleEntry(depends = {CoreModule.class, DestroyableModule.class, TeamModule.class, WoolModule.class})
 public class FilterModule extends AbstractModule {
 
   private Map<Match, Map<String, Filter>> filters = Maps.newHashMap();
-
-  public FilterModule() {
-    depends = new Class[]{CoreModule.class, DestroyableModule.class, TeamModule.class, WoolModule.class};
-  }
 
   @Override
   public boolean loadMatch(@NonNull Match match) {

@@ -49,14 +49,13 @@ import org.bukkit.event.Listener;
 import java.util.Map;
 import java.util.UUID;
 
-@ModuleEntry
+@ModuleEntry(depends = {RotationModule.class})
 public final class CycleModule extends AbstractModule implements Listener {
 
   @Getter
   private final Map<MatchThread, CycleRunnable> nextCycle = Maps.newHashMap();
 
   public CycleModule() {
-    this.depends = new Class[]{RotationModule.class};
     Cardinal.registerEvents(this);
   }
 

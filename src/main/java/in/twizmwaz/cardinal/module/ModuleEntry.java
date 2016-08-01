@@ -33,4 +33,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ModuleEntry {
+  /**
+   * @return The classes of modules to load matches before this module.
+   */
+  public Class[] depends() default {};
+
+  /**
+   * @return The classes of modules to load matches after this module.
+   */
+  public Class[] loadBefore() default {};
+
 }

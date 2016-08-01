@@ -36,16 +36,6 @@ import java.util.Collection;
 public interface Module {
 
   /**
-   * @return The classes of modules to load matches before this module.
-   */
-  Class[] getDepends();
-
-  /**
-   * @return The classes of modules to load matches after this module.
-   */
-  Class[] getLoadBefore();
-
-  /**
    * Clears match information from a module.
    *
    * @param match Match to be cleared from the module.

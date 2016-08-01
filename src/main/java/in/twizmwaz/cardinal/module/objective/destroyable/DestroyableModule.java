@@ -51,14 +51,10 @@ import org.jdom2.located.Located;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry
+@ModuleEntry(depends = {TeamModule.class, RegionModule.class})
 public class DestroyableModule extends AbstractModule {
 
   private Map<Match, List<Destroyable>> destroyables = Maps.newHashMap();
-
-  public DestroyableModule() {
-    this.depends = new Class[]{TeamModule.class, RegionModule.class};
-  }
 
   @Override
   public boolean loadMatch(Match match) {

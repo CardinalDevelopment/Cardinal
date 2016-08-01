@@ -53,14 +53,10 @@ import org.jdom2.located.Located;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry
+@ModuleEntry(depends = {TeamModule.class, RegionModule.class})
 public class WoolModule extends AbstractModule {
 
   private Map<Match, List<Wool>> wools = Maps.newHashMap();
-
-  public WoolModule() {
-    this.depends = new Class[]{TeamModule.class, RegionModule.class};
-  }
 
   @Override
   public boolean loadMatch(Match match) {

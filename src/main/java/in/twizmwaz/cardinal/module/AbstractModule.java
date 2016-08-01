@@ -35,8 +35,6 @@ import java.util.List;
 @Getter
 public abstract class AbstractModule implements Module {
 
-  protected Class[] depends;
-  protected Class[] loadBefore;
   @NonNull
   protected List<ModuleError> errors = Lists.newArrayList();
 
