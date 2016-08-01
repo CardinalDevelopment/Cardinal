@@ -105,6 +105,31 @@ public class MaterialPattern {
   }
 
   /**
+   * Creates a material pattern with a single material.
+   * @param type The material.
+   * @return A material pattern.
+   */
+  @NonNull
+  public static MaterialPattern getSingleMaterialPattern(@NonNull Material type) {
+    MaterialPattern pattern = new MaterialPattern();
+    pattern.add(type, ANY_DATA_VALUE);
+    return pattern;
+  }
+
+  /**
+   * Creates a material pattern with a single material and data pair.
+   * @param type The material.
+   * @param data the Data to match
+   * @return A material pattern.
+   */
+  @NonNull
+  public static MaterialPattern getSingleMaterialPattern(@NonNull Material type, Integer data) {
+    MaterialPattern pattern = new MaterialPattern();
+    pattern.add(type, data);
+    return pattern;
+  }
+
+  /**
    * @param in The input string that is used to get the material pattern.
    * @return The list of material pairs based on the input string.
    */

@@ -38,6 +38,8 @@ import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.kit.Kit;
+import in.twizmwaz.cardinal.module.kit.KitModule;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.region.type.modifications.PointProviderRegion;
@@ -65,7 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ModuleEntry(depends = {TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class})
+@ModuleEntry(depends = {TeamModule.class, KitModule.class/*, FilterModule.class*/, RegionModule.class})
 public class SpawnModule extends AbstractListenerModule {
 
   private Map<Match, List<Spawn>> spawns = Maps.newHashMap();
@@ -127,6 +129,16 @@ public class SpawnModule extends AbstractListenerModule {
       team = Cardinal.getModule(TeamModule.class).getTeamByName(match, ParseUtil.getFirstAttribute("team", elements));
     }
 
+    String kitValue = ParseUtil.getFirstAttribute("kit", elements);
+    Kit kit = kitValue != null ? Cardinal.getModule(KitModule.class).getKit(match, kitValue) : null;
+
+    if (kit == null && kitValue != null) {
+      Located spawn = (Located) elements[0];
+      errors.add(new ModuleError(this, match.getMap(),
+          new String[]{"Invalid kit specified for spawn",
+              "Element at " + spawn.getLine() + ", " + spawn.getColumn()}, false));
+    }
+
     List<Region> regions = Lists.newArrayList();
 
     Region spawnRegion = getPointProvider(match, "region", true, elements);
@@ -147,7 +159,7 @@ public class SpawnModule extends AbstractListenerModule {
       // Prevent errors later trying to get a spawn region from an empty list.
       return null;
     }
-    return new Spawn(defaultSpawn, team, safe, sequential, spread, exclusive, persistent, regions);
+    return new Spawn(defaultSpawn, team, safe, sequential, spread, exclusive, persistent, kit, regions);
   }
 
   private PointProviderRegion getPointProvider(Match match, String attr, boolean allowMissing, Element... elements) {
@@ -191,8 +203,8 @@ public class SpawnModule extends AbstractListenerModule {
       return new PointProviderRegion(region, angle);
     }
 
-    float yaw = Numbers.parseFloat(ParseUtil.getFirstAttribute("yaw", elements), 0),
-        pitch = Numbers.parseFloat(ParseUtil.getFirstAttribute("pitch", elements), 0);
+    float yaw = Numbers.parseFloat(ParseUtil.getFirstAttribute("yaw", elements), 0);
+    float pitch = Numbers.parseFloat(ParseUtil.getFirstAttribute("pitch", elements), 0);
 
     return new PointProviderRegion(region, yaw, pitch);
   }
@@ -270,7 +282,10 @@ public class SpawnModule extends AbstractListenerModule {
   @EventHandler
   public void onCardinalRespawn(CardinalRespawnEvent event) {
     Players.reset(event.getPlayer());
-    //event.getSpawn().getKit().apply(event.getPlayer(), false);
+    Players.setPlaying(event.getPlayer());
+    if (event.getSpawn().getKit() != null) {
+      event.getSpawn().getKit().apply(event.getPlayer(), false);
+    }
     event.getPlayer().teleport(event.getSpawn().getSpawnPoint());
   }
 

@@ -38,6 +38,7 @@ import in.twizmwaz.cardinal.module.channel.channels.TeamChannel;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,7 +50,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry(depends = {RotationModule.class})
+@ModuleEntry(depends = {RotationModule.class, TeamModule.class})
 public class ChannelModule extends AbstractModule implements Listener {
 
   private Map<MatchThread, GlobalChannel> globalChannels = Maps.newHashMap();
@@ -108,6 +109,7 @@ public class ChannelModule extends AbstractModule implements Listener {
       Cardinal.registerEvents(channel);
       teamChannels.add(channel);
     }
+    this.teamChannels.put(match, teamChannels);
     return true;
   }
 

@@ -53,6 +53,7 @@ import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Strings;
 import in.twizmwaz.cardinal.util.document.DocumentItems;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
@@ -88,6 +89,10 @@ public class KitModule extends AbstractModule {
       }
     }
     return true;
+  }
+
+  public Kit getKit(@NonNull Match match, @NonNull String id) {
+    return kits.get(match).get(id);
   }
 
   private Map.Entry<String, Kit> parseKit(Match match, Element element) {
@@ -171,12 +176,19 @@ public class KitModule extends AbstractModule {
       float flySpeed = Float.parseFloat(jump.getAttributeValue("fly-speed", "1")) / 10F;
       kits.add(new KitFly(canFly, flying, flySpeed));
     }
-    Filter filter = Cardinal.getModule(FilterModule.class)
-        .getFilter(match, element.getAttributeValue("filter", "always"));
-    String parent = element.getAttributeValue("parents", "");
+    Filter filter =
+        Cardinal.getModule(FilterModule.class).getFilter(match, element.getAttributeValue("filter", "always"));
+    String parent = element.getAttributeValue("parents", (String) null);
     List<String> parents = Lists.newArrayList();
-    for (String parentPart : parent.split(",")) {
-      parents.add(parentPart.trim());
+    if (parent != null) {
+      for (String parentPart : parent.split(",")) {
+        if (!parentPart.equals("")) {
+          parents.add(parentPart.trim());
+        }
+      }
+      if (parents.size() == 0) {
+        parents = null;
+      }
     }
     boolean force = Numbers.parseBoolean(element.getAttributeValue("force"), false);
     boolean potionParticles = Numbers.parseBoolean(element.getAttributeValue("potion-particles"), false);

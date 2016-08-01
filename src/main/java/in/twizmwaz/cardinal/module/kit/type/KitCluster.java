@@ -91,7 +91,14 @@ public class KitCluster implements KitRemovable {
 
   private void evaluateParents() {
     if (parentsRaw != null) {
-      parentsRaw.forEach(parent -> parents.add(Cardinal.getModule(KitModule.class).getKits().get(match).get(parent)));
+      parentsRaw.forEach(parent -> {
+        Kit kit = Cardinal.getModule(KitModule.class).getKits().get(match).get(parent);
+        if (kit != null) {
+          parents.add(kit);
+        }
+      });
+      parentsRaw.clear();
     }
   }
+
 }

@@ -25,31 +25,13 @@
 
 package in.twizmwaz.cardinal.module.filter.type.modifiers;
 
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.filter.Filter;
-import in.twizmwaz.cardinal.module.filter.FilterModule;
 import in.twizmwaz.cardinal.module.filter.FilterState;
-import in.twizmwaz.cardinal.module.filter.LoadLateFilter;
-import lombok.AllArgsConstructor;
 
-import java.util.Collections;
+public class DenyFilter extends TransformFilter {
 
-@AllArgsConstructor
-public class DenyFilter implements Filter, LoadLateFilter {
-
-  private final Filter child;
-
-  @Override
-  public void load(Match match) {
-    Cardinal.getModule(FilterModule.class).loadFilters(match, Collections.singleton(child));
-  }
-
-  @Override
-  public FilterState evaluate(Object... objects) {
-    FilterState response = child.evaluate(objects);
-    return response.equals(FilterState.ALLOW) ? FilterState.DENY : FilterState.ABSTAIN;
-
+  public DenyFilter(Filter child) {
+    super(child, FilterState.DENY, FilterState.ABSTAIN, FilterState.ABSTAIN);
   }
 
 }

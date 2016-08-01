@@ -58,7 +58,7 @@ public class BlockRegion extends AbstractRegion {
   }
 
   public Vector getVector() {
-    return vector.clone().add(0.5, 0.5, 0.5);
+    return vector.plus(0.5, 0.5, 0.5);
   }
 
   public Location getLocation() {

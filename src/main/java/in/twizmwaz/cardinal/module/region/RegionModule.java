@@ -85,13 +85,17 @@ public class RegionModule extends AbstractModule {
 
   private Map<Match, Map<String, Region>> regions = new HashMap<>();
 
+  //Static regions. Can be shared across matches
+  public static final Region EVERYWHERE = new EverywhereRegion(null);
+  public static final Region NOWHERE = new NowhereRegion(null);
+
   @Override
   public boolean loadMatch(@NonNull Match match) {
     Map<String, Region> regions = new HashMap<>();
     this.regions.put(match, regions);
 
-    regions.put("everywhere", new EverywhereRegion(match));
-    regions.put("nowhere", new NowhereRegion(match));
+    regions.put("everywhere", EVERYWHERE);
+    regions.put("nowhere", NOWHERE);
 
     for (Element regionsElement : match.getMap().getDocument().getRootElement().getChildren("regions")) {
       for (Element regionElement : regionsElement.getChildren()) {
@@ -168,9 +172,9 @@ public class RegionModule extends AbstractModule {
       case "empty":
         return new EmptyRegion(match);
       case "nowhere":
-        return new NowhereRegion(match);
+        return NOWHERE;
       case "everywhere":
-        return new EverywhereRegion(match);
+        return EVERYWHERE;
       case "negative":
         return new NegativeRegion(match, new NegativeRegionParser(match, element));
       case "union":

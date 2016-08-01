@@ -63,10 +63,11 @@ public class FiniteBlockRegion extends AbstractRegion {
     return true;
   }
 
+  @Override
   public boolean contains(Vector evaluating) {
     evaluating = Geometry.floor(evaluating);
     for (Block block : super.getBlocks()) {
-      if (block.getLocation().equals(evaluating)) {
+      if (block.getLocation().toVector().equals(evaluating)) {
         return true;
       }
     }
@@ -85,14 +86,14 @@ public class FiniteBlockRegion extends AbstractRegion {
    * @param pattern The material pattern to filter blocks.
    * @return A FiniteBlockRegion containing all regions that matched the pattern.
    */
-  public FiniteBlockRegion getFromMaterialPattern(Match match, Region region, MaterialPattern pattern) {
+  public static FiniteBlockRegion getFromMaterialPattern(Match match, Region region, MaterialPattern pattern) {
     List<Block> blocks = region.getBlocks().stream().filter(block -> pattern.contains(block.getType(), block.getData()))
         .collect(Collectors.toList());
     return new FiniteBlockRegion(new RegionBounds(match, getBounds(blocks)), blocks);
   }
 
 
-  private Cuboid getBounds(List<Block> blocks) {
+  private static Cuboid getBounds(List<Block> blocks) {
     List<Vector> vectors = new ArrayList<>();
     vectors.addAll(blocks.stream().map(Block::getLocation).collect(Collectors.toList()));
     vectors.addAll(blocks.stream().map(block -> block.getLocation().plus(1, 1, 1)).collect(Collectors.toList()));

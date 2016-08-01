@@ -28,16 +28,27 @@ package in.twizmwaz.cardinal.module.objective.destroyable;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.NameComponent;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import ee.ellytr.chat.component.formattable.ListComponent;
 import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.module.apply.AppliedModule;
+import in.twizmwaz.cardinal.module.apply.AppliedRegion;
+import in.twizmwaz.cardinal.module.apply.ApplyType;
+import in.twizmwaz.cardinal.module.filter.FilterState;
+import in.twizmwaz.cardinal.module.filter.type.MaterialFilter;
+import in.twizmwaz.cardinal.module.filter.type.TeamFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.AllFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.TransformFilter;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.region.type.FiniteBlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.Channels;
@@ -45,13 +56,12 @@ import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,13 +70,13 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class Destroyable extends Objective implements Listener {
+public class Destroyable extends Objective {
 
   private final String name;
   private final Region region;
   private final MaterialPattern materials;
   private final Team owner;
-  private final double completion;
+  private final double completion; // Ranges between 0 and 1.
   private final boolean modeChanges;
   private final boolean showProgress;
   private final boolean repairable;
@@ -77,6 +87,7 @@ public class Destroyable extends Objective implements Listener {
   private final List<Player> touchedPlayers = new ArrayList<>();
   private final Map<UUID, Integer> playerContributions = new HashMap<>();
 
+  @Setter
   private int broken;
   private long total;
 
@@ -107,10 +118,9 @@ public class Destroyable extends Objective implements Listener {
                      ProximityMetric proximityMetric, boolean proximityHorizontal) {
     super(match, id, required, show);
     this.name = name;
-    this.region = region;
     this.materials = materials;
     this.owner = owner;
-    this.completion = completion;
+    this.completion = completion / 100;
     this.modeChanges = modeChanges;
     this.showProgress = showProgress;
     this.repairable = repairable;
@@ -118,89 +128,75 @@ public class Destroyable extends Objective implements Listener {
     this.proximityMetric = proximityMetric;
     this.proximityHorizontal = proximityHorizontal;
 
-    total = region.getBlocks().stream().filter(this::isPartOf).count();
+    this.region = FiniteBlockRegion.getFromMaterialPattern(match, region, materials);
+    total = this.region.getBlocks().size();
+
+    AppliedModule appliedModule = Cardinal.getModule(AppliedModule.class);
+    appliedModule.add(match,
+        new AppliedRegion(ApplyType.BLOCK_BREAK, this.region,
+            new AllFilter(new MaterialFilter(materials),
+                new TransformFilter(new TeamFilter(owner), FilterState.DENY, FilterState.DENY, FilterState.ALLOW)),
+            new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.error.own")),
+            true),
+        true);
   }
 
-  private boolean isPartOf(@NonNull Block block) {
-    return materials.contains(block.getType(), (int) block.getState().getMaterialData().getData());
+  public boolean isPartOf(@NonNull Block block) {
+    return region.contains(block.getLocation())
+        && materials.contains(block.getType(), (int) block.getState().getMaterialData().getData());
   }
 
   /**
-   * Checks the destroyable's state when a player breaks a block.
-   *
-   * @param event The event.
+   * Breaks a number of pieces for a certain player. This will automatically show touch messages, and complete the
+   * monument if it reaches completion percentage.
+   * @param player The player that touched.
+   * @param contribution The amount of pieces this player broke.
    */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockBreak(BlockBreakEvent event) {
-    Player player = event.getPlayer();
-    if (match.hasPlayer(player)) {
-      Block block = event.getBlock();
-      if (isPartOf(block)) {
-        PlayingPlayerContainer team = match.getPlayingContainer(player);
-        if (team != null && !team.equals(owner)) {
-          if (!touchedPlayers.contains(player)) {
-            touchedPlayers.add(player);
+  public void addBrokenPiecesFor(Player player, int contribution) {
+    PlayingPlayerContainer container = match.getPlayingContainer(player);
+    if (!isCompleted() && container instanceof Team) {
+      Team team = (Team) container;
+      if (show && !touchedPlayers.contains(player)) {
+        touchedPlayers.add(player);
+        Channels.getTeamChannel(match, team).sendPrefixedMessage(
+            new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.touched"),
+                new TeamComponent(owner),
+                new UnlocalizedComponent(name),
+                new NameComponent(player)
+            )
+        );
+      }
 
-            if (show) {
-              //fixme
-              /*BaseComponent message = Components.getTeamComponent(team,
-                  new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.touched"),
-                      new TeamComponent(owner),
-                      new UnlocalizedComponent(name),
-                      new NameComponent(player)
-                  )
-              );
-              team.forEach(teamMember -> {
-                if (teamMember.equals(player)) {
-                  Channels.getPlayerChannel(player).sendMessage(
-                      new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.touched.self"))
-                  );
-                } else {
-                  Channels.getPlayerChannel(teamMember).sendMessage(message);
-                }
-              });*/
-            }
-          }
-          broken++;
+      UUID uuid = player.getUniqueId();
+      playerContributions.putIfAbsent(uuid, 0);
+      playerContributions.put(uuid, playerContributions.get(uuid) + contribution);
+      broken += contribution;
+      if ((double) broken / total >= completion) {
+        completed = true;
 
-          UUID uuid = player.getUniqueId();
-          playerContributions.putIfAbsent(uuid, 0);
-          playerContributions.put(uuid, playerContributions.get(uuid) + 1);
+        Channels.getGlobalChannel(match.getMatchThread()).sendMessage(
+            new LocalizedComponentBuilder(
+                ChatConstant.getConstant("objective.destroyable.completed"),
+                new TeamComponent(owner),
+                new UnlocalizedComponent(name),
+                getContributionList()
+            ).build()
+        );
 
-          if (!completed) {
-            if ((double) broken / total >= completion) {
-              completed = true;
-
-              Channels.getGlobalChannel(match.getMatchThread()).sendMessage(
-                  new LocalizedComponentBuilder(
-                      ChatConstant.getConstant("objective.destroyable.completed"),
-                      new TeamComponent(owner),
-                      new UnlocalizedComponent(name),
-                      getContributionList()
-                  ).build()
-              );
-
-              Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));
-            } else {
-              Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
-            }
-          }
-        } else {
-          event.setCancelled(true);
-          Channels.getPlayerChannel(player).sendMessage(Components.getWarningComponent(
-              new LocalizedComponent(ChatConstant.getConstant("objective.destroyable.error.own"))
-          ));
-        }
+        Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));
+      } else {
+        Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
       }
     }
   }
 
   private ListComponent getContributionList() {
     List<BaseComponent> contributions = new ArrayList<>();
-    playerContributions.forEach((player, amount) -> {
-      contributions.add(
-          new UnlocalizedComponent("{0} (" + amount + "%)", new NameComponent(Bukkit.getOfflinePlayer(player)))
-      );
+    playerContributions.forEach((uuid, amount) -> {
+      long percent = Math.round((double) amount / broken * 100);
+      contributions.add(new UnlocalizedComponent("{0} ({1}%)",
+          Components.getName(Bukkit.getOfflinePlayer(uuid)).build(),
+          new UnlocalizedComponentBuilder(percent + "").color(ChatColor.AQUA).build()));
     });
     return new ListComponent(contributions);
   }

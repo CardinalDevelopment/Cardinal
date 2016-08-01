@@ -27,25 +27,41 @@ package in.twizmwaz.cardinal.module.objective.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import ee.ellytr.chat.ChatConstant;
+import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.apply.AppliedModule;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
-import in.twizmwaz.cardinal.module.region.type.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
+import in.twizmwaz.cardinal.util.Channels;
+import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.MaterialPattern;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
 import lombok.NonNull;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.util.Vector;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -55,8 +71,8 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry(depends = {TeamModule.class, RegionModule.class})
-public class CoreModule extends AbstractModule {
+@ModuleEntry(depends = {TeamModule.class, RegionModule.class, AppliedModule.class})
+public class CoreModule extends AbstractListenerModule {
 
   private Map<Match, List<Core>> cores = Maps.newHashMap();
 
@@ -129,7 +145,7 @@ public class CoreModule extends AbstractModule {
         }
         String teamValue = ParseUtil.getFirstAttribute("team", coreElement, coresElement);
         if (teamValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool",
+          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for core",
               "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
@@ -165,10 +181,8 @@ public class CoreModule extends AbstractModule {
         boolean proximityHorizontal = proximityHorizontalValue != null
             && Numbers.parseBoolean(proximityHorizontalValue);
 
-        Core core = new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
-            proximityMetric, proximityHorizontal);
-        Cardinal.registerEvents(core);
-        cores.add(core);
+        cores.add(new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
+            proximityMetric, proximityHorizontal));
       }
     }
     this.cores.put(match, cores);
@@ -191,8 +205,8 @@ public class CoreModule extends AbstractModule {
     Core closestCore = null;
     double closestDistance = Double.POSITIVE_INFINITY;
     for (Core core : this.cores.get(match)) {
-      BlockRegion center = core.getRegion().getBounds().getCenterBlock();
-      double distance = vector.distance(center.getVector());
+      Vector center = core.getRegion().getBounds().getCenterBlock().getVector();
+      double distance = vector.distanceSquared(center);
       if (distance < closestDistance) {
         closestCore = core;
         closestDistance = distance;
@@ -203,6 +217,84 @@ public class CoreModule extends AbstractModule {
 
   public List<Core> getCores(@NonNull Match match) {
     return cores.get(match);
+  }
+
+  /**
+   * Checks if the core has been touched when a player breaks a block.
+   *
+   * @param event The event.
+   */
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onBlockBreak(BlockBreakEvent event) {
+    Player player = event.getPlayer();
+    Match match = Cardinal.getMatch(player);
+    if (match == null || !match.hasPlayer(player) || this.cores.get(match).size() == 0) {
+      return;
+    }
+    Team team = (Team) match.getPlayingContainer(player);
+    Block block = event.getBlock();
+    cores.get(match).forEach(core -> {
+      if (core.getRegion().contains(block.getLocation())) {
+        core.setTouched(true);
+        if (core.isShow() && !core.getTouchedPlayers().contains(player)) {
+          core.getTouchedPlayers().add(player);
+          Channels.getTeamChannel(match, team).sendPrefixedMessage(
+              new LocalizedComponent(
+                  ChatConstant.getConstant("objective.core.touched"),
+                  new TeamComponent(core.getOwner()),
+                  core.getComponent(),
+                  Components.getName(player).build()
+              )
+          );
+        }
+      }
+    });
+  }
+
+  /**
+   * Checks if lava has reached the leak distance below this core.
+   *
+   * @param event The event.
+   */
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onBlockFromTo(BlockFromToEvent event) {
+    Match match = Cardinal.getMatch(event.getWorld());
+    if (match == null || this.cores.get(match).size() == 0) {
+      return;
+    }
+    Block to = event.getToBlock();
+    Material type = event.getBlock().getType();
+    Core core = getClosestCore(match, to.getLocation().clone());
+    if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA)) && !core.isComplete()) {
+      int distance = getBottom(core) - to.getY();
+      if (distance >= core.getLeak()) {
+        core.setComplete(true);
+        Channels.getGlobalChannel(Cardinal.getMatchThread(match)).sendMessage(new LocalizedComponentBuilder(
+            ChatConstant.getConstant("objective.core.completed"),
+            new TeamComponent(core.getOwner()),
+            Components.setColor(core.getComponent(), ChatColor.RED)).color(ChatColor.RED).build());
+        Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(core, null));
+      }
+    }
+  }
+
+  /**
+   * Removes the player from the list of players who have touched the core during their previous life.
+   *
+   * @param event The event.
+   */
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onPlayerDeath(PlayerDeathEvent event) {
+    Player player = event.getEntity();
+    Match match = Cardinal.getMatch(player);
+    if (match == null || !match.hasPlayer(player) || this.cores.get(match).size() == 0) {
+      return;
+    }
+    cores.get(match).forEach(core -> core.getTouchedPlayers().remove(player));
+  }
+
+  private int getBottom(Core core) {
+    return core.getRegion().getBounds().getCuboid().minimum().getBlockY();
   }
 
 }

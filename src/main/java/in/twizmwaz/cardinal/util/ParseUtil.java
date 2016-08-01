@@ -78,4 +78,13 @@ public class ParseUtil {
     return newElements;
   }
 
+  /**
+   * @param value    The value to test.
+   * @param fallback The fallback if value is null.
+   * @return Returns value as long as it isn't null, if it's null, it returns fallback.
+   */
+  public static <T> T fallback(T value, @NonNull T fallback) {
+    return value == null ? fallback : value;
+  }
+
 }

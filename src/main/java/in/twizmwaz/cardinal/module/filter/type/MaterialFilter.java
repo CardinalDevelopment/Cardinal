@@ -30,7 +30,9 @@ import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.AllArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 @AllArgsConstructor
 public class MaterialFilter extends SingleObjectFilter {
@@ -44,6 +46,12 @@ public class MaterialFilter extends SingleObjectFilter {
       return FilterState.fromBoolean(material.contains(block.getType(), block.getData()));
     } else if (evaluating instanceof Material) {
       return FilterState.fromBoolean(material.contains((Material) evaluating, -1));
+    } else if (evaluating instanceof BlockState) {
+      return FilterState.fromBoolean(
+          material.contains(((BlockState) evaluating).getMaterial(), ((BlockState) evaluating).getRawData()));
+    }  else if (evaluating instanceof MaterialData) {
+      return FilterState.fromBoolean(
+          material.contains(((MaterialData) evaluating).getItemType(), ((MaterialData) evaluating).getData()));
     } else if (evaluating instanceof ItemStack) {
       return FilterState.fromBoolean(material.contains((ItemStack) evaluating));
     }

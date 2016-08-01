@@ -85,13 +85,30 @@ public class Components {
     return component;
   }
 
+  /**
+   * Will get a component with a warning character at the front.
+   * @param component The component to add the warning to.
+   * @return A new UnlocalizedComponent with the warning on it.
+   */
   public static UnlocalizedComponent getWarningComponent(@NonNull BaseComponent component) {
     component.setColor(ChatColor.RED);
-    return new UnlocalizedComponentBuilder(" ⚠ {0}", component).color(ChatColor.YELLOW).build();
+    return
+        new UnlocalizedComponentBuilder(" " + Characters.WARNING + " {0}", component).color(ChatColor.YELLOW).build();
   }
 
   public static UnlocalizedComponent getTeamComponent(@NonNull Team team, @NonNull BaseComponent component) {
     return new UnlocalizedComponentBuilder("[" + team.getName() + "] {0}", component).color(team.getColor()).build();
+  }
+
+  /**
+   * Sets a color to a base component.
+   * @param component The component.
+   * @param color The color to set.
+   * @return The component with the new color applied.
+   */
+  public static BaseComponent setColor(BaseComponent component, ChatColor color) {
+    component.setColor(color);
+    return component;
   }
 
 }

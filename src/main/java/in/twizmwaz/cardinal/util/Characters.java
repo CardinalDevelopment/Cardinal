@@ -33,7 +33,9 @@ public enum Characters {
 
   WOOL_COMPLETED('\u2B1B'),
   WOOL_INCOMPLETE('\u2B1C'),
-  WOOL_TOUCHED('\u2592');
+  WOOL_TOUCHED('\u2592'),
+
+  WARNING('\u26A0');
 
   private final char c;
 

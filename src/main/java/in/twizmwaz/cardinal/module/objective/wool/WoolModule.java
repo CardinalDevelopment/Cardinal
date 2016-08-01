@@ -32,9 +32,15 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.apply.AppliedModule;
+import in.twizmwaz.cardinal.module.apply.AppliedRegion;
+import in.twizmwaz.cardinal.module.apply.ApplyType;
+import in.twizmwaz.cardinal.module.apply.regions.WoolMonumentPlace;
+import in.twizmwaz.cardinal.module.filter.FilterState;
+import in.twizmwaz.cardinal.module.filter.type.StaticFilter;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.objective.ProximityRule;
 import in.twizmwaz.cardinal.module.region.Region;
@@ -55,17 +61,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -80,8 +80,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry(depends = {TeamModule.class, RegionModule.class})
-public class WoolModule extends AbstractModule {
+@ModuleEntry(depends = {TeamModule.class, RegionModule.class, AppliedModule.class})
+public class WoolModule extends AbstractListenerModule {
 
   private Map<Match, List<Wool>> wools = new HashMap<>();
 
@@ -228,6 +228,14 @@ public class WoolModule extends AbstractModule {
             new ProximityRule(monumentProximityMetric, monumentProximityHorizontal)
         );
         wools.add(wool);
+        AppliedModule appliedModule = Cardinal.getModule(AppliedModule.class);
+        appliedModule.add(match, new WoolMonumentPlace(wool), true);
+        appliedModule.add(match,
+            new AppliedRegion(ApplyType.BLOCK_BREAK, monument, new StaticFilter(FilterState.DENY),
+                new LocalizedComponentBuilder(
+                    ChatConstant.getConstant("objective.wool.error.break"),
+                    wool.getComponent()
+                ).color(ChatColor.RED).build()), true);
       }
     }
     this.wools.put(match, wools);
@@ -272,7 +280,8 @@ public class WoolModule extends AbstractModule {
               new LocalizedComponentBuilder(
                   ChatConstant.getConstant("objective.wool.touched"),
                   Components.getName(player).build(),
-                  wool.getComponent()
+                  wool.getComponent(),
+                  new TeamComponent(wool.getTeam())
               ).build()
           );
           //todo: send message to observers
@@ -286,7 +295,7 @@ public class WoolModule extends AbstractModule {
    *
    * @param event The event.
    */
-  @EventHandler(ignoreCancelled = true)
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onPlayerPickupItem(PlayerPickupItemEvent event) {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getPlayer()))) {
       Player player = event.getPlayer();
@@ -299,16 +308,15 @@ public class WoolModule extends AbstractModule {
           && item.getData().getData() == wool.getColor().getData()
           && team.equals(container)) {
         wool.setTouched(true);
-        boolean showMessage = false;
         if (wool.isShow() && !wool.hasPlayerTouched(player)) {
           wool.addPlayerTouched(player);
-          showMessage = true;
 
           Channels.getTeamChannel(match, team).sendPrefixedMessage(
               new LocalizedComponentBuilder(
                   ChatConstant.getConstant("objective.wool.touched"),
                   Components.getName(player).build(),
-                  wool.getComponent()
+                  wool.getComponent(),
+                  new TeamComponent(wool.getTeam())
               ).build()
           );
           //todo: send message to observers
@@ -322,162 +330,30 @@ public class WoolModule extends AbstractModule {
    *
    * @param event The event.
    */
-  @EventHandler(ignoreCancelled = true)
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
+      if (wool.isComplete()) {
+        continue;
+      }
       Player player = event.getPlayer();
       Block block = event.getBlock();
-      if (wool.getMonument().evaluate(block.getLocation().toVector()).toBoolean() && !wool.isComplete()) {
-        if (block.getType().equals(Material.WOOL)) {
-          if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(wool.getColor())) {
-            wool.setComplete(true);
+      if (wool.getMonument().contains(block.getLocation().toVector()) && block.getType().equals(Material.WOOL)
+          && ((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(wool.getColor())) {
+        wool.setComplete(true);
 
-            if (wool.isShow()) {
-              //fixme: unchecked cast
-              Match match = Cardinal.getMatch(event.getWorld());
-              Team team = (Team) match.getPlayingContainer(player);
-              Channels.getGlobalChannel(match.getMatchThread()).sendMessage(
-                  new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
-                      Components.getName(player).build(),
-                      wool.getComponent(),
-                      new TeamComponent(team)).color(ChatColor.GRAY).build());
-            }
-
-            Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(wool, player));
-          } else {
-            event.setCancelled(true);
-            if (wool.isShow()) {
-              Channels.getPlayerChannel(player).sendMessage(
-                  new LocalizedComponentBuilder(
-                      ChatConstant.getConstant("objective.wool.error.wrongBlock"),
-                      wool.getComponent()
-                  ).color(ChatColor.RED).build()
-              );
-            }
-          }
-        } else {
-          event.setCancelled(true);
-          if (wool.isShow()) {
-            Channels.getPlayerChannel(player).sendMessage(
-                new LocalizedComponentBuilder(
-                    ChatConstant.getConstant("objective.wool.error.wrongBlock"),
-                    wool.getComponent()
-                ).color(ChatColor.RED).build()
-            );
-          }
+        if (wool.isShow()) {
+          //fixme: unchecked cast
+          Match match = Cardinal.getMatch(event.getWorld());
+          Team team = (Team) match.getPlayingContainer(player);
+          Channels.getGlobalChannel(match.getMatchThread()).sendMessage(
+              new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
+                  Components.getName(player).build(),
+                  wool.getComponent(),
+                  new TeamComponent(team)).color(ChatColor.GRAY).build());
         }
-      }
-    }
-  }
 
-  /**
-   * Prevents players from breaking blocks that are inside the wool monument.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockBreak(BlockBreakEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
-        event.setCancelled(true);
-        break;
-      }
-    }
-  }
-
-  /**
-   * Prevents blocks from forming on the wool monument, such as snow.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockForm(BlockFormEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
-        event.setCancelled(true);
-        break;
-      }
-    }
-  }
-
-  /**
-   * Prevents blocks from spreading onto the wool monument, such as mushrooms or fire.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockSpread(BlockSpreadEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
-        event.setCancelled(true);
-        break;
-      }
-    }
-  }
-
-  /**
-   * Prevents entities from changing blocks, such as endermen or falling blocks.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
-        event.setCancelled(true);
-        break;
-      }
-    }
-  }
-
-  /**
-   * Prevents blocks from being pushed into the wool monument by a piston.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      Region monument = wool.getMonument();
-      Block piston = event.getBlock();
-      BlockFace direction = event.getDirection();
-      if (monument.evaluate(piston.getRelative(direction).getLocation().toVector()).toBoolean()) {
-        //Cancels the event if the piston's arm extends into the monument
-        event.setCancelled(true);
-        break;
-      } else {
-        //Cancels the event if any of the pushed blocks extend into the monument
-        for (Block block : event.getBlocks()) {
-          if (monument.evaluate(block.getLocation().toVector()).toBoolean()
-              || monument.evaluate(block.getRelative(direction).getLocation().toVector()).toBoolean()) {
-            event.setCancelled(true);
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Prevents blocks from being pulled from the wool monument by a piston.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockPistonRetract(BlockPistonRetractEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      //Cancels the event if any of the pulled blocks retract from the monument
-      Region monument = wool.getMonument();
-      BlockFace direction = event.getDirection();
-      for (Block block : event.getBlocks()) {
-        if (monument.evaluate(block.getLocation().toVector()).toBoolean()
-            || monument.evaluate(block.getRelative(direction).getLocation().toVector()).toBoolean()) {
-          event.setCancelled(true);
-          break;
-        }
-      }
-      if (event.isCancelled()) {
-        break;
+        Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(wool, player));
       }
     }
   }

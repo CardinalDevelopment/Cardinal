@@ -25,13 +25,45 @@
 
 package in.twizmwaz.cardinal.module.filter.type.modifiers;
 
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.filter.FilterModule;
 import in.twizmwaz.cardinal.module.filter.FilterState;
+import in.twizmwaz.cardinal.module.filter.LoadLateFilter;
 
-public class NotFilter extends TransformFilter {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-  public NotFilter(Filter child) {
-    super(child, FilterState.DENY, FilterState.ABSTAIN, FilterState.ALLOW);
+public class TransformFilter implements Filter, LoadLateFilter {
+
+  private final Filter child;
+  private final Map<FilterState, FilterState> transform = new HashMap<>();
+
+  /**
+   * Will create a transform filter, this filter just transforms one output to another.
+   * @param child The child filter to ask for the result.
+   * @param allow The output if the child returns allow.
+   * @param abstain The output if the child returns abstain.
+   * @param deny The output if the child returns deny.
+   */
+  public TransformFilter(Filter child, FilterState allow, FilterState abstain, FilterState deny) {
+    this.child = child;
+    transform.put(FilterState.ALLOW, allow);
+    transform.put(FilterState.ABSTAIN, abstain);
+    transform.put(FilterState.DENY, deny);
+  }
+
+  @Override
+  public void load(Match match) {
+    Cardinal.getModule(FilterModule.class).loadFilters(match, Collections.singleton(child));
+  }
+
+  @Override
+  public FilterState evaluate(Object... objects) {
+    return transform.get(child.evaluate(objects));
+
   }
 
 }

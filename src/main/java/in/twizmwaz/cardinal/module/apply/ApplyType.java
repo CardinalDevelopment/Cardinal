@@ -23,22 +23,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.filter.type;
+package in.twizmwaz.cardinal.module.apply;
 
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import lombok.AllArgsConstructor;
 
-public class CreatureFilter extends ObjectTypeFilter<Entity> {
+@AllArgsConstructor
+public enum ApplyType {
 
-  @Override
-  public Class<Entity> getType() {
-    return Entity.class;
+  ENTER("enter"),
+  LEAVE("leave"),
+  BLOCK("block"),
+  BLOCK_PLACE("block-place"),
+  BLOCK_PLACE_AGAINST("block-place-against"),
+  BLOCK_BREAK("block-break"),
+  BLOCK_PHYSICS("block-physics"),
+  USE("use"),
+  MOBS("mobs"),
+  KIT("filter", "kit"),
+  KIT_LEND("filter", "lend-kit"),
+  VELOCITY("filter", "velocity");
+
+  public final String filterAttr;
+  public final String otherAttr;
+  public final boolean filterOnly;
+
+  private ApplyType(String filterAttr) {
+    this(filterAttr, null, true);
   }
 
-  @Override
-  public Boolean evaluate(Entity entity) {
-    return entity instanceof Creature || entity.getType().equals(EntityType.SLIME); // Slimes extend Living entity
+  private ApplyType(String filterAttr, String otherAttr) {
+    this(filterAttr, otherAttr, false);
   }
 
 }

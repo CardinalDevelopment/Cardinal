@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.filter.type;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
 
 public class MonsterFilter extends ObjectTypeFilter<Entity> {
@@ -37,7 +38,7 @@ public class MonsterFilter extends ObjectTypeFilter<Entity> {
 
   @Override
   public Boolean evaluate(Entity entity) {
-    return entity instanceof Monster;
+    return entity instanceof Monster || entity.getType().equals(EntityType.SLIME); // Slimes extend Living entity
   }
 
 }

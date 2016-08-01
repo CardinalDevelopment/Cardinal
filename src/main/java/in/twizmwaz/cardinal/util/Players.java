@@ -27,6 +27,7 @@ package in.twizmwaz.cardinal.util;
 
 import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -69,6 +70,25 @@ public class Players {
     player.setSaturation(0);
     player.setTotalExperience(0);
     player.setWalkSpeed(0.2F);
+  }
+
+  /**
+   * @param player The player to be set as playing.
+   */
+  public static void setPlaying(Player player) {
+    player.setGameMode(GameMode.SURVIVAL);
+    player.setCollidesWithEntities(true);
+    player.setCanPickupItems(true);
+  }
+
+
+  /**
+   * @param player The player to be set as spectating.
+   */
+  public static void setSpectating(Player player) {
+    player.setGameMode(GameMode.CREATIVE);
+    player.setCollidesWithEntities(false);
+    player.setCanPickupItems(false);
   }
 
 }

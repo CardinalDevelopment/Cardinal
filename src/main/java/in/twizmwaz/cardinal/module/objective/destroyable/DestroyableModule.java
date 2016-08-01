@@ -29,9 +29,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.apply.AppliedModule;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
@@ -43,7 +44,12 @@ import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
 import lombok.NonNull;
-import org.bukkit.event.HandlerList;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
@@ -51,8 +57,8 @@ import org.jdom2.located.Located;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry(depends = {TeamModule.class, RegionModule.class})
-public class DestroyableModule extends AbstractModule {
+@ModuleEntry(depends = {TeamModule.class, RegionModule.class, AppliedModule.class})
+public class DestroyableModule extends AbstractListenerModule {
 
   private Map<Match, List<Destroyable>> destroyables = Maps.newHashMap();
 
@@ -165,7 +171,6 @@ public class DestroyableModule extends AbstractModule {
 
         Destroyable destroyable = new Destroyable(match, id, name, required, region, materials, owner,
             completion, modeChanges, showProgress, repairable, sparks, show, proximityMetric, proximityHorizontal);
-        Cardinal.registerEvents(destroyable);
         destroyables.add(destroyable);
       }
     }
@@ -175,14 +180,47 @@ public class DestroyableModule extends AbstractModule {
 
   @Override
   public void clearMatch(Match match) {
-    List<Destroyable> destroyables = this.destroyables.get(match);
-    destroyables.forEach(HandlerList::unregisterAll);
-    destroyables.clear();
+    this.destroyables.get(match).clear();
     this.destroyables.remove(match);
   }
 
   public List<Destroyable> getDestroyables(@NonNull Match match) {
     return destroyables.get(match);
+  }
+
+  /**
+   * Checks the destroyable's state when a player breaks a block.
+   *
+   * @param event The event.
+   */
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onBlockBreak(BlockBreakEvent event) {
+    Player player = event.getPlayer();
+    Match match = Cardinal.getMatch(player);
+    if (match == null || !match.hasPlayer(player) || this.destroyables.get(match).size() == 0) {
+      return;
+    }
+    Block block = event.getBlock();
+    destroyables.get(match).forEach(destroyable -> {
+      if (destroyable.isPartOf(block)) {
+        destroyable.addBrokenPiecesFor(player, 1);
+      }
+    });
+  }
+
+  /**
+   * Removes the player from the list of players who have touched the monument during their previous life.
+   *
+   * @param event The event.
+   */
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onPlayerDeath(PlayerDeathEvent event) {
+    Player player = event.getEntity();
+    Match match = Cardinal.getMatch(player);
+    if (match == null || !match.hasPlayer(player) || this.destroyables.get(match).size() == 0) {
+      return;
+    }
+    destroyables.get(match).forEach(core -> core.getTouchedPlayers().remove(player));
   }
 
 }

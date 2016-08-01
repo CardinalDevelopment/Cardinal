@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.spawn;
 
+import in.twizmwaz.cardinal.module.kit.Kit;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.ListUtil;
@@ -47,12 +48,16 @@ public class Spawn {
   private final boolean spread;
   private final boolean exclusive;
   private final boolean persistent;
-  // private final Kit kit;
+  private final Kit kit;
   // private final Filter filter;
   private final List<Region> regions;
 
   private int position = 0;
 
+  /**
+   * Gets a spawn point for this spawn.
+   * @return A location from the region list.
+   */
   public Location getSpawnPoint() {
     Vector result;
     if (sequential) {

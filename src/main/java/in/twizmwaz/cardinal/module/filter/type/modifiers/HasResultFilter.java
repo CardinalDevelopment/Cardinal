@@ -23,22 +23,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.filter.type;
+package in.twizmwaz.cardinal.module.filter.type.modifiers;
 
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.filter.FilterState;
 
-public class CreatureFilter extends ObjectTypeFilter<Entity> {
+public class HasResultFilter extends TransformFilter {
 
-  @Override
-  public Class<Entity> getType() {
-    return Entity.class;
-  }
-
-  @Override
-  public Boolean evaluate(Entity entity) {
-    return entity instanceof Creature || entity.getType().equals(EntityType.SLIME); // Slimes extend Living entity
+  public HasResultFilter(Filter child) {
+    super(child, FilterState.ALLOW, FilterState.DENY, FilterState.ALLOW);
   }
 
 }
