@@ -61,7 +61,7 @@ public class RepositoryModule extends AbstractModule {
   public RepositoryModule() {
     //TODO: support alternate repos
     String mapRepository = Cardinal.getInstance().getConfig().getString("mapRepository");
-    File mapRepositoryRoot = new File(Paths.get(mapRepository).isAbsolute() ? mapRepository : Cardinal.getInstance().getDataFolder().getAbsolutePath() + mapRepository);
+    File mapRepositoryRoot = new File(Paths.get(mapRepository).isAbsolute() ? mapRepository : Cardinal.getInstance().getDataFolder().getAbsolutePath() + File.separator + mapRepository);
     loadRepository(mapRepositoryRoot);
   }
 
