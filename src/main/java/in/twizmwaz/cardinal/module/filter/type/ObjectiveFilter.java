@@ -25,28 +25,42 @@
 
 package in.twizmwaz.cardinal.module.filter.type;
 
-import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.module.filter.FilterException;
+import in.twizmwaz.cardinal.module.filter.FilterState;
+import in.twizmwaz.cardinal.module.filter.LoadLateFilter;
+import in.twizmwaz.cardinal.module.filter.parser.ObjectiveFilterParser;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.jdom2.Element;
 
-@AllArgsConstructor
-public class ObjectiveFilter implements Filter<Object> {
+@RequiredArgsConstructor
+public class ObjectiveFilter extends AgnosticFilter implements LoadLateFilter {
 
-  private final Objective objective;
+  private final Element element;
+  private Objective objective = null;
 
   @Override
-  public boolean evaluate(Object evaluating) {
-    if (objective instanceof Core) {
-      return ((Core) objective).isComplete();
-    } else if (objective instanceof Destroyable) {
-      //TODO: Check completion of destroyables
-      // return ((Destroyable) objective).isComplete();
-    } else if (objective instanceof Wool) {
-      return ((Wool) objective).isComplete();
+  public void load(Match match) throws FilterException {
+    ObjectiveFilterParser parser = new ObjectiveFilterParser(element, match);
+    this.objective = parser.getObjective();
+  }
+
+  @Override
+  public FilterState evaluate() {
+    if (objective == null) {
+      return FilterState.ABSTAIN;
     }
-    return false;
+    if (objective instanceof Core) {
+      return FilterState.fromBoolean(((Core) objective).isComplete());
+    } else if (objective instanceof Destroyable) {
+      return FilterState.fromBoolean(((Destroyable) objective).isCompleted());
+    } else if (objective instanceof Wool) {
+      return FilterState.fromBoolean(((Wool) objective).isComplete());
+    }
+    return FilterState.ABSTAIN;
   }
 }

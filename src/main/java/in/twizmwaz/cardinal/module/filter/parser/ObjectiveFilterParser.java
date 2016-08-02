@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.filter.parser;
 
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.filter.FilterException;
 import in.twizmwaz.cardinal.module.filter.FilterParser;
 import in.twizmwaz.cardinal.module.filter.exception.property.InvalidFilterPropertyException;
@@ -44,13 +45,12 @@ public class ObjectiveFilterParser implements FilterParser {
    * @param element The element.
    * @throws FilterException Thrown if the objective property is missing or invalid.
    */
-  public ObjectiveFilterParser(Element element) throws FilterException {
+  public ObjectiveFilterParser(Element element, Match match) throws FilterException {
     String objectiveProperty = element.getText();
     if (objectiveProperty == null) {
       throw new MissingFilterPropertyException("objective", element);
     }
-    //TODO: Get objective by id
-    Objective objective = null;
+    Objective objective = Objective.getObjectiveById(match, objectiveProperty);
     if (objective == null) {
       throw new InvalidFilterPropertyException("objective", element);
     }

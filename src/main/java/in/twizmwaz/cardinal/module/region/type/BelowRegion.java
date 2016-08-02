@@ -50,7 +50,7 @@ public class BelowRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
+  public boolean contains(Vector vector) {
     return max.isGreater(vector);
   }
 

@@ -26,48 +26,98 @@
 package in.twizmwaz.cardinal.module.filter;
 
 import com.google.common.collect.Maps;
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.match.MatchModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.filter.exception.FilterPropertyException;
 import in.twizmwaz.cardinal.module.filter.exception.property.InvalidFilterPropertyException;
+import in.twizmwaz.cardinal.module.filter.exception.property.MissingFilterChildException;
 import in.twizmwaz.cardinal.module.filter.exception.property.MissingFilterPropertyException;
+import in.twizmwaz.cardinal.module.filter.parser.CauseFilterParser;
+import in.twizmwaz.cardinal.module.filter.parser.ChildFilterParser;
+import in.twizmwaz.cardinal.module.filter.parser.ChildrenFilterParser;
 import in.twizmwaz.cardinal.module.filter.parser.EntityFilterParser;
+import in.twizmwaz.cardinal.module.filter.parser.ItemFilterParser;
+import in.twizmwaz.cardinal.module.filter.parser.LayerFilterParser;
 import in.twizmwaz.cardinal.module.filter.parser.MaterialFilterParser;
-import in.twizmwaz.cardinal.module.filter.parser.ObjectiveFilterParser;
 import in.twizmwaz.cardinal.module.filter.parser.RandomFilterParser;
+import in.twizmwaz.cardinal.module.filter.parser.RangeFilterParser;
 import in.twizmwaz.cardinal.module.filter.parser.SpawnFilterParser;
 import in.twizmwaz.cardinal.module.filter.parser.TeamFilterParser;
 import in.twizmwaz.cardinal.module.filter.type.CanFlyFilter;
+import in.twizmwaz.cardinal.module.filter.type.CarryingFilter;
+import in.twizmwaz.cardinal.module.filter.type.CauseFilter;
+import in.twizmwaz.cardinal.module.filter.type.CreatureFilter;
 import in.twizmwaz.cardinal.module.filter.type.CrouchingFilter;
+import in.twizmwaz.cardinal.module.filter.type.EntityFilter;
 import in.twizmwaz.cardinal.module.filter.type.FlyingFilter;
+import in.twizmwaz.cardinal.module.filter.type.HoldingFilter;
+import in.twizmwaz.cardinal.module.filter.type.LayerFilter;
+import in.twizmwaz.cardinal.module.filter.type.MaterialFilter;
+import in.twizmwaz.cardinal.module.filter.type.MonsterFilter;
 import in.twizmwaz.cardinal.module.filter.type.ObjectiveFilter;
 import in.twizmwaz.cardinal.module.filter.type.RandomFilter;
-import in.twizmwaz.cardinal.module.filter.type.SingletonFilter;
+import in.twizmwaz.cardinal.module.filter.type.SameTeamFilter;
+import in.twizmwaz.cardinal.module.filter.type.SpawnFilter;
 import in.twizmwaz.cardinal.module.filter.type.SprintingFilter;
+import in.twizmwaz.cardinal.module.filter.type.StaticFilter;
 import in.twizmwaz.cardinal.module.filter.type.TeamFilter;
+import in.twizmwaz.cardinal.module.filter.type.VoidFilter;
 import in.twizmwaz.cardinal.module.filter.type.WalkingFilter;
-import in.twizmwaz.cardinal.module.objective.core.CoreModule;
-import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
-import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
+import in.twizmwaz.cardinal.module.filter.type.WearingFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.AllFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.AllowFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.AnyFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.DenyFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.NotFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.OneFilter;
+import in.twizmwaz.cardinal.module.filter.type.modifiers.RangeFilter;
+import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
+import java.util.Collection;
 import java.util.Map;
 
-@ModuleEntry(depends = {CoreModule.class, DestroyableModule.class, TeamModule.class, WoolModule.class})
-public class FilterModule extends AbstractModule {
+@ModuleEntry(depends = {RegionModule.class, TeamModule.class})
+public class FilterModule extends AbstractModule implements Listener {
 
   private Map<Match, Map<String, Filter>> filters = Maps.newHashMap();
+
+  //Static filters. Can be shared across matches, because they use no arguments
+  public static final Filter ALLOW = new StaticFilter(FilterState.ALLOW);
+  public static final Filter ABSTAIN = new StaticFilter(FilterState.ABSTAIN);
+  public static final Filter DENY = new StaticFilter(FilterState.DENY);
+
+  public static final Filter CREATURE = new CreatureFilter();
+  public static final Filter MONSTER = new MonsterFilter();
+
+  public static final Filter CROUCHING = new CrouchingFilter();
+  public static final Filter WALKING = new WalkingFilter();
+  public static final Filter SPRINTING = new SprintingFilter();
+  public static final Filter FLYING = new FlyingFilter();
+  public static final Filter CAN_FLY = new CanFlyFilter();
+
+  public static final Filter VOID = new VoidFilter();
+
+  public FilterModule() {
+    Cardinal.registerEvents(this);
+  }
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
     filters.put(match, Maps.newHashMap());
     for (Element filtersElement : match.getMap().getDocument().getRootElement().getChildren("filters")) {
       for (Element filterElement : filtersElement.getChildren()) {
+        filters.get(match).put("always", ALLOW);
+        filters.get(match).put("never", DENY);
         try {
           getFilter(match, filterElement);
         } catch (FilterException e) {
@@ -81,6 +131,27 @@ public class FilterModule extends AbstractModule {
   @Override
   public void clearMatch(@NonNull Match match) {
     filters.remove(match);
+  }
+
+  /**
+   * Runs load() on filters that implement the LoadLateFilter interface.
+   */
+  @EventHandler
+  public void onModuleLoad(MatchModuleLoadCompleteEvent event) {
+    loadFilters(event.getMatch(), filters.get(event.getMatch()).values());
+  }
+
+  /**
+   * Runs load() on filters that implement the LoadLateFilter interface.
+   */
+  public void loadFilters(Match match, Collection<Filter> filters) {
+    filters.stream().filter(filter -> filter instanceof LoadLateFilter).forEach(filter -> {
+      try {
+        ((LoadLateFilter) filter).load(match);
+      } catch (FilterException e) {
+        errors.add(new ModuleError(this, match.getMap(), new String[]{getFilterError(e, "filter", null)}, false));
+      }
+    });
   }
 
   public Filter getFilter(@NonNull Match match, @NonNull String id) {
@@ -99,66 +170,143 @@ public class FilterModule extends AbstractModule {
   public Filter getFilter(Match match, Element element, String... alternateAttributes) throws FilterException {
     String id = element.getAttributeValue("id");
     switch (element.getName()) {
+      /* Static filters */
+      case "always": {
+        return checkFilter(match, id, ALLOW);
+      }
+      case "never": {
+        return checkFilter(match, id, DENY);
+      }
+      /* Filter modifiers */
+      case "not": {
+        ChildFilterParser parser = new ChildFilterParser(this, match, element);
+        return checkFilter(match, id, new NotFilter(parser.getChild()));
+      }
+      case "allow": {
+        ChildFilterParser parser = new ChildFilterParser(this, match, element);
+        return checkFilter(match, id, new AllowFilter(parser.getChild()));
+      }
+      case "deny": {
+        ChildFilterParser parser = new ChildFilterParser(this, match, element);
+        return checkFilter(match, id, new DenyFilter(parser.getChild()));
+      }
+      /* Filter combinations */
+      case "one": {
+        ChildrenFilterParser parser = new ChildrenFilterParser(this, match, element);
+        return checkFilter(match, id, new OneFilter(parser.getChildren()));
+      }
+      case "all": {
+        ChildrenFilterParser parser = new ChildrenFilterParser(this, match, element);
+        return checkFilter(match, id, new AllFilter(parser.getChildren()));
+      }
+      case "any": {
+        ChildrenFilterParser parser = new ChildrenFilterParser(this, match, element);
+        return checkFilter(match, id, new AnyFilter(parser.getChildren()));
+      }
+      case "range": {
+        RangeFilterParser parser = new RangeFilterParser(this, match, element);
+        return checkFilter(match, id, new RangeFilter(parser.getChildren(), parser.getMin(), parser.getMax()));
+      }
+      /* Regular filters */
       case "team": {
         TeamFilterParser parser = new TeamFilterParser(match, element);
         return checkFilter(match, id, new TeamFilter(parser.getTeam()));
       }
       case "material": {
         MaterialFilterParser parser = new MaterialFilterParser(element);
-        return checkFilter(match, id, new SingletonFilter<>(parser.getPattern()));
+        return checkFilter(match, id, new MaterialFilter(parser.getPattern()));
       }
       case "spawn": {
         SpawnFilterParser parser = new SpawnFilterParser(element);
-        return checkFilter(match, id, new SingletonFilter<>(parser.getSpawnReason()));
+        return checkFilter(match, id, new SpawnFilter(parser.getSpawnReason()));
       }
       case "mob": {
-        //TODO
-        return null;
+        return checkFilter(match, id, MONSTER);
+      }
+      case "monster": {
+        return checkFilter(match, id, MONSTER);
+      }
+      case "creature": {
+        return checkFilter(match, id, CREATURE);
       }
       case "entity": {
         EntityFilterParser parser = new EntityFilterParser(element);
-        return checkFilter(match, id, new SingletonFilter<>(parser.getEntityType()));
+        return checkFilter(match, id, new EntityFilter(parser.getEntityType()));
       }
       case "kill-streak":
         //TODO: Track killstreaks
-        return null;
+        return checkFilter(match, id, ABSTAIN);
       case "class":
         //TODO: Support classes
-        return null;
+        return checkFilter(match, id, ABSTAIN);
       case "random": {
         RandomFilterParser parser = new RandomFilterParser(element);
         return checkFilter(match, id, new RandomFilter(parser));
       }
       case "crouching": {
-        return checkFilter(match, id, new CrouchingFilter());
+        return checkFilter(match, id, CROUCHING);
       }
       case "walking": {
-        return checkFilter(match, id, new WalkingFilter());
+        return checkFilter(match, id, WALKING);
       }
       case "sprinting": {
-        return checkFilter(match, id, new SprintingFilter());
+        return checkFilter(match, id, SPRINTING);
       }
       case "flying": {
-        return checkFilter(match, id, new FlyingFilter());
+        return checkFilter(match, id, FLYING);
       }
       case "can-fly": {
-        return checkFilter(match, id, new CanFlyFilter());
+        return checkFilter(match, id, CAN_FLY);
       }
       case "objective": {
-        ObjectiveFilterParser parser = new ObjectiveFilterParser(element);
-        return checkFilter(match, id, new ObjectiveFilter(parser.getObjective()));
+        return checkFilter(match, id, new ObjectiveFilter(element));
+      }
+      //Fixme: missing flag filters
+      case "flag-carried": {
+        return checkFilter(match, id, ABSTAIN);
+      }
+      case "flag-dropped": {
+        return checkFilter(match, id, ABSTAIN);
+      }
+      case "flag-returned": {
+        return checkFilter(match, id, ABSTAIN);
+      }
+      case "flag-captured": {
+        return checkFilter(match, id, ABSTAIN);
+      }
+      case "carrying-flag": {
+        return checkFilter(match, id, ABSTAIN);
+      }
+      case "cause": {
+        CauseFilterParser parser = new CauseFilterParser(element);
+        return checkFilter(match, id, new CauseFilter(parser.getCause()));
       }
       case "carrying": {
-        //TODO
-        return null;
+        ItemFilterParser parser = new ItemFilterParser(element);
+        return checkFilter(match, id, new CarryingFilter(parser.getItem()));
       }
       case "holding": {
-        //TODO
-        return null;
+        ItemFilterParser parser = new ItemFilterParser(element);
+        return checkFilter(match, id, new HoldingFilter(parser.getItem()));
       }
       case "wearing": {
-        //TODO
-        return null;
+        ItemFilterParser parser = new ItemFilterParser(element);
+        return checkFilter(match, id, new WearingFilter(parser.getItem()));
+      }
+      case "same-team": {
+        ChildFilterParser parser = new ChildFilterParser(this, match, element);
+        return checkFilter(match, id, new SameTeamFilter(parser.getChild()));
+      }
+      case "void": {
+        return checkFilter(match, id, VOID);
+      }
+      case "layer": {
+        LayerFilterParser parser = new LayerFilterParser(element);
+        return checkFilter(match, id, new LayerFilter(parser.getLayer(), parser.getCoordinate()));
+      }
+      /* Region filter */
+      case "region": {
+        return checkFilter(match, id, Cardinal.getModule(RegionModule.class).getRegionById(match, id));
       }
       default:
         for (String alternateAttribute : alternateAttributes) {
@@ -182,8 +330,12 @@ public class FilterModule extends AbstractModule {
     return null;
   }
 
-  private Filter checkFilter(Match match, String id, Filter filter) {
+  private Filter checkFilter(Match match, String id, Filter filter) throws FilterException {
     if (id != null) {
+      if (!filters.get(match).containsKey(id)) {
+        //Fixme: needs descriptive exception
+        throw new FilterException();
+      }
       filters.get(match).put(id, filter);
     }
     return filter;
@@ -206,6 +358,9 @@ public class FilterModule extends AbstractModule {
             + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       } else if (exception instanceof InvalidFilterPropertyException) {
         return "Invalid property \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
+            + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
+      }  else if (exception instanceof MissingFilterChildException) {
+        return "Missing child \"" + exception.getProperty() + "\"" + (name != null ? " for " + name : "")
             + (parent != null ? " for " + parent : "") + " at " + located.getLine() + ", " + located.getColumn();
       }
     }

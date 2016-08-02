@@ -31,7 +31,9 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
-public interface Region extends Filter<Vector> {
+public interface Region extends Filter {
+
+  boolean contains(Vector vector);
 
   boolean isRandomizable();
 

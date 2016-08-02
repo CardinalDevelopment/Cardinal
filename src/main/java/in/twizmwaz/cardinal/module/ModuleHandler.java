@@ -26,11 +26,13 @@
 package in.twizmwaz.cardinal.module;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.match.MatchModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,8 +69,10 @@ public class ModuleHandler {
         }
       } catch (Throwable throwable) {
         throwable.printStackTrace();
-        continue;
       }
+    }
+    Bukkit.getPluginManager().callEvent(new MatchModuleLoadCompleteEvent(match));
+    for (Module module : registry.getLoadOrder()) {
       sendErrorMessages(match, module);
     }
     Cardinal.getInstance().getLogger().info("Modules for " + match.getMap().getName() + " loaded successfully.");

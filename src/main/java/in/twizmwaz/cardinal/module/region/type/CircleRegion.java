@@ -59,7 +59,7 @@ public class CircleRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
+  public boolean contains(Vector vector) {
     return Math.hypot(Math.abs(vector.getX() - center.getX()), Math.abs(vector.getZ() - center.getZ())) <= radius;
   }
 

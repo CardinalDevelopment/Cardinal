@@ -76,7 +76,7 @@ public class ComplementRegion extends AbstractRegion {
       throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
     }
     Collection<Block> blocks = getBounds().getBlocks().stream().filter(
-        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+        block -> contains(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
     setBlocks(ImmutableSet.copyOf(blocks));
     return super.getBlocks();
   }
@@ -87,12 +87,12 @@ public class ComplementRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
-    if (!region.evaluate(evaluating)) {
+  public boolean contains(Vector evaluating) {
+    if (!region.contains(evaluating)) {
       return false;
     }
     for (Region complement : complements) {
-      if (complement.evaluate(evaluating)) {
+      if (complement.contains(evaluating)) {
         return false;
       }
     }

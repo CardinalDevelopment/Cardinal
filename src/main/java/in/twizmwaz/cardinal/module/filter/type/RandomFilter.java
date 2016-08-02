@@ -25,14 +25,14 @@
 
 package in.twizmwaz.cardinal.module.filter.type;
 
-import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.filter.FilterState;
 import in.twizmwaz.cardinal.module.filter.parser.RandomFilterParser;
 import lombok.AllArgsConstructor;
 
 import java.util.Random;
 
 @AllArgsConstructor
-public class RandomFilter implements Filter<Object> {
+public class RandomFilter extends AgnosticFilter {
 
   private final double chance;
 
@@ -41,8 +41,8 @@ public class RandomFilter implements Filter<Object> {
   }
 
   @Override
-  public boolean evaluate(Object fg) {
-    return new Random().nextDouble() <= chance;
+  public FilterState evaluate() {
+    return FilterState.fromBoolean(new Random().nextDouble() <= chance);
   }
 
 }

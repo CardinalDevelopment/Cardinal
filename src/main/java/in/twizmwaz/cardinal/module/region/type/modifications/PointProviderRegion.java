@@ -71,7 +71,7 @@ public class PointProviderRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
+  public boolean contains(Vector evaluating) {
     throw new UnsupportedOperationException("Cannot determine absolute location of PointProvider");
   }
 }

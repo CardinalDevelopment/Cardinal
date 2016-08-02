@@ -25,11 +25,14 @@
 
 package in.twizmwaz.cardinal.module.region;
 
+import in.twizmwaz.cardinal.module.filter.FilterState;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.Random;
@@ -44,5 +47,27 @@ public abstract class AbstractRegion implements Region {
   private Collection<Block> blocks;
 
   private Random random = new Random();
+
+  @Override
+  public FilterState evaluate(Object... objects) {
+    for (Object obj : objects) {
+      FilterState response = FilterState.fromBoolean(this.evaluate(obj));
+      if (!response.equals(FilterState.ABSTAIN)) {
+        return response;
+      }
+    }
+    return FilterState.ABSTAIN;
+  }
+
+  private Boolean evaluate(Object obj) {
+    if (obj instanceof Vector) {
+      return this.contains((Vector) obj);
+    } else if (obj instanceof Block) {
+      return evaluate(((Block) obj).getLocation());
+    } else if (obj instanceof Entity) {
+      return evaluate(((Entity) obj).getLocation());
+    }
+    return null;
+  }
 
 }

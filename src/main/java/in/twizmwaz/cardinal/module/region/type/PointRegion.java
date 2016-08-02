@@ -57,7 +57,7 @@ public class PointRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
+  public boolean contains(Vector evaluating) {
     return evaluating != null && evaluating.equals(location.toVector());
   }
 }

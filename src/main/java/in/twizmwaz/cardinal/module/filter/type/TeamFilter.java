@@ -26,21 +26,27 @@
 package in.twizmwaz.cardinal.module.filter.type;
 
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.filter.FilterState;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 
 @AllArgsConstructor
-public class TeamFilter implements Filter<Player> {
+public class TeamFilter extends SingleObjectFilter {
 
   private final Team team;
 
   @Override
-  public boolean evaluate(Player evaluating) {
-    PlayingPlayerContainer container = Cardinal.getMatch(evaluating).getPlayingContainer(evaluating);
-    return container != null && team.equals(container);
+  public FilterState evaluate(Object evaluating) {
+    if (evaluating instanceof Team) {
+      return FilterState.fromBoolean(team.equals(evaluating));
+    } else if (evaluating instanceof Player) {
+      PlayingPlayerContainer container =
+          Cardinal.getMatch((Player) evaluating).getPlayingContainer((Player) evaluating);
+      return FilterState.fromBoolean(container != null && team.equals(container));
+    }
+    return FilterState.ABSTAIN;
   }
 
 }

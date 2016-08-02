@@ -25,18 +25,22 @@
 
 package in.twizmwaz.cardinal.module.filter.type;
 
-import in.twizmwaz.cardinal.module.filter.Filter;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 @AllArgsConstructor
-public class HoldingFilter implements Filter<Player> {
+public class HoldingFilter extends ObjectTypeFilter<Player> {
 
   private final ItemStack item;
 
   @Override
-  public boolean evaluate(Player evaluating) {
+  public Class<Player> getType() {
+    return Player.class;
+  }
+
+  @Override
+  public Boolean evaluate(Player evaluating) {
     return evaluating.getInventory().getItemInMainHand().isSimilar(item);
   }
 

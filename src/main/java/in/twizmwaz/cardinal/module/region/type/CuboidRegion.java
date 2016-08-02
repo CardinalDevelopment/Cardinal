@@ -56,7 +56,7 @@ public class CuboidRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
+  public boolean contains(Vector vector) {
     return cuboid.contains(vector);
   }
 

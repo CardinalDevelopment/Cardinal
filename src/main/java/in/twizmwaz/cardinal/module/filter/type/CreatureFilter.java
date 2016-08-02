@@ -23,7 +23,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.filter.parser;
+package in.twizmwaz.cardinal.module.filter.type;
 
-public class CarryingFilterParser {
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Entity;
+
+public class CreatureFilter extends ObjectTypeFilter<Entity> {
+
+  @Override
+  public Class<Entity> getType() {
+    return Entity.class;
+  }
+
+  @Override
+  public Boolean evaluate(Entity entity) {
+    return entity instanceof Creature;
+  }
+
 }

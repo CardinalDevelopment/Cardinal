@@ -327,7 +327,7 @@ public class WoolModule extends AbstractModule {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
       Player player = event.getPlayer();
       Block block = event.getBlock();
-      if (wool.getMonument().evaluate(block.getLocation().toVector()) && !wool.isComplete()) {
+      if (wool.getMonument().evaluate(block.getLocation().toVector()).toBoolean() && !wool.isComplete()) {
         if (block.getType().equals(Material.WOOL)) {
           if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(wool.getColor())) {
             wool.setComplete(true);
@@ -378,7 +378,7 @@ public class WoolModule extends AbstractModule {
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector())) {
+      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
         event.setCancelled(true);
         break;
       }
@@ -393,7 +393,7 @@ public class WoolModule extends AbstractModule {
   @EventHandler(ignoreCancelled = true)
   public void onBlockForm(BlockFormEvent event) {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector())) {
+      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
         event.setCancelled(true);
         break;
       }
@@ -408,7 +408,7 @@ public class WoolModule extends AbstractModule {
   @EventHandler(ignoreCancelled = true)
   public void onBlockSpread(BlockSpreadEvent event) {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector())) {
+      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
         event.setCancelled(true);
         break;
       }
@@ -423,7 +423,7 @@ public class WoolModule extends AbstractModule {
   @EventHandler(ignoreCancelled = true)
   public void onEntityChangeBlock(EntityChangeBlockEvent event) {
     for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
-      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector())) {
+      if (wool.getMonument().evaluate(event.getBlock().getLocation().toVector()).toBoolean()) {
         event.setCancelled(true);
         break;
       }
@@ -441,15 +441,15 @@ public class WoolModule extends AbstractModule {
       Region monument = wool.getMonument();
       Block piston = event.getBlock();
       BlockFace direction = event.getDirection();
-      if (monument.evaluate(piston.getRelative(direction).getLocation().toVector())) {
+      if (monument.evaluate(piston.getRelative(direction).getLocation().toVector()).toBoolean()) {
         //Cancels the event if the piston's arm extends into the monument
         event.setCancelled(true);
         break;
       } else {
         //Cancels the event if any of the pushed blocks extend into the monument
         for (Block block : event.getBlocks()) {
-          if (monument.evaluate(block.getLocation().toVector())
-              || monument.evaluate(block.getRelative(direction).getLocation().toVector())) {
+          if (monument.evaluate(block.getLocation().toVector()).toBoolean()
+              || monument.evaluate(block.getRelative(direction).getLocation().toVector()).toBoolean()) {
             event.setCancelled(true);
             break;
           }
@@ -470,8 +470,8 @@ public class WoolModule extends AbstractModule {
       Region monument = wool.getMonument();
       BlockFace direction = event.getDirection();
       for (Block block : event.getBlocks()) {
-        if (monument.evaluate(block.getLocation().toVector())
-            || monument.evaluate(block.getRelative(direction).getLocation().toVector())) {
+        if (monument.evaluate(block.getLocation().toVector()).toBoolean()
+            || monument.evaluate(block.getRelative(direction).getLocation().toVector()).toBoolean()) {
           event.setCancelled(true);
           break;
         }

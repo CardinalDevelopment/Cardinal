@@ -29,8 +29,11 @@ import com.google.common.collect.Lists;
 import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.module.objective.core.Core;
 import in.twizmwaz.cardinal.module.objective.core.CoreModule;
+import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
 import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
+import in.twizmwaz.cardinal.module.objective.wool.Wool;
 import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
 import lombok.Data;
 import lombok.NonNull;
@@ -80,6 +83,30 @@ public abstract class Objective {
       }
     }
     return specificObjective;
+  }
+
+  /**
+   * Gets the objective with the id on a specific match;
+   *
+   * @return The objective. Null if no objective is found with that id.
+   */
+  public static Objective getObjectiveById(@NonNull Match match, @NonNull String id) {
+    for (Core core : Cardinal.getModule(CoreModule.class).getCores(match)) {
+      if (core.getId().equalsIgnoreCase(id)) {
+        return core;
+      }
+    }
+    for (Destroyable monument : Cardinal.getModule(DestroyableModule.class).getDestroyables(match)) {
+      if (monument.getId().equalsIgnoreCase(id)) {
+        return monument;
+      }
+    }
+    for (Wool wool : Cardinal.getModule(WoolModule.class).getWools(match)) {
+      if (wool.getId().equalsIgnoreCase(id)) {
+        return wool;
+      }
+    }
+    return null;
   }
 
 }

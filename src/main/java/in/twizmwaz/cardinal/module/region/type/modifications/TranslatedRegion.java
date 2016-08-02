@@ -56,8 +56,8 @@ public class TranslatedRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
-    return region.evaluate(vector.minus(offset));
+  public boolean contains(Vector vector) {
+    return region.contains(vector.minus(offset));
   }
 
   @Override
@@ -79,7 +79,7 @@ public class TranslatedRegion extends AbstractRegion {
       return super.getBlocks();
     }
     Collection<Block> blocks = getBounds().getBlocks().stream().filter(
-        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+        block -> contains(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
     setBlocks(blocks);
     return super.getBlocks();
   }

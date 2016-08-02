@@ -25,8 +25,8 @@
 
 package in.twizmwaz.cardinal.module.filter;
 
-public interface Filter<T> {
+public interface Filter {
 
-  boolean evaluate(T evaluating);
+  FilterState evaluate(Object... evaluating);
 
 }

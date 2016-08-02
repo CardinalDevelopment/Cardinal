@@ -70,7 +70,7 @@ public class NegativeRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
-    return !region.evaluate(evaluating);
+  public boolean contains(Vector evaluating) {
+    return !region.contains(evaluating);
   }
 }

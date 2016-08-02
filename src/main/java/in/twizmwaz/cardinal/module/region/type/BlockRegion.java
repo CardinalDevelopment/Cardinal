@@ -51,7 +51,7 @@ public class BlockRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
+  public boolean contains(Vector vector) {
     return vector.getBlockX() == getVector().getBlockX()
         && vector.getBlockY() == getVector().getBlockY()
         && vector.getBlockZ() == getVector().getBlockZ();

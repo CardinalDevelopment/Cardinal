@@ -23,18 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.filter.type;
+package in.twizmwaz.cardinal.module.filter.type.modifiers;
 
+import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.filter.FilterModule;
+import in.twizmwaz.cardinal.module.filter.FilterState;
+import in.twizmwaz.cardinal.module.filter.LoadLateFilter;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class SingletonFilter<T> implements Filter<T> {
+import java.util.Collections;
 
-  private final T object;
+@AllArgsConstructor
+public class DenyFilter implements Filter, LoadLateFilter {
+
+  private final Filter child;
 
   @Override
-  public boolean evaluate(T evaluating) {
-    return object.equals(evaluating);
+  public void load(Match match) {
+    Cardinal.getModule(FilterModule.class).loadFilters(match, Collections.singleton(child));
   }
+
+  @Override
+  public FilterState evaluate(Object... objects) {
+    FilterState response = child.evaluate(objects);
+    return response.equals(FilterState.ALLOW) ? FilterState.DENY : FilterState.ABSTAIN;
+
+  }
+
 }

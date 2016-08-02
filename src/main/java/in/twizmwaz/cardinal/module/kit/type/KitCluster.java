@@ -46,7 +46,7 @@ public class KitCluster implements KitRemovable {
 
   private final Match match;
 
-  private final Filter<Player> filter;
+  private final Filter filter;
   private final boolean force;
   private final boolean potionParticles;
   private final boolean discardPotionBottles;
@@ -60,7 +60,7 @@ public class KitCluster implements KitRemovable {
   @Override
   public void apply(Player player, boolean force) {
     evaluateParents();
-    if (filter != null && filter.evaluate(player)) {
+    if (filter.evaluate(player).toBoolean()) {
       for (Kit kit : parents) {
         kit.apply(player, force || this.force);
       }

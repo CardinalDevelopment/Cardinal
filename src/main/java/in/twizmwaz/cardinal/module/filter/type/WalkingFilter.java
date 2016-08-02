@@ -25,14 +25,18 @@
 
 package in.twizmwaz.cardinal.module.filter.type;
 
-import in.twizmwaz.cardinal.module.filter.Filter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-public class WalkingFilter implements Filter<Player> {
+public class WalkingFilter extends ObjectTypeFilter<Player> {
 
   @Override
-  public boolean evaluate(Player evaluating) {
+  public Class<Player> getType() {
+    return Player.class;
+  }
+
+  @Override
+  public Boolean evaluate(Player evaluating) {
     Vector velocity = evaluating.getVelocity();
     return velocity.length() != 0 && velocity.getY() == 0 && !evaluating.isSprinting();
   }

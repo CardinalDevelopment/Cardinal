@@ -60,8 +60,8 @@ public class MirroredRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
-    return region.evaluate(Geometry.getMirrored(vector, origin, normal));
+  public boolean contains(Vector vector) {
+    return region.contains(Geometry.getMirrored(vector, origin, normal));
   }
 
   @Override
@@ -83,7 +83,7 @@ public class MirroredRegion extends AbstractRegion {
       return super.getBlocks();
     }
     Collection<Block> blocks = getBounds().getBlocks().stream().filter(
-        block -> evaluate(block.getLocation().toVector().add(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+        block -> contains(block.getLocation().toVector().add(0.5, 0.5, 0.5))).collect(Collectors.toSet());
     setBlocks(blocks);
     return super.getBlocks();
   }

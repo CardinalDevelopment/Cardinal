@@ -83,7 +83,7 @@ public class CylinderRegion extends AbstractRegion {
       return super.getBlocks();
     }
     Collection<Block> blocks = getBounds().getBlocks().stream().filter(
-        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+        block -> contains(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
     setBlocks(ImmutableSet.copyOf(blocks));
     return super.getBlocks();
   }
@@ -101,7 +101,7 @@ public class CylinderRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
+  public boolean contains(Vector evaluating) {
     return Math.hypot(Math.abs(evaluating.getX() - base.getX()), Math.abs(evaluating.getZ() - base.getZ())) <= radius
         && base.getY() <= evaluating.getY() && evaluating.getY() <= base.getY() + height;
   }

@@ -79,7 +79,7 @@ public class SphereRegion extends AbstractRegion {
       return super.getBlocks();
     }
     Collection<Block> blocks = getBounds().getBlocks().stream().filter(
-        block -> evaluate(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
+        block -> contains(block.getLocation().toVector().plus(0.5, 0.5, 0.5))).collect(Collectors.toSet());
     setBlocks(ImmutableSet.copyOf(blocks));
     return super.getBlocks();
   }
@@ -90,7 +90,7 @@ public class SphereRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
+  public boolean contains(Vector evaluating) {
     return evaluating.isInSphere(origin, radius);
   }
 

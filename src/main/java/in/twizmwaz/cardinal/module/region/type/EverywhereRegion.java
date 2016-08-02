@@ -40,7 +40,7 @@ public class EverywhereRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector vector) {
+  public boolean contains(Vector vector) {
     return true;
   }
 

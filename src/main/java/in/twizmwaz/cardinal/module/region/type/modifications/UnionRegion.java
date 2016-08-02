@@ -95,9 +95,9 @@ public class UnionRegion extends AbstractRegion {
   }
 
   @Override
-  public boolean evaluate(Vector evaluating) {
+  public boolean contains(Vector evaluating) {
     for (Region region : regions) {
-      if (region.evaluate(evaluating)) {
+      if (region.contains(evaluating)) {
         return true;
       }
     }
