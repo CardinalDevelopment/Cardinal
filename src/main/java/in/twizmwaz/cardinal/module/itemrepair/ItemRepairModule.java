@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.itemremove;
+package in.twizmwaz.cardinal.module.itemrepair;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
@@ -43,22 +43,23 @@ import java.util.List;
 import java.util.Map;
 
 @ModuleEntry
-public class ItemRemoveModule extends AbstractModule {
+public class ItemRepairModule extends AbstractModule {
 
-  private final Map<Match, ItemRemoveHandler> handlers = new HashMap<>();
+  private final Map<Match, ItemRepairHandler> handlers = new HashMap<>();
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
     List<MaterialType> types = new ArrayList<>();
 
     LoadedMap map = match.getMap();
-    for (Element element : map.getDocument().getRootElement().getChildren("item-remove")) {
+    for (Element element : map.getDocument().getRootElement().getChildren("item-repair")) {
       for (Element typeElement : element.getChildren("type")) {
         Located located = (Located) typeElement;
         String text = typeElement.getText();
         if (text == null) {
           errors.add(new ModuleError(this, map, new String[]{
-              "No type specified for item remove at " + located.getLine() + ", " + located.getColumn()
+              "No type specified for item repair",
+              "Element at " + located.getLine() + ", " + located.getColumn()
           }, false));
           continue;
         }
@@ -66,13 +67,14 @@ public class ItemRemoveModule extends AbstractModule {
           types.add(MaterialType.parse(text));
         } catch (IllegalArgumentException e) {
           errors.add(new ModuleError(this, map, new String[]{
-              "Invalid type specified for item remove at " + located.getLine() + ", " + located.getColumn()
+              "Invalid type specified for item repair",
+              "Element at " + located.getLine() + ", " + located.getColumn()
           }, false));
         }
       }
     }
 
-    ItemRemoveHandler handler = new ItemRemoveHandler(match, types);
+    ItemRepairHandler handler = new ItemRepairHandler(match, types);
     Cardinal.registerEvents(handler);
     handlers.put(match, handler);
 

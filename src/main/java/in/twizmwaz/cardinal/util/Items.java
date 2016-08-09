@@ -100,4 +100,21 @@ public class Items {
     return item2;
   }
 
+  /**
+   * Checks if two items are equal to each other, regardless of their durability.
+   *
+   * @param item1 The first item.
+   * @param item2 The second item.
+   * @return If the two items are equal.
+   */
+  public static boolean equalsIgnoreDurability(@NonNull ItemStack item1, @NonNull ItemStack item2) {
+    ItemStack item1Clone = item1.clone();
+    ItemStack item2Clone = item2.clone();
+
+    item1Clone.setDurability((short) 0);
+    item2Clone.setDurability((short) 0);
+
+    return item1Clone.equals(item2Clone);
+  }
+
 }

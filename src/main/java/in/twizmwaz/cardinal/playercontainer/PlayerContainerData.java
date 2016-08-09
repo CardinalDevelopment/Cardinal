@@ -43,8 +43,8 @@ public class PlayerContainerData {
    * Creates new container data under a match thread, match, and player container.
    *
    * @param matchThread The match thread.
-   * @param match The match.
-   * @param playing The player container.
+   * @param match       The match.
+   * @param playing     The player container.
    */
   public PlayerContainerData(MatchThread matchThread, Match match, PlayingPlayerContainer playing) {
     if (match != null && playing == null) {
