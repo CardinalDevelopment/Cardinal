@@ -40,8 +40,8 @@ public class ObjectiveTouchEvent extends ObjectiveEvent {
   /**
    * An event that is called when any objective has been touched.
    *
-   * @param objective   The objective.
-   * @param player      The player that has touched the objective, if applicable.
+   * @param objective The objective.
+   * @param player    The player that has touched the objective, if applicable.
    */
   public ObjectiveTouchEvent(Objective objective, Player player) {
     super(objective);

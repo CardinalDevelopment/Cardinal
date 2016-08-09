@@ -39,6 +39,13 @@ public class PlayerContainerData {
   private final Match match;
   private final PlayingPlayerContainer playing;
 
+  /**
+   * Creates new container data under a match thread, match, and player container.
+   *
+   * @param matchThread The match thread.
+   * @param match The match.
+   * @param playing The player container.
+   */
   public PlayerContainerData(MatchThread matchThread, Match match, PlayingPlayerContainer playing) {
     if (match != null && playing == null) {
       throw new IllegalArgumentException("Playing cannot be null when match is not null");
@@ -48,6 +55,12 @@ public class PlayerContainerData {
     this.playing = playing;
   }
 
+  /**
+   * Creates data of a player container for a player.
+   *
+   * @param player The player.
+   * @return The container data.
+   */
   public static PlayerContainerData of(@NonNull Player player) {
     MatchThread thread = Cardinal.getMatchThread(player);
     if (thread.getCurrentMatch().hasPlayer(player)) {

@@ -86,7 +86,7 @@ public class Core extends Objective implements Listener {
    * @param region              The region that contains this core.
    * @param leak                The distance required for the lava to be from the core in order to be leaked.
    * @param material            The material that the core is made out of.
-   * @param owner                The owner that owns this core.
+   * @param owner               The owner that owns this core.
    * @param modeChanges         Determines if this core follows mode changes.
    * @param show                Determines if this core shows on the scoreboard.
    * @param proximityMetric     The proximity metric for proximity tracking of this core.

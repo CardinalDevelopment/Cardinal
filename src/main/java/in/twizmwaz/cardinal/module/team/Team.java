@@ -127,7 +127,7 @@ public class Team implements PlayingPlayerContainer {
 
   public static ChatColor getTeamColor(@NonNull Player player) {
     PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
-    return container instanceof Team  ? ((Team) container).getColor() : ChatColor.YELLOW;
+    return container instanceof Team ? ((Team) container).getColor() : ChatColor.YELLOW;
   }
 
   /**

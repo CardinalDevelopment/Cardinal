@@ -46,7 +46,7 @@ public class PlayerContainerChangeStateEvent extends PlayerEvent implements Canc
   /**
    * Called when a player switches from one team to another.
    *
-   * @param who           The player that is switching teams.
+   * @param who     The player that is switching teams.
    * @param oldData The containers that the player is switching from.
    * @param newData The containers that the player is switching to.
    */

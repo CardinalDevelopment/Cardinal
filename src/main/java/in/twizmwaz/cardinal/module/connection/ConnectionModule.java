@@ -35,7 +35,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInitialSpawnEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @ModuleEntry
@@ -45,6 +44,11 @@ public class ConnectionModule extends AbstractModule implements Listener {
     Cardinal.registerEvents(this);
   }
 
+  /**
+   * Handles new container data when the player initially joins the server.
+   *
+   * @param event The event.
+   */
   @EventHandler(priority = EventPriority.LOWEST)
   public void onPlayerJoin(PlayerInitialSpawnEvent event) {
     MatchThread thread = Cardinal.getInstance().getMatchThreads().get(0);
@@ -53,15 +57,13 @@ public class ConnectionModule extends AbstractModule implements Listener {
     Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
   }
 
+  /**
+   * Handles old container data when the player leaves the server.
+   *
+   * @param event The event.
+   */
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onPlayerQuit(PlayerQuitEvent event) {
-    PlayerContainerData oldData = PlayerContainerData.of(event.getPlayer());
-    PlayerContainerData newData = PlayerContainerData.empty();
-    Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
-  }
-
-  @EventHandler(priority = EventPriority.HIGHEST)
-  public void onPlayerQuit(PlayerKickEvent event) {
     PlayerContainerData oldData = PlayerContainerData.of(event.getPlayer());
     PlayerContainerData newData = PlayerContainerData.empty();
     Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);

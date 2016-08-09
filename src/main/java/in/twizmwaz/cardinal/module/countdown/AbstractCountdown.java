@@ -63,5 +63,4 @@ public abstract class AbstractCountdown implements Taskable {
   }
 
 
-
 }

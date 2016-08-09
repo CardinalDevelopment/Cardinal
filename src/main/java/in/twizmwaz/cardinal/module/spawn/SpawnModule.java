@@ -141,21 +141,24 @@ public class SpawnModule extends AbstractModule implements Listener {
       try {
         region = Cardinal.getModule(RegionModule.class).getRegion(match, regionElement);
       } catch (RegionException e) {
-        errors.add(new ModuleError(this, match.getMap(),
-            new String[]{RegionModule.getRegionError(e, "region", (defaultSpawn ? "default" : team.getName()) + " spawn"),
-                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        errors.add(new ModuleError(this, match.getMap(), new String[]{
+            RegionModule.getRegionError(e, "region", (defaultSpawn ? "default" : team.getName()) + " spawn"),
+            "Element at line " + located.getLine() + ", column " + located.getColumn()
+        }, false));
         continue;
       }
       if (region == null) {
-        errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Invalid region specified for a spawn",
-                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        errors.add(new ModuleError(this, match.getMap(), new String[]{
+            "Invalid region specified for a spawn",
+            "Element at line " + located.getLine() + ", column " + located.getColumn()
+        }, false));
         continue;
       }
       if (!region.isRandomizable()) {
-        errors.add(new ModuleError(this, match.getMap(),
-            new String[]{"Region specified for " + (defaultSpawn ? "default" : team.getName()) + " spawn must be randomizable",
-                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        errors.add(new ModuleError(this, match.getMap(), new String[]{
+            "Region specified for " + (defaultSpawn ? "default" : team.getName()) + " spawn must be randomizable",
+            "Element at line " + located.getLine() + ", column " + located.getColumn()
+        }, false));
         continue;
       }
       regions.add(region);

@@ -77,7 +77,7 @@ public class ModuleHandler {
 
   private void sendErrorMessages(Match match, Module module) {
     for (ModuleError moduleError : module.getErrors().stream().filter(error ->
-      error.getMap().equals(match.getMap())).collect(Collectors.toList())) {
+        error.getMap().equals(match.getMap())).collect(Collectors.toList())) {
       Logger logger = Cardinal.getPluginLogger();
       logger.warning("Error loading module \"" + module.getClass().getSimpleName() + "\":");
       for (String message : moduleError.getMessage()) {

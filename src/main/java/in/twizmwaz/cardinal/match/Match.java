@@ -65,8 +65,8 @@ public final class Match implements PlayerContainer {
    * Creates a new Match.
    *
    * @param matchThread The {@link MatchThread} that this match will occur on.
-   * @param uuid   The unique id of this match.
-   * @param map    The {@link LoadedMap} this match will occur on.
+   * @param uuid        The unique id of this match.
+   * @param map         The {@link LoadedMap} this match will occur on.
    */
   public Match(@NonNull MatchThread matchThread, @NonNull UUID uuid, @NonNull LoadedMap map, @NonNull World world) {
     this.matchThread = matchThread;
@@ -101,6 +101,11 @@ public final class Match implements PlayerContainer {
     }
   }
 
+  /**
+   * Checks if any of the player containers in the match are teams, determining if a match is FFA or not.
+   *
+   * @return If the match is a free-for-all.
+   */
   public boolean isFfa() {
     for (PlayingPlayerContainer container : playerContainers) {
       if (container instanceof Team) {
@@ -144,6 +149,12 @@ public final class Match implements PlayerContainer {
     return players.iterator();
   }
 
+  /**
+   * Gets the {@link PlayingPlayerContainer} of a player in the match.
+   *
+   * @param player The player.
+   * @return The container of the player.
+   */
   public PlayingPlayerContainer getPlayingContainer(@NonNull Player player) {
     if (!players.contains(player)) {
       throw new IllegalArgumentException("Cannot get PlayingPlayerContainer of player not in match");
