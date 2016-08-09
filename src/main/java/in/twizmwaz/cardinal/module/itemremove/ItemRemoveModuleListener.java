@@ -25,21 +25,19 @@
 
 package in.twizmwaz.cardinal.module.itemremove;
 
+import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.util.MaterialType;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.material.MaterialData;
 
-import java.util.List;
+@AllArgsConstructor
+public class ItemRemoveModuleListener implements Listener {
 
-@RequiredArgsConstructor
-public class ItemRemoveHandler implements Listener {
-
-  private final Match match;
-  private final List<MaterialType> types;
+  ItemRemoveModule itemRemoveModule;
 
   /**
    * Prevent items from spawning if they are in the item-remove tag in XML.
@@ -48,8 +46,9 @@ public class ItemRemoveHandler implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onItemSpawn(ItemSpawnEvent event) {
+    Match match = Cardinal.getMatch(event.getWorld());
     MaterialData data = event.getEntity().getItemStack().getData();
-    for (MaterialType type : types) {
+    for (MaterialType type : itemRemoveModule.getMaterials().get(match)) {
       if (type.isType(data)) {
         event.setCancelled(true);
         break;

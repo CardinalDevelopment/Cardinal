@@ -53,6 +53,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -206,6 +207,20 @@ public final class Cardinal extends JavaPlugin {
       return null;
     }
     return matchThread.getCurrentMatch();
+  }
+
+  /**
+   * @param world The world.
+   * @return The match that uses that world.
+   */
+  @NonNull
+  public static Match getMatch(@NonNull World world) {
+    for (MatchThread matchThread : getInstance().getMatchThreads()) {
+      if (matchThread.getCurrentMatch().getWorld().equals(world)) {
+        return matchThread.getCurrentMatch();
+      }
+    }
+    return null;
   }
 
   private void registerLocales() {

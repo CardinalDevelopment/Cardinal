@@ -28,11 +28,12 @@ package in.twizmwaz.cardinal.module.itemremove;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.util.MaterialType;
+import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.event.HandlerList;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
@@ -41,9 +42,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ModuleEntry
 public class ItemRemoveModule extends AbstractModule {
 
-  private final Map<Match, ItemRemoveHandler> handlers = new HashMap<>();
+  @Getter
+  private final Map<Match, List<MaterialType>> materials = new HashMap<>();
+
+  public ItemRemoveModule() {
+    Cardinal.registerEvents(new ItemRemoveModuleListener(this));
+  }
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
@@ -69,18 +76,13 @@ public class ItemRemoveModule extends AbstractModule {
         }
       }
     }
-
-    ItemRemoveHandler handler = new ItemRemoveHandler(match, types);
-    Cardinal.registerEvents(handler);
-    handlers.put(match, handler);
-
+    materials.put(match, types);
     return true;
   }
 
   @Override
   public void clearMatch(@NonNull Match match) {
-    HandlerList.unregisterAll(handlers.get(match));
-    handlers.remove(match);
+    materials.remove(match);
   }
 
 }
