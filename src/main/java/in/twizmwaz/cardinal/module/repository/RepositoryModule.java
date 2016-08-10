@@ -34,6 +34,7 @@ import in.twizmwaz.cardinal.module.contributor.Contributor;
 import in.twizmwaz.cardinal.util.Proto;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +84,7 @@ public class RepositoryModule extends AbstractModule {
     maps.addAll(candidates.stream().filter(this::checkDirectory).collect(Collectors.toList()));
     Map<String, LoadedMap> loaded = Maps.newHashMap();
     maps.forEach(map -> {
-      LoadedMap loadedMap = loadMap(map);
+      LoadedMap loadedMap = loadMap(map, file);
       if (loadedMap != null) {
         loaded.put(loadedMap.getName(), loadedMap);
       } else {
@@ -119,13 +121,33 @@ public class RepositoryModule extends AbstractModule {
     return false;
   }
 
-  private LoadedMap loadMap(@NonNull File file) {
-    Cardinal.getPluginLogger().info("Loading map from " + file.getAbsolutePath());
+  private LoadedMap loadMap(@NonNull File map, @NonNull File repo) {
+    Cardinal.getPluginLogger().info("Loading map from " + map.getAbsolutePath());
     SAXBuilder builder = new SAXBuilder();
     builder.setJDOMFactory(new LocatedJDOMFactory());
     try {
-      Document doc = builder.build(new FileInputStream(file.getAbsolutePath() + "/map.xml"));
+      Document doc = builder.build(new FileInputStream(map.getAbsolutePath() + "/map.xml"));
       Element root = doc.getRootElement();
+      Map<Element, Element> includeReplacements = Maps.newHashMap();
+      for (Content descendant : root.getDescendants()) {
+        if (descendant.getCType().equals(Content.CType.Element)
+            && ((Element) descendant).getName().equals("include")) {
+          Element includeElement = (Element) descendant;
+          String source = includeElement.getAttributeValue("src");
+          File include = new File(map.getParentFile(), source);
+          if (!include.exists()) {
+            include = new File(repo, source);
+          }
+          Document includeDoc = builder.build(include);
+          includeReplacements.put(includeElement, includeDoc.getRootElement());
+        }
+      }
+      includeReplacements.forEach((original, replacement) -> {
+        List<Content> toAdd = new ArrayList<Content>(replacement.getContent().size());
+        replacement.getContent().forEach(content -> toAdd.add(content.clone().detach()));
+        original.getParentElement().addContent(toAdd);
+        original.getParentElement().removeContent(original);
+      });
       Proto proto = Proto.parseProto(root.getAttributeValue("proto"));
       String name = root.getChildText("name");
       String gamemode = root.getChildText("gamemode");
@@ -144,9 +166,7 @@ public class RepositoryModule extends AbstractModule {
         }
       }
 
-      return
-          new LoadedMap(file, doc, proto, name, gamemode,
-              edition, objective, authors, contributors, 0);
+      return new LoadedMap(map, doc, proto, name, gamemode, edition, objective, authors, contributors, 0);
     } catch (NullPointerException | JDOMException | IOException ex) {
       if (Cardinal.getInstance().getConfig().getBoolean("displayMapLoadErrors")) {
         ex.printStackTrace();
@@ -154,4 +174,5 @@ public class RepositoryModule extends AbstractModule {
       return null;
     }
   }
+
 }
