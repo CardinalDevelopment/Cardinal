@@ -40,22 +40,12 @@ import org.bukkit.permissions.ServerOperator;
 public class Components {
 
   /**
-   * Gets a name component based on a retrieved builder.
-   *
-   * @param who The user to get the component for.
-   * @return The name component of the user.
-   */
-  public static NameComponent getNameComponent(@NonNull ServerOperator who) {
-    return getNameComponentBuilder(who).build();
-  }
-
-  /**
    * Gets a builder of a {@link NameComponent}.
    *
    * @param who The user to get the builder for.
    * @return The builder of the name component.
    */
-  public static NameComponentBuilder getNameComponentBuilder(@NonNull ServerOperator who) {
+  public static NameComponentBuilder getName(@NonNull ServerOperator who) {
     NameComponentBuilder builder = new NameComponentBuilder(who);
     if (who instanceof Player) {
       return builder.color(Team.getTeamColor((Player) who));

@@ -205,4 +205,9 @@ public class Destroyable extends Objective implements Listener {
     return new ListComponent(contributions);
   }
 
+  @Override
+  public UnlocalizedComponent getComponent() {
+    return new UnlocalizedComponent(name);
+  }
+
 }

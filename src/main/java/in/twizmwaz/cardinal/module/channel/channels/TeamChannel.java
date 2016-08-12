@@ -25,11 +25,15 @@
 
 package in.twizmwaz.cardinal.module.channel.channels;
 
+import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
+import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
 import in.twizmwaz.cardinal.module.channel.AbstractChannel;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.util.Components;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,4 +59,17 @@ public class TeamChannel extends AbstractChannel implements Listener {
     }
   }
 
+  /**
+   * Send a message in the team channel with a prefix.
+   *
+   * @param components The message, without a prefix.
+   */
+  public void sendPrefixedMessage(BaseComponent... components) {
+    super.sendMessage(
+        new UnlocalizedComponentBuilder(
+            "[{0}] {1}",
+            new BaseComponent[]{new TeamComponent(team), Components.compress(components)}
+        ).color(team.getColor()).build()
+    );
+  }
 }

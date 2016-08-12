@@ -25,51 +25,29 @@
 
 package in.twizmwaz.cardinal.module.objective.wool;
 
-import com.google.common.collect.Lists;
-import ee.ellytr.chat.ChatConstant;
-import ee.ellytr.chat.component.NameComponent;
-import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.component.TeamComponent;
-import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
+import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
-import in.twizmwaz.cardinal.module.objective.ProximityMetric;
+import in.twizmwaz.cardinal.module.objective.ProximityRule;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
-import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Colors;
-import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.Strings;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class Wool extends Objective implements Listener {
 
   private final Team team;
@@ -77,12 +55,10 @@ public class Wool extends Objective implements Listener {
   private final Region monument;
   private final boolean craftable;
   private final Vector location;
-  private final ProximityMetric woolProximityMetric;
-  private final boolean woolProximityHorizontal;
-  private final ProximityMetric monumentProximityMetric;
-  private final boolean monumentProximityHorizontal;
+  private final ProximityRule woolProximityRule;
+  private final ProximityRule monumentProximityRule;
 
-  private final List<Player> touchedPlayers = Lists.newArrayList();
+  private final List<Player> touchedPlayers = new ArrayList<>();
 
   private boolean touched;
   private boolean complete;
@@ -97,253 +73,40 @@ public class Wool extends Objective implements Listener {
    * @param craftable                   Determines if this wool may be crafted with white wool and a dye.
    * @param show                        Determines if this wool shows on the scoreboard.
    * @param location                    The location of the wool room, used in proximity calculation.
-   * @param woolProximityMetric         The proximity metric that determines how to calculate proximity
+   * @param woolProximityRule           The proximity rule that determines how to calculate proximity
    *                                    before picking up the wool.
-   * @param woolProximityHorizontal     Determines if only horizontal distance is considered when
-   *                                    calculating proximity before picking up the wool.
-   * @param monumentProximityMetric     The proximity metric that determines how to calculate proximity
+   * @param monumentProximityRule       The proximity rule that determines how to calculate proximity
    *                                    after picking up the wool.
-   * @param monumentProximityHorizontal Determines if only horizontal distance is considered when
-   *                                    calculating proximity after picking up the wool.
    */
   public Wool(Match match, String id, boolean required, Team team, DyeColor color, Region monument, boolean craftable,
-              boolean show, Vector location, ProximityMetric woolProximityMetric, boolean woolProximityHorizontal,
-              ProximityMetric monumentProximityMetric, boolean monumentProximityHorizontal) {
+              boolean show, Vector location, ProximityRule woolProximityRule, ProximityRule monumentProximityRule) {
     super(match, id, required, show);
     this.team = team;
     this.color = color;
     this.monument = monument;
     this.craftable = craftable;
     this.location = location;
-    this.woolProximityMetric = woolProximityMetric;
-    this.woolProximityHorizontal = woolProximityHorizontal;
-    this.monumentProximityMetric = monumentProximityMetric;
-    this.monumentProximityHorizontal = monumentProximityHorizontal;
-  }
-
-  /**
-   * Checks if the wool has been picked up when a player clicks on an item in their inventory.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onInventoryClick(InventoryClickEvent event) {
-    Player player = (Player) event.getWhoClicked();
-    ItemStack item = event.getCurrentItem();
-    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
-    if (!complete && item != null && item.getType().equals(Material.WOOL)
-        && item.getData().getData() == color.getData() && team.equals(container)) {
-      touched = true;
-      boolean showMessage = false;
-      if (isShow() && !touchedPlayers.contains(player)) {
-        touchedPlayers.add(player);
-        showMessage = true;
-
-        Match match = getMatch();
-        Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
-                new NameComponent(player),
-                new UnlocalizedComponentBuilder(getName())
-                    .color(Colors.convertDyeToChatColor(color)).build()).build()));
-        //fixme: new obs
-        /*Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
-                Components.getNameComponentBuilder(player).build(),
-                new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                new TeamComponent(team)).build()));*/
-      }
-    }
-  }
-
-  /**
-   * Checks if the wool has been picked up when a player picks an item up from the ground.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-    Player player = event.getPlayer();
-    ItemStack item = event.getItem().getItemStack();
-    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
-    if (!complete && item.getType().equals(Material.WOOL)
-        && item.getData().getData() == color.getData() && team.equals(container)) {
-      touched = true;
-      boolean showMessage = false;
-      if (isShow() && !touchedPlayers.contains(player)) {
-        touchedPlayers.add(player);
-        showMessage = true;
-
-        Match match = getMatch();
-        Channels.getTeamChannel(match, team).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touched"),
-                Components.getNameComponentBuilder(player).build(),
-                new UnlocalizedComponentBuilder(getName())
-                    .color(Colors.convertDyeToChatColor(color)).build()).build()));
-        //fixme: new obs
-        /*Channels.getTeamChannel(match, Team.getObservers(match)).sendMessage(Components.appendTeamPrefix(team,
-            new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.touchedFor"),
-                Components.getNameComponentBuilder(player).build(),
-                new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                new TeamComponent(team)).build()));*/
-      }
-    }
-  }
-
-  /**
-   * Checks if this wool has been captured when a block is placed.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockPlace(BlockPlaceEvent event) {
-    Player player = event.getPlayer();
-    if (match.hasPlayer(player)) {
-      Block block = event.getBlock();
-      if (monument.evaluate(block.getLocation().toVector()) && !complete) {
-        if (block.getType().equals(Material.WOOL)) {
-          if (((org.bukkit.material.Wool) block.getState().getMaterialData()).getColor().equals(color)) {
-            complete = true;
-
-            if (isShow()) {
-              //fixme: unchecked cast
-              Team team = (Team) Cardinal.getMatch(player).getPlayingContainer(player);
-              Channels.getGlobalChannel(Cardinal.getMatchThread(getMatch())).sendMessage(
-                  new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
-                      Components.getNameComponentBuilder(player).build(),
-                      new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build(),
-                      new TeamComponent(team)).color(ChatColor.GRAY).build());
-            }
-
-            Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(this, player));
-          } else {
-            event.setCancelled(true);
-            if (show) {
-              Channels.getPlayerChannel(player).sendMessage(
-                  new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.error.wrongBlock"),
-                      new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build())
-                      .color(ChatColor.RED).build());
-            }
-          }
-        } else {
-          event.setCancelled(true);
-          if (show) {
-            Channels.getPlayerChannel(player).sendMessage(
-                new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.error.wrongBlock"),
-                    new UnlocalizedComponentBuilder(getName()).color(Colors.convertDyeToChatColor(color)).build())
-                    .color(ChatColor.RED).build());
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Prevents players from breaking blocks that are inside the wool monument.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockBreak(BlockBreakEvent event) {
-    if (match.hasPlayer(event.getPlayer())) {
-      if (monument.evaluate(event.getBlock().getLocation().toVector())) {
-        event.setCancelled(true);
-      }
-    }
-  }
-
-  /**
-   * Prevents blocks from forming on the wool monument, such as snow.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockForm(BlockFormEvent event) {
-    if (match.getWorld().equals(event.getWorld()) && monument.evaluate(event.getBlock().getLocation().toVector())) {
-      event.setCancelled(true);
-    }
-  }
-
-  /**
-   * Prevents blocks from spreading onto the wool monument, such as mushrooms or fire.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockSpread(BlockSpreadEvent event) {
-    if (match.getWorld().equals(event.getWorld()) && monument.evaluate(event.getBlock().getLocation().toVector())) {
-      event.setCancelled(true);
-    }
-  }
-
-  /**
-   * Prevents entities from changing blocks, such as endermen or falling blocks.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-    if (match.getWorld().equals(event.getWorld()) && monument.evaluate(event.getBlock().getLocation().toVector())) {
-      event.setCancelled(true);
-    }
-  }
-
-  /**
-   * Prevents blocks from being pushed into the wool monument by a piston.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-    Block block = event.getBlock();
-    if (monument.evaluate(event.getBlock().getRelative(event.getDirection()).getLocation().toVector())) {
-      //Cancels the event if the piston's arm extends into the monument
-      event.setCancelled(true);
-    } else {
-      //Cancels the event if any of the pushed blocks extend into the monument
-      event.getBlocks().stream().filter(extended -> monument.evaluate(extended.getLocation().toVector())
-          || monument.evaluate(block.getRelative(event.getDirection()).getLocation().toVector()))
-          .forEach(extended -> event.setCancelled(true));
-    }
-  }
-
-  /**
-   * Prevents blocks from being pulled from the wool monument by a piston.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onBlockPistonRetract(BlockPistonRetractEvent event) {
-    //Cancels the event if any of the pulled blocks retract from the monument
-    event.getBlocks().stream().filter(block -> monument.evaluate(block.getLocation().toVector())
-        || monument.evaluate(block.getRelative(event.getDirection()).getLocation().toVector()))
-        .forEach(block -> event.setCancelled(true));
-  }
-
-  /**
-   * Prevents the wool from being crafted if specified when registering the wool.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onCraftItem(CraftItemEvent event) {
-    if (event.getRecipe().getResult().equals(new ItemStack(Material.WOOL, 1, color.getData())) && !this.craftable) {
-      event.setCancelled(true);
-    }
-  }
-
-  /**
-   * Removes the player from the list of players who have touched the wool during their previous life.
-   *
-   * @param event The event.
-   */
-  @EventHandler
-  public void onPlayerDeath(PlayerDeathEvent event) {
-    touchedPlayers.remove(event.getEntity());
+    this.woolProximityRule = woolProximityRule;
+    this.monumentProximityRule = monumentProximityRule;
   }
 
   @Override
-  public String getName() {
-    return WordUtils.capitalizeFully(Strings.getSimpleName(color.name())) + " Wool";
+  public UnlocalizedComponent getComponent() {
+    return new UnlocalizedComponentBuilder(
+        WordUtils.capitalizeFully(Strings.getSimpleName(color.name())) + " Wool"
+    ).color(Colors.convertDyeToChatColor(color)).build();
+  }
+
+  public boolean hasPlayerTouched(@NonNull Player player) {
+    return touchedPlayers.contains(player);
+  }
+
+  public void addPlayerTouched(@NonNull Player player) {
+    touchedPlayers.add(player);
+  }
+
+  public void removePlayerTouched(@NonNull Player player) {
+    touchedPlayers.remove(player);
   }
 
 }

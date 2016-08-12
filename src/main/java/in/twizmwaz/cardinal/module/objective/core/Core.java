@@ -144,7 +144,7 @@ public class Core extends Objective implements Listener {
             ChatConstant.getConstant("objective.core.touched"),
             new TeamComponent((Team) this.owner),
             new UnlocalizedComponent(name),
-            Components.getNameComponentBuilder(player).build())));
+            Components.getName(player).build())));
       }
     }
   }
@@ -218,6 +218,11 @@ public class Core extends Objective implements Listener {
 
   public List<Block> getBlocks() {
     return core.stream().filter(this::isPartOf).collect(Collectors.toList());
+  }
+
+  @Override
+  public UnlocalizedComponent getComponent() {
+    return new UnlocalizedComponent(name);
   }
 
 }

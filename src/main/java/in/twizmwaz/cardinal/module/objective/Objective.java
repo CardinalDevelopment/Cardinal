@@ -26,6 +26,7 @@
 package in.twizmwaz.cardinal.module.objective;
 
 import com.google.common.collect.Lists;
+import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.core.CoreModule;
@@ -45,7 +46,7 @@ public abstract class Objective {
   private final boolean required;
   protected final boolean show;
 
-  public abstract String getName();
+  public abstract UnlocalizedComponent getComponent();
 
   /**
    * Gets the objectives in the current match.
