@@ -73,6 +73,21 @@ public class RegionBounds {
   }
 
   /**
+   * Substracts other regions.
+   *
+   * @param complement Regions to substract.
+   * @return The complemented region bounds.
+   */
+  public RegionBounds complement(Collection<Region> complement) {
+    Cuboid result = Cuboid.between(this.cuboid.minimum(), this.cuboid.maximum());
+    for (Region substract : complement) {
+      // Fixme: this will cause problems, because the substracted region doesn't have the same size as its bounds.
+      result = Cuboid.complement(result, substract.getBounds().getCuboid());
+    }
+    return new RegionBounds(match, result);
+  }
+
+  /**
    * Checks if region bounds are bounded (non-infinite).
    *
    * @return If the bounds are bounded.

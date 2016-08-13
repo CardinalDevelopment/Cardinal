@@ -43,7 +43,7 @@ public class IntersectRegion extends AbstractRegion {
   private final Collection<Region> regions;
 
   public IntersectRegion(Match match, Collection<Region> regions) {
-    super(new RegionBounds(match, Geometry.getCuboidEnclosing(regions)));
+    super(new RegionBounds(match, Geometry.getCuboidIntersecting(regions)));
     this.regions = regions;
   }
 

@@ -23,80 +23,80 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.region.type.modifications;
+package in.twizmwaz.cardinal.module.region.type;
 
-import com.google.common.collect.ImmutableSet;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.region.AbstractRegion;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionBounds;
-import in.twizmwaz.cardinal.module.region.parser.modifications.UnionRegionParser;
 import in.twizmwaz.cardinal.util.Geometry;
 import in.twizmwaz.cardinal.util.ListUtil;
+import in.twizmwaz.cardinal.util.MaterialPattern;
 import org.bukkit.block.Block;
+import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class UnionRegion extends AbstractRegion {
+public class FiniteBlockRegion extends AbstractRegion {
 
-  private final List<Region> regions;
-
-  public UnionRegion(Match match, List<Region> regions) {
-    super(new RegionBounds(match, Geometry.getCuboidEnclosing(regions)));
-    this.regions = regions;
-  }
-
-  public UnionRegion(Match match, UnionRegionParser parser) {
-    this(match, parser.getRegions());
-  }
-
-  @Override
-  public boolean isRandomizable() {
-    for (Region region : regions) {
-      if (!region.isRandomizable()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean isBounded() {
-    return getBounds().isBounded();
+  private FiniteBlockRegion(RegionBounds bounds, List<Block> blocks) {
+    super(bounds);
+    super.setBlocks(blocks);
   }
 
   @Override
   public Collection<Block> getBlocks() {
-    if (!isBounded()) {
-      throw new UnsupportedOperationException("Cannot get blocks in unbounded region");
-    }
-    if (super.getBlocks() != null) {
-      return super.getBlocks();
-    }
-    ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
-    regions.forEach(region -> builder.addAll(region.getBlocks()));
-    setBlocks(builder.build());
     return super.getBlocks();
   }
 
   @Override
   public Vector getRandomPoint() {
-    if (!isRandomizable()) {
-      throw new UnsupportedOperationException("Cannot get random point in non-randomizable region");
-    }
-    return ListUtil.getRandom(getRandom(), regions).getRandomPoint();
+    return ListUtil.getRandom((List<Block>) super.getBlocks()).getLocation();
   }
 
   @Override
+  public boolean isBounded() {
+    return true;
+  }
+
   public boolean contains(Vector evaluating) {
-    for (Region region : regions) {
-      if (region.contains(evaluating)) {
+    evaluating = Geometry.floor(evaluating);
+    for (Block block : super.getBlocks()) {
+      if (block.getLocation().equals(evaluating)) {
         return true;
       }
     }
     return false;
+  }
+
+  @Override
+  public boolean isRandomizable() {
+    return true;
+  }
+
+  /**
+   * Creates a block finite region that matches a material.
+   * @param match The match this region belongs to.
+   * @param region The region to build the finite block region on. MUST be bounded.
+   * @param pattern The material pattern to filter blocks.
+   * @return A FiniteBlockRegion containing all regions that matched the pattern.
+   */
+  public FiniteBlockRegion getFromMaterialPattern(Match match, Region region, MaterialPattern pattern) {
+    List<Block> blocks = region.getBlocks().stream().filter(block -> pattern.contains(block.getType(), block.getData()))
+        .collect(Collectors.toList());
+    return new FiniteBlockRegion(new RegionBounds(match, getBounds(blocks)), blocks);
+  }
+
+
+  private Cuboid getBounds(List<Block> blocks) {
+    List<Vector> vectors = new ArrayList<>();
+    vectors.addAll(blocks.stream().map(Block::getLocation).collect(Collectors.toList()));
+    vectors.addAll(blocks.stream().map(block -> block.getLocation().plus(1, 1, 1)).collect(Collectors.toList()));
+    return Cuboid.enclosing(vectors.toArray(new Vector[vectors.size()]));
   }
 
 }

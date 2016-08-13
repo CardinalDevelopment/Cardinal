@@ -48,7 +48,7 @@ public class ComplementRegion extends AbstractRegion {
    * @param complements The complements.
    */
   public ComplementRegion(Region region, List<Region> complements) {
-    super(region.getBounds());
+    super(region.getBounds().complement(complements));
     this.region = region;
     this.complements = complements;
   }

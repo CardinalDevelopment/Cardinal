@@ -31,6 +31,9 @@ import org.bukkit.util.Cuboid;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Geometry {
@@ -94,6 +97,16 @@ public class Geometry {
   }
 
   /**
+   * Gets the second minimum double from a list of doubles.
+   *
+   * @param doubles The list of doubles.
+   * @return The second minimum double.
+   */
+  public static double getSecondMinimum(@NonNull List<Double> doubles) {
+    return doubles.stream().sorted().collect(Collectors.toList()).get(1);
+  }
+
+  /**
    * Gets the maximum vector from a list of regions.
    *
    * @param regions The list of regions.
@@ -149,6 +162,30 @@ public class Geometry {
 
   public static Cuboid getCuboidEnclosing(Collection<Region> regions) {
     return Cuboid.between(getMinimumBound(regions), getMaximumBound(regions));
+  }
+
+  public static Cuboid getCuboidIntersecting(Collection<Region> regions) {
+    if (regions.size() < 2) {
+      return Cuboid.empty();
+    }
+    List<Vector>
+        mins = regions.stream().map(region -> region.getBounds().getCuboid().minimum()).collect(Collectors.toList()),
+        maxs = regions.stream().map(region -> region.getBounds().getCuboid().maximum()).collect(Collectors.toList());
+    return Cuboid.between(
+        new Vector(
+            getSecond(mins, Vector::getX, false),
+            getSecond(mins, Vector::getY, false),
+            getSecond(mins, Vector::getZ, false)),
+        new Vector(
+            getSecond(maxs, Vector::getX, true),
+            getSecond(maxs, Vector::getY, true),
+            getSecond(maxs, Vector::getZ, true)));
+  }
+
+
+  private static double getSecond(@NonNull List<Vector> vectors, Function<Vector, Double> function, boolean max) {
+    return vectors.stream().map(function)
+        .sorted(max ? Comparator.reverseOrder() : Comparator.naturalOrder()).collect(Collectors.toList()).get(1);
   }
 
 }
