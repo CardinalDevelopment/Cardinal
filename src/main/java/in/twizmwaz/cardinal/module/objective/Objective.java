@@ -49,6 +49,10 @@ public abstract class Objective {
   private final boolean required;
   protected final boolean show;
 
+  /**
+   * Gets the objective display name.
+   * @return The display name.
+   */
   public abstract UnlocalizedComponent getComponent();
 
   /**
@@ -59,9 +63,9 @@ public abstract class Objective {
   public static List<Objective> getObjectives(@NonNull Match match) {
     List<Objective> objectives = Lists.newArrayList();
 
-    Cardinal.getModule(CoreModule.class).getCores(match).forEach(objectives::add);
-    Cardinal.getModule(DestroyableModule.class).getDestroyables(match).forEach(objectives::add);
-    Cardinal.getModule(WoolModule.class).getWools(match).forEach(objectives::add);
+    objectives.addAll(Cardinal.getModule(WoolModule.class).getWools(match));
+    objectives.addAll(Cardinal.getModule(CoreModule.class).getCores(match));
+    objectives.addAll(Cardinal.getModule(DestroyableModule.class).getDestroyables(match));
 
     return objectives;
   }

@@ -23,16 +23,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
+import com.google.common.collect.Lists;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+import java.util.List;
 
-  String getName();
+/**
+ * Represents a scoreboard group, this can be any group of lines that should be displayed in the scoreboard.
+ */
+@Data
+public class ScoreboardGroup implements Displayable {
 
-  ChatColor getColor();
+  @Getter
+  private int score;
+  @Setter
+  @Getter
+  private List<Displayable> entries = Lists.newArrayList();
 
-  String getCompleteName();
+  /**
+   * This will move the whole list of entries this group has, and put them in a new index, in the same order they had.
+   * @param index the top most index.
+   */
+  @Override
+  public void setScore(int index) {
+    for (Displayable entry : entries) {
+      entry.setScore(index);
+      index -= entry.getSize();
+    }
+  }
+
+  /**
+   * Gets the size of the scoreboard group.
+   * @return the group size.
+   */
+  @Override
+  public int getSize() {
+    int size = 0;
+    for (Displayable displayable : entries) {
+      size += displayable.getSize();
+    }
+    return size;
+  }
+
+  /**
+   * Forces the entries to set their score again. Should be used after changing the entries for them to apply changes.
+   */
+  @Override
+  public void update() {
+    setScore(score);
+  }
 
 }

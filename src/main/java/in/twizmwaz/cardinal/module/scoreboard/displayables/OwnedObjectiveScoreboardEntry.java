@@ -23,16 +23,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
+import in.twizmwaz.cardinal.module.objective.OwnedObjective;
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardDisplay;
+import in.twizmwaz.cardinal.module.team.Team;
 import net.md_5.bungee.api.ChatColor;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+public class OwnedObjectiveScoreboardEntry extends ScoreboardEntry {
 
-  String getName();
+  OwnedObjective objective;
+  Team attacker;
 
-  ChatColor getColor();
+  /**
+   * Creates a display entry for an OwnedObjective on a scoreboard.
+   * @param objective The objective this entry represents.
+   * @param display The ScoreboardDisplay this entry belongs to.
+   * @param attacker The team scoreboard group this entry is inside of.
+   */
+  public OwnedObjectiveScoreboardEntry(OwnedObjective objective, ScoreboardDisplay display, Team attacker) {
+    super(display, "", display.getEntry(" " + ChatColor.WHITE + objective.getComponent().toPlainText(), null));
+    this.objective = objective;
+    this.attacker = attacker;
+    if (objective instanceof EntryUpdater) {
+      ((EntryUpdater) objective).getEntryHolder().addEntry(this);
+    }
+  }
 
-  String getCompleteName();
+  @Override
+  public void setScore(int newScore) {
+    setPrefix(" " + objective.getPrefix((Team) getDisplay().getViewer(), attacker) + " "
+        /* + obj.getProximity(viewer, attacker)*/);
+    // NOTE: If viewer is null (observers) and monument is touched, the proximity will be the number of pieces: num/max
+    super.setScore(newScore);
+  }
 
 }

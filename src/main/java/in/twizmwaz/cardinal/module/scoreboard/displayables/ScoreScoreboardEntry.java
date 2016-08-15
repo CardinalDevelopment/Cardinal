@@ -23,16 +23,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardDisplay;
+import in.twizmwaz.cardinal.module.scores.PlayerContainerScore;
 import net.md_5.bungee.api.ChatColor;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+public class ScoreScoreboardEntry extends SortableScoreboardEntry {
 
-  String getName();
+  private final PlayerContainerScore score;
 
-  ChatColor getColor();
+  /**
+   * Represents a score for a player container on a scoreboard.
+   * @param display The scoreboard display this entry belongs to.
+   * @param score The PlayerContainerScore this entry represents.
+   */
+  public ScoreScoreboardEntry(ScoreboardDisplay display, PlayerContainerScore score) {
+    super(display, "", display.getEntry(score.getContainer().getColor() + "", score.getContainer().getColor() + ""));
+    this.score = score;
+    score.getEntryHolder().addEntry(this);
+  }
 
-  String getCompleteName();
+  @Override
+  public void setScore(int newScore) {
+    setDisplayName(score.getScore() + (score.getRule().getLimit() > 0
+        ? ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + score.getRule().getLimit() : "")
+        + " " + score.getContainer().getCompleteName());
+    super.setScore(newScore);
+  }
+
+  @Override
+  public int getSort() {
+    return score.getScore();
+  }
 
 }

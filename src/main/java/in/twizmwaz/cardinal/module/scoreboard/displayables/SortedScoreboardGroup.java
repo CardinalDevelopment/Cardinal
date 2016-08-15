@@ -23,16 +23,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.stream.Collectors;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+/**
+ * Will sort the entries before updating, all the entries must implement SortableEntry, or will be removed.
+ *
+ * <p>Used for Score and Blitz.
+ */
+public class SortedScoreboardGroup extends ScoreboardGroup {
 
-  String getName();
-
-  ChatColor getColor();
-
-  String getCompleteName();
+  @Override
+  public void setScore(int index) {
+    setEntries(getEntries().stream()
+        .filter(entry -> entry instanceof SortableEntry)
+        .sorted((Displayable d1, Displayable d2) -> ((SortableEntry) d2).getSort() - ((SortableEntry) d1).getSort())
+        .collect(Collectors.toList()));
+    super.setScore(index);
+  }
 
 }

@@ -23,16 +23,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.objective;
 
-import net.md_5.bungee.api.ChatColor;
+import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
+import in.twizmwaz.cardinal.module.team.Team;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+public interface OwnedObjective {
 
-  String getName();
+  Team getOwner();
 
-  ChatColor getColor();
+  String getPrefix(Team viewer, Team attacker);
 
-  String getCompleteName();
+  UnlocalizedComponent getComponent();
 
 }

@@ -39,24 +39,27 @@ import in.twizmwaz.cardinal.module.filter.FilterState;
 import in.twizmwaz.cardinal.module.filter.type.TeamFilter;
 import in.twizmwaz.cardinal.module.filter.type.modifiers.TransformFilter;
 import in.twizmwaz.cardinal.module.objective.Objective;
+import in.twizmwaz.cardinal.module.objective.OwnedObjective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.type.FiniteBlockRegion;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryHolder;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryUpdater;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.util.Characters;
 import in.twizmwaz.cardinal.util.MaterialPattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Setter;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import java.util.AbstractMap;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Core extends Objective implements Listener {
+public class Core extends Objective implements OwnedObjective, EntryUpdater {
 
   private static final MaterialPattern lavaPattern = new MaterialPattern(
           new AbstractMap.SimpleEntry<>(Material.LAVA, MaterialPattern.ANY_DATA_VALUE),
@@ -71,10 +74,11 @@ public class Core extends Objective implements Listener {
   private final ProximityMetric proximityMetric;
   private final boolean proximityHorizontal;
 
-  private final List<Player> touchedPlayers = Lists.newArrayList();
+  private final EntryHolder entryHolder = new EntryHolder();
 
-  @Setter
-  private boolean touched;
+  private final List<Player> touchedPlayers = Lists.newArrayList();
+  private final List<Team> touchedTeams = Lists.newArrayList();
+
   private boolean complete;
 
   /**
@@ -85,7 +89,7 @@ public class Core extends Objective implements Listener {
    * @param region              The region that contains this core.
    * @param leak                The distance required for the lava to be from the core in order to be leaked.
    * @param material            The material that the core is made out of.
-   * @param owner               The owner that owns this core.
+   * @param owner               The team that owns this core.
    * @param modeChanges         Determines if this core follows mode changes.
    * @param show                Determines if this core shows on the scoreboard.
    * @param proximityMetric     The proximity metric for proximity tracking of this core.
@@ -116,6 +120,43 @@ public class Core extends Objective implements Listener {
             new LocalizedComponent(ChatConstant.getConstant("objective.core.error.own")),
             true),
         true);
+  }
+
+  public boolean isTouched(Team team) {
+    return touchedTeams.contains(team);
+  }
+
+  /**
+   * Sets the core as touched for a certain team. Scoreboard entries will be updated.
+   * @param team The team that touched the core.
+   */
+  public void setTouched(Team team) {
+    if (!isTouched(team)) {
+      touchedTeams.add(team);
+      entryHolder.updateEntries();
+    }
+  }
+
+  public void setComplete(boolean complete) {
+    this.complete = complete;
+    entryHolder.updateEntries();
+  }
+
+  /**
+   * Gets the monument prefix for a given viewer team, for a specific attacker
+   * @param viewer The viewer team, null for observers.
+   * @param attacker The team attacking the objective. Used to see if the team has a touch or not.
+   * @return Color and wool state character. Always 3 characters.
+   */
+  @Override
+  public String getPrefix(Team viewer, Team attacker) {
+    if (isComplete()) {
+      return "" + ChatColor.GREEN + Characters.CORE_COMPLETED;
+    } else if (isTouched(attacker) && (viewer == null || viewer.equals(attacker))) {
+      return "" + ChatColor.YELLOW + Characters.CORE_TOUCHED;
+    } else {
+      return "" + ChatColor.RED + Characters.CORE_INCOMPLETE;
+    }
   }
 
   @Override

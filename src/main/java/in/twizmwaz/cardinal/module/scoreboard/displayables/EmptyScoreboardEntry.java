@@ -23,16 +23,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardDisplay;
 
-  String getName();
+public class EmptyScoreboardEntry extends ScoreboardEntry implements SortableEntry {
 
-  ChatColor getColor();
+  public EmptyScoreboardEntry(ScoreboardDisplay display) {
+    super(display, "", display.getEntry(" ", null));
+  }
 
-  String getCompleteName();
+  @Override
+  public void setScore(int score) {
+    if (score == -1) {
+      hide();
+    } else {
+      if (!isShown()) {
+        show();
+      }
+      super.setScore(score);
+    }
+  }
+
+  @Override
+  public int getSort() {
+    return -10000;
+  }
 
 }

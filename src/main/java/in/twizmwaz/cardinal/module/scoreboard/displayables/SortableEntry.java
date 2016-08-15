@@ -23,16 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
+public interface SortableEntry {
 
-public interface PlayingPlayerContainer extends PlayerContainer {
-
-  String getName();
-
-  ChatColor getColor();
-
-  String getCompleteName();
+  int getSort();
 
 }

@@ -58,7 +58,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -191,9 +190,7 @@ public class CoreModule extends AbstractListenerModule {
 
   @Override
   public void clearMatch(Match match) {
-    List<Core> cores = this.cores.get(match);
-    cores.forEach(HandlerList::unregisterAll);
-    cores.clear();
+    this.cores.get(match).clear();
     this.cores.remove(match);
   }
 
@@ -235,7 +232,7 @@ public class CoreModule extends AbstractListenerModule {
     Block block = event.getBlock();
     cores.get(match).forEach(core -> {
       if (core.getRegion().contains(block.getLocation())) {
-        core.setTouched(true);
+        core.setTouched(team);
         if (core.isShow() && !core.getTouchedPlayers().contains(player)) {
           core.getTouchedPlayers().add(player);
           Channels.getTeamChannel(match, team).sendPrefixedMessage(

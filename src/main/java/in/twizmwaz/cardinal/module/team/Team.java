@@ -33,8 +33,7 @@ import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
-import in.twizmwaz.cardinal.module.objective.core.Core;
-import in.twizmwaz.cardinal.module.objective.destroyable.Destroyable;
+import in.twizmwaz.cardinal.module.objective.OwnedObjective;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import lombok.AllArgsConstructor;
@@ -97,6 +96,10 @@ public class Team implements PlayingPlayerContainer {
     return players.iterator();
   }
 
+  public String getCompleteName() {
+    return color + name;
+  }
+
   /**
    * Shorthand for getting the teams of the current match.
    *
@@ -148,12 +151,20 @@ public class Team implements PlayingPlayerContainer {
    */
   public static List<Objective> getTeamObjectives(@NonNull Match match, @NonNull Team team) {
     List<Objective> objectives = Lists.newArrayList();
-    objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Core
-        && !((Core) objective).getOwner().equals(team)).collect(Collectors.toList()));
-    objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Destroyable
-        && !((Destroyable) objective).getOwner().equals(team)).collect(Collectors.toList()));
-    objectives.addAll(Objective.getObjectives(match).stream().filter(objective -> objective instanceof Wool
-        && ((Wool) objective).getTeam().equals(team)).collect(Collectors.toList()));
+    objectives.addAll(Objective.getObjectives(match).stream().filter(objective ->
+        (objective instanceof OwnedObjective && !((OwnedObjective) objective).getOwner().equals(team))
+        || (objective instanceof Wool && ((Wool) objective).getTeam().equals(team))).collect(Collectors.toList()));
     return objectives;
   }
+
+  /**
+   * Gets the objectives shown in the scoreboard for a team.
+   *
+   * @param team The team.
+   * @return The team's shown objectives.
+   */
+  public static List<Objective> getTeamShownObjectives(@NonNull Match match, @NonNull Team team) {
+    return getTeamObjectives(match, team).stream().filter(Objective::isShow).collect(Collectors.toList());
+  }
+
 }

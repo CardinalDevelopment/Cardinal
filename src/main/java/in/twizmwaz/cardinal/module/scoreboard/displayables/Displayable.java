@@ -23,16 +23,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
+/**
+ * Represents an object that can be displayed on a scoreboard sidebar.
+ * Both entries (single lines) or groups (multiple lines).
+ */
+public interface Displayable {
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+  /**
+   * Gets the start score.
+   * @return the biggest value this Displayable uses.
+   */
+  int getScore();
 
-  String getName();
+  /**
+   * Sets the top score for the displayable.
+   * @param score The top score it will use.
+   */
+  void setScore(int score);
 
-  ChatColor getColor();
+  /**
+   * Gets the size of the displayable, helpful for displayables that are bigger than 1 line.
+   * @return the size of the displayable.
+   */
+  int getSize();
 
-  String getCompleteName();
+  /**
+   * Updates the displayable, groups will reorder and set scores, Entries will update the text they display.
+   */
+  void update();
 
 }

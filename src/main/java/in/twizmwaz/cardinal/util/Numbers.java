@@ -194,6 +194,10 @@ public class Numbers {
     return isDecimal(str) || isInfinity(str);
   }
 
+  public static double between(double num, double min, double max) {
+    return num > max ? max : num < min ? min : num;
+  }
+
   /**
    * Gets a vector based on coordinates from a given string.
    *

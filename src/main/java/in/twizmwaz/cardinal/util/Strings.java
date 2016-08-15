@@ -179,4 +179,31 @@ public class Strings {
     return (negative ? "-" : "") + (hours == 0 ? "" : hoursString + ":") + minutesString + ":" + secondsString + "."
         + millisString;
   }
+
+  /**
+   * Removes last word from a string.
+   *
+   * @param string The string to remove last word.
+   * @return The string without the last word.
+   */
+  public static String removeLastWord(String string) {
+    String word = string;
+    boolean reachedWord = false;
+    for (int i = word.length() - 1; i >= 0; i--) {
+      if (word.charAt(i) == ' ') {
+        if (reachedWord) {
+          break;
+        } else {
+          word = word.substring(0, i);
+        }
+      } else {
+        if (!reachedWord) {
+          reachedWord = true;
+        }
+        word = word.substring(0, i);
+      }
+    }
+    return word;
+  }
+
 }

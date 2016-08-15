@@ -23,16 +23,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
+import in.twizmwaz.cardinal.module.objective.wool.Wool;
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardDisplay;
+import in.twizmwaz.cardinal.module.team.Team;
 import net.md_5.bungee.api.ChatColor;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+public class WoolScoreboardEntry extends ScoreboardEntry {
 
-  String getName();
+  private Wool wool;
 
-  ChatColor getColor();
+  /**
+   * Creates a display entry for a wool on a scoreboard.
+   * @param wool The wool this entry represents.
+   * @param display The ScoreboardDisplay this entry belongs to.
+   */
+  public WoolScoreboardEntry(Wool wool, ScoreboardDisplay display) {
+    super(display, "", display.getEntry(" " + ChatColor.WHITE + wool.getComponent().toPlainText(), null), "");
+    this.wool = wool;
+    wool.getEntryHolder().addEntry(this);
+  }
 
-  String getCompleteName();
+  @Override
+  public void setScore(int newScore) {
+    //TODO: Proximity
+    setPrefix(" " + wool.getPrefix((Team) getDisplay().getViewer()) + " " /* + wool.getProximity(viewer)*/);
+    super.setScore(newScore);
+  }
 
 }

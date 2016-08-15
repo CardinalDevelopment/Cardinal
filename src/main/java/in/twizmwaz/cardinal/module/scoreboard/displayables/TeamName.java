@@ -23,16 +23,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardDisplay;
+import in.twizmwaz.cardinal.module.team.Team;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+public class TeamName extends ScoreboardEntry {
 
-  String getName();
+  Team team;
 
-  ChatColor getColor();
+  public TeamName(ScoreboardDisplay display, Team team) {
+    super(display, team.getColor() + team.getName(), display.getEntry(team.getColor() + "", team.getColor() + ""));
+    this.team = team;
+  }
 
-  String getCompleteName();
+  //TODO: listen to team name changes
 
 }

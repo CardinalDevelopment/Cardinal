@@ -23,67 +23,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.team;
+package in.twizmwaz.cardinal.module.scores;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableSet;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryHolder;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryUpdater;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.entity.Player;
 
-import java.util.Iterator;
+@RequiredArgsConstructor
+public class PlayerContainerScore implements EntryUpdater {
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SinglePlayerContainer implements PlayingPlayerContainer {
-
-  @NonNull
-  private final Player player;
-  //TODO: colors
   @Getter
-  private final ChatColor color = ChatColor.YELLOW;
+  private final PlayingPlayerContainer container;
+  @Getter
+  private final ScoreRule rule;
+  private double score = 0;
 
-  public String getName() {
-    return player.getName();
+  @Getter
+  private final EntryHolder entryHolder = new EntryHolder();
+
+  public int getScore() {
+    return (int) score;
   }
 
-  public String getCompleteName() {
-    //TODO: flairs
-    return color + getName();
+  public double getScoreExact() {
+    return score;
   }
 
-  @Override
-  public ImmutableCollection<Player> getPlayers() {
-    return ImmutableSet.of(player);
+  public void setScore(int score) {
+    setScore((double) score);
   }
 
-  @Override
-  public boolean hasPlayer(Player player) {
-    return this.player == player;
+  /**
+   * Sets the score for this PlayerContainerScore. It will update it's scoreboard entries.
+   * @param score The score this should be set to.
+   */
+  public void setScore(double score) {
+    this.score = score;
+    //TODO: if goes up a number, trow event.
+    entryHolder.updateEntries();
   }
-
-  @Override
-  public void addPlayer(Player player) {
-    throw new IllegalArgumentException("Cannot add additional players to a SinglePlayerContainer");
-  }
-
-  @Override
-  public void removePlayer(Player player) {
-    throw new IllegalArgumentException("Cannot remove players to a SinglePlayerContainer");
-  }
-
-  @Override
-  public Iterator<Player> iterator() {
-    return ImmutableSet.of(player).iterator();
-  }
-
-  public static SinglePlayerContainer of(@NonNull Player player) {
-    return new SinglePlayerContainer(player);
-  }
-
-
 
 }

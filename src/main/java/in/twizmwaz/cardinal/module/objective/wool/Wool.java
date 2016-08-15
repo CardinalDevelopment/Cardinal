@@ -31,7 +31,10 @@ import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.ProximityRule;
 import in.twizmwaz.cardinal.module.region.Region;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryHolder;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryUpdater;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.util.Characters;
 import in.twizmwaz.cardinal.util.Colors;
 import in.twizmwaz.cardinal.util.Strings;
 import lombok.Data;
@@ -48,7 +51,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Wool extends Objective implements Listener {
+public class Wool extends Objective implements Listener, EntryUpdater {
 
   private final Team team;
   private final DyeColor color;
@@ -57,6 +60,8 @@ public class Wool extends Objective implements Listener {
   private final Vector location;
   private final ProximityRule woolProximityRule;
   private final ProximityRule monumentProximityRule;
+
+  private final EntryHolder entryHolder = new EntryHolder();
 
   private final List<Player> touchedPlayers = new ArrayList<>();
 
@@ -90,6 +95,23 @@ public class Wool extends Objective implements Listener {
     this.monumentProximityRule = monumentProximityRule;
   }
 
+  /**
+   * Gets the wool prefix for a given viewer team.
+   * @param viewer The viewer team, null for observers.
+   * @return Color and wool state character. Always 3 characters.
+   */
+  public String getPrefix(Team viewer) {
+    String result = Colors.convertDyeToChatColor(color) + "";
+    if (isComplete()) {
+      result += Characters.WOOL_COMPLETED;
+    } else if (isTouched() && (viewer == null || viewer.equals(team))) {
+      result += Characters.WOOL_TOUCHED;
+    } else {
+      result += Characters.WOOL_INCOMPLETE;
+    }
+    return result;
+  }
+
   @Override
   public UnlocalizedComponent getComponent() {
     return new UnlocalizedComponentBuilder(
@@ -107,6 +129,16 @@ public class Wool extends Objective implements Listener {
 
   public void removePlayerTouched(@NonNull Player player) {
     touchedPlayers.remove(player);
+  }
+
+  public void setTouched(boolean touched) {
+    this.touched = touched;
+    entryHolder.updateEntries();
+  }
+
+  public void setComplete(boolean complete) {
+    this.complete = complete;
+    entryHolder.updateEntries();
   }
 
 }

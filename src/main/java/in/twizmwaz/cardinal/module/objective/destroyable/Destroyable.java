@@ -46,14 +46,19 @@ import in.twizmwaz.cardinal.module.filter.type.TeamFilter;
 import in.twizmwaz.cardinal.module.filter.type.modifiers.AllFilter;
 import in.twizmwaz.cardinal.module.filter.type.modifiers.TransformFilter;
 import in.twizmwaz.cardinal.module.objective.Objective;
+import in.twizmwaz.cardinal.module.objective.OwnedObjective;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.type.FiniteBlockRegion;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryHolder;
+import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryUpdater;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.Channels;
+import in.twizmwaz.cardinal.util.Characters;
 import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.MaterialPattern;
+import in.twizmwaz.cardinal.util.Numbers;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -70,7 +75,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class Destroyable extends Objective {
+public class Destroyable extends Objective implements OwnedObjective, EntryUpdater {
 
   private final String name;
   private final Region region;
@@ -84,7 +89,10 @@ public class Destroyable extends Objective {
   private final ProximityMetric proximityMetric;
   private final boolean proximityHorizontal;
 
+  private final EntryHolder entryHolder = new EntryHolder();
+
   private final List<Player> touchedPlayers = new ArrayList<>();
+  private final List<Team> touchedTeams = new ArrayList<>();
   private final Map<UUID, Integer> playerContributions = new HashMap<>();
 
   @Setter
@@ -141,6 +149,21 @@ public class Destroyable extends Objective {
         true);
   }
 
+  public boolean isTouched(Team team) {
+    return touchedTeams.contains(team);
+  }
+
+  /**
+   * Sets the destroyable as touched for a certain team. Scoreboard entries will be updated.
+   * @param team The team that touched the destroyable.
+   */
+  public void setTouched(Team team) {
+    if (!isTouched(team)) {
+      touchedTeams.add(team);
+      entryHolder.updateEntries();
+    }
+  }
+
   public boolean isPartOf(@NonNull Block block) {
     return region.contains(block.getLocation())
         && materials.contains(block.getType(), (int) block.getState().getMaterialData().getData());
@@ -156,6 +179,7 @@ public class Destroyable extends Objective {
     PlayingPlayerContainer container = match.getPlayingContainer(player);
     if (!isCompleted() && container instanceof Team) {
       Team team = (Team) container;
+      setTouched(team);
       if (show && !touchedPlayers.contains(player)) {
         touchedPlayers.add(player);
         Channels.getTeamChannel(match, team).sendPrefixedMessage(
@@ -187,7 +211,19 @@ public class Destroyable extends Objective {
       } else {
         Bukkit.getPluginManager().callEvent(new ObjectiveTouchEvent(this, player));
       }
+      entryHolder.updateEntries();
     }
+  }
+
+  /**
+   * Gets the completion percentage.
+   * @return The percentage, always between 0 and 100;
+   */
+  public int getPercent() {
+    if (isCompleted()) {
+      return 100;
+    }
+    return (int) Numbers.between(Math.floor((double) broken / (total * completion) * 100), 0, 100);
   }
 
   private ListComponent getContributionList() {
@@ -199,6 +235,27 @@ public class Destroyable extends Objective {
           new UnlocalizedComponentBuilder(percent + "").color(ChatColor.AQUA).build()));
     });
     return new ListComponent(contributions);
+  }
+
+  /**
+   * Gets the monument prefix for a given viewer team, for a specific attacker.
+   * @param viewer The viewer team, null for observers.
+   * @param attacker The team attacking the objective. Used to see if the team has a touch or not.
+   * @return Color and monument state or percentage. Always between 3 and 6 characters (color + "100%").
+   */
+  @Override
+  public String getPrefix(Team viewer, Team attacker) {
+    if (isCompleted()) {
+      return ChatColor.GREEN + getCompletionOrCharacter(viewer, Characters.CORE_COMPLETED);
+    } else if (isTouched(attacker) && (viewer == null || viewer.equals(attacker))) {
+      return ChatColor.YELLOW + getCompletionOrCharacter(viewer, Characters.CORE_TOUCHED);
+    } else {
+      return ChatColor.RED + getCompletionOrCharacter(viewer, Characters.CORE_INCOMPLETE);
+    }
+  }
+
+  private String getCompletionOrCharacter(Team viewer, Characters character) {
+    return viewer == null || isShowProgress() ? getPercent() + "%" : character + "";
   }
 
   @Override

@@ -23,16 +23,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scores;
 
-import net.md_5.bungee.api.ChatColor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+@Data
+@AllArgsConstructor
+public class ScoreRule {
 
-  String getName();
-
-  ChatColor getColor();
-
-  String getCompleteName();
+  private final boolean scoring;
+  private final int limit;
+  private final int kills;
+  private final int deaths;
 
 }

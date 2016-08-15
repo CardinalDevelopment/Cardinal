@@ -23,16 +23,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.scoreboard.displayables;
 
-import net.md_5.bungee.api.ChatColor;
+import in.twizmwaz.cardinal.module.scoreboard.ScoreboardDisplay;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+/**
+ * Sortable scoreboard entry, used for Score and Blitz.
+ */
+public class SortableScoreboardEntry extends ScoreboardEntry implements SortableEntry {
 
-  String getName();
+  @Setter
+  @Getter
+  private int sort = 0;
 
-  ChatColor getColor();
-
-  String getCompleteName();
+  SortableScoreboardEntry(ScoreboardDisplay display, String displayName, String entry) {
+    super(display, displayName, entry);
+  }
 
 }
