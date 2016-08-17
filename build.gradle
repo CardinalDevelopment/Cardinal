@@ -35,7 +35,7 @@ dependencies {
     compile 'tc.oc:sportbukkit-api:1.10.2-R0.1-SNAPSHOT'
     // compile 'tc.oc:sportbukkit:1.10.2-R0.1-SNAPSHOT' -Leaving this disabled until we need to enable it
     compile 'ee.ellytr.command:EllyCommand:2.0.4'
-    compile 'ee.ellytr.chat:EllyChat:1.2.5'
+    compile 'ee.ellytr.chat:EllyChat:1.2.6'
     compile 'org.jdom:jdom2:2.0.6'
     compile 'org.ow2.asm:asm-all:5.0.4'
 
@@ -61,7 +61,7 @@ shadowJar {
         include(dependency('org.ow2.asm:asm-all:5.0.4'))
         relocate 'org.objectweb.asm', 'in.twizmwaz.cardinal.libs.asm'
         include(dependency('ee.ellytr.command:EllyCommand:2.0.4'))
-        include(dependency('ee.ellytr.chat:EllyChat:1.2.5'))
+        include(dependency('ee.ellytr.chat:EllyChat:1.2.6'))
     }
 }
 
