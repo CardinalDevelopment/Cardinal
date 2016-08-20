@@ -34,21 +34,39 @@ import org.bukkit.util.Vector;
 public class PointProviderRegion extends AbstractRegion {
 
   private final Region region;
-  private Vector direction;
+  private Vector angle;
   private final float yaw;
   private final float pitch;
 
   /**
-   * @param region    The region to get points from.
-   * @param direction A vector to set direction.
-   * @param yaw       Yaw for direction.
-   * @param pitch     Pitch for direction.
+   * @param region  The region to get points from.
+   * @param angle   A vector to set direction.
+   * @param yaw     Yaw for direction.
+   * @param pitch   Pitch for direction.
    */
-  public PointProviderRegion(@NonNull Region region, Vector direction, float yaw, float pitch) {
+  public PointProviderRegion(@NonNull Region region, Vector angle, float yaw, float pitch) {
     super(region.getBounds());
     this.region = region;
+    this.angle = angle;
     this.yaw = yaw;
     this.pitch = pitch;
+  }
+
+  /**
+   * @param region  The region to get points from.
+   * @param angle   A vector to set direction.
+   */
+  public PointProviderRegion(@NonNull Region region, Vector angle) {
+    this(region, angle, 0, 0);
+  }
+
+  /**
+   * @param region  The region to get points from.
+   * @param yaw     Yaw for direction.
+   * @param pitch   Pitch for direction.
+   */
+  public PointProviderRegion(@NonNull Region region, float yaw, float pitch) {
+    this(region, null, yaw, pitch);
   }
 
   @Override
@@ -64,8 +82,8 @@ public class PointProviderRegion extends AbstractRegion {
   @Override
   public Vector getRandomPoint() {
     Location location = region.getRandomPoint().toLocation(getBounds().getMatch().getWorld(), yaw, pitch);
-    if (direction != null) {
-      location.setDirection(direction);
+    if (angle != null) {
+      location.setDirection(angle);
     }
     return location;
   }

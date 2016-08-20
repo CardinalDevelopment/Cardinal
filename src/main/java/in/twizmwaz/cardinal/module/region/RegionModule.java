@@ -99,9 +99,10 @@ public class RegionModule extends AbstractModule {
           continue;
         }
         try {
-          String id = regionElement.getAttributeValue("id");
+          Map.Entry<String, String> id =
+              ParseUtil.getFirstNonNullAttributeValue(regionElement, Lists.newArrayList("id", "name"));
           if (id != null) {
-            regions.put(id, getRegion(match, regionElement));
+            regions.put(id.getValue(), getRegion(match, regionElement));
           }
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{getRegionError(e, "region", null)}, false));

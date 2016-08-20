@@ -27,13 +27,16 @@ package in.twizmwaz.cardinal.module.spawn;
 
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
-import lombok.AllArgsConstructor;
+import in.twizmwaz.cardinal.util.ListUtil;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class Spawn {
 
   private final boolean defaultSpawn;
@@ -47,5 +50,20 @@ public class Spawn {
   // private final Kit kit;
   // private final Filter filter;
   private final List<Region> regions;
+
+  private int position = 0;
+
+  public Location getSpawnPoint() {
+    Vector result;
+    if (sequential) {
+      result = regions.get(position).getRandomPoint();
+      if (position++ == regions.size()) {
+        position = 0;
+      }
+    } else {
+      result = ListUtil.getRandom(regions).getRandomPoint();
+    }
+    return ((Location) result);
+  }
 
 }

@@ -38,14 +38,15 @@ import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.region.Region;
-import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.type.modifications.PointProviderRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import in.twizmwaz.cardinal.util.ListUtil;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
+import in.twizmwaz.cardinal.util.Players;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -54,12 +55,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInitialSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.util.Vector;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ModuleEntry(depends = {TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class})
 public class SpawnModule extends AbstractModule implements Listener {
@@ -81,9 +84,11 @@ public class SpawnModule extends AbstractModule implements Listener {
     for (Element spawnsElement : document.getRootElement().getChildren("spawns")) {
       for (Element spawnElement : spawnsElement.getChildren("spawn")) {
         Spawn spawn = parseSpawn(match, spawnElement, spawnsElement);
-        spawns.add(spawn);
-        if (spawn.isDefaultSpawn()) {
-          defaultPresent = true;
+        if (spawn != null) {
+          spawns.add(spawn);
+          if (spawn.isDefaultSpawn()) {
+            defaultPresent = true;
+          }
         }
       }
     }
@@ -129,42 +134,73 @@ public class SpawnModule extends AbstractModule implements Listener {
     }
 
     List<Region> regions = Lists.newArrayList();
-    List<Element> working;
-    if (elements[0].getChild("regions") == null) {
-      working = elements[0].getChildren();
-    } else {
-      working = elements[0].getChild("regions").getChildren();
+
+    Region spawnRegion = getPointProvider(match, "region", true, elements);
+    if (spawnRegion != null) {
+      regions.add(spawnRegion);
     }
-    for (Element regionElement : working) {
-      Located located = (Located) regionElement;
-      Region region;
-      try {
-        region = Cardinal.getModule(RegionModule.class).getRegion(match, regionElement);
-      } catch (RegionException e) {
+    for (Element regionElement : elements[0].getChildren("region")) {
+      Region region = getPointProvider(match, "id", false, ParseUtil.addElement(regionElement, elements));
+      if (region != null) {
+        regions.add(region);
+      }
+    }
+    if (regions.size() == 0) {
+      Located located = (Located) elements[0];
+      errors.add(new ModuleError(this, match.getMap(), new String[]{
+          "No regions specified for spawn at line " + located.getLine() + ", column " + located.getColumn(),
+      }, false));
+      // Prevent errors later trying to get a spawn region from an empty list.
+      return null;
+    }
+    return new Spawn(defaultSpawn, team, safe, sequential, spread, exclusive, persistent, regions);
+  }
+
+  private PointProviderRegion getPointProvider(Match match, String attr, boolean allowMissing, Element... elements) {
+    Located located = (Located) elements[0];
+    String attribute = ParseUtil.getFirstAttribute(attr, elements);
+    if (attribute == null) {
+      if (!allowMissing) {
         errors.add(new ModuleError(this, match.getMap(), new String[]{
-            RegionModule.getRegionError(e, "region", (defaultSpawn ? "default" : team.getName()) + " spawn"),
+            "Missing \"" + attr + "\" attribute for spawn region",
             "Element at line " + located.getLine() + ", column " + located.getColumn()
         }, false));
-        continue;
       }
-      if (region == null) {
-        errors.add(new ModuleError(this, match.getMap(), new String[]{
-            "Invalid region specified for a spawn",
-            "Element at line " + located.getLine() + ", column " + located.getColumn()
-        }, false));
-        continue;
-      }
-      if (!region.isRandomizable()) {
-        errors.add(new ModuleError(this, match.getMap(), new String[]{
-            "Region specified for " + (defaultSpawn ? "default" : team.getName()) + " spawn must be randomizable",
-            "Element at line " + located.getLine() + ", column " + located.getColumn()
-        }, false));
-        continue;
-      }
-      regions.add(region);
+      return null;
+    }
+    Region region = Cardinal.getModule(RegionModule.class).getRegionById(match, attribute);
+    if (region == null) {
+      errors.add(new ModuleError(this, match.getMap(), new String[]{
+          "Invalid region specified for a spawn",
+          "Element at line " + located.getLine() + ", column " + located.getColumn()
+      }, false));
+      return null;
+    }
+    if (!region.isRandomizable()) {
+      errors.add(new ModuleError(this, match.getMap(), new String[]{
+          "Region specified for spawn spawn must be randomizable",
+          "Element at line " + located.getLine() + ", column " + located.getColumn()
+      }, false));
+      return null;
     }
 
-    return new Spawn(defaultSpawn, team, safe, sequential, spread, exclusive, persistent, regions);
+    String rawAngle = ParseUtil.getFirstAttribute("angle", elements);
+    if (rawAngle != null) {
+      Vector angle = Numbers.getVector(rawAngle);
+      if (angle == null) {
+        errors.add(new ModuleError(this, match.getMap(), new String[]{
+            "Invalid angle attribute specified",
+            "Element at line " + located.getLine() + ", column " + located.getColumn()
+        }, false));
+        return null;
+      }
+      return new PointProviderRegion(region, angle);
+    }
+
+    float yaw = Numbers.parseFloat(ParseUtil.getFirstAttribute("yaw", elements), 0),
+        pitch = Numbers.parseFloat(ParseUtil.getFirstAttribute("pitch", elements), 0);
+
+    return new PointProviderRegion(region, yaw, pitch);
   }
 
   /**
@@ -175,8 +211,7 @@ public class SpawnModule extends AbstractModule implements Listener {
   @EventHandler(priority = EventPriority.HIGH)
   public void onPlayerInitialSpawn(PlayerInitialSpawnEvent event) {
     Match match = Cardinal.getMatch(event.getPlayer());
-    List<Region> regions = getDefaultSpawn(match).getRegions();
-    event.setSpawnLocation(ListUtil.getRandom(regions).getRandomPoint().toLocation(match.getWorld()));
+    event.setSpawnLocation(getDefaultSpawn(match).getSpawnPoint());
   }
 
   @EventHandler
@@ -235,9 +270,9 @@ public class SpawnModule extends AbstractModule implements Listener {
    */
   @EventHandler
   public void onCardinalRespawn(CardinalRespawnEvent event) {
-    Player player = event.getPlayer();
-    List<Region> regions = event.getSpawn().getRegions();
-    player.teleport(ListUtil.getRandom(regions).getRandomPoint().toLocation(player.getWorld()));
+    Players.reset(event.getPlayer());
+    //event.getSpawn().getKit().apply(event.getPlayer(), false);
+    event.getPlayer().teleport(event.getSpawn().getSpawnPoint());
   }
 
   /**
@@ -257,18 +292,17 @@ public class SpawnModule extends AbstractModule implements Listener {
   }
 
   /**
-   * Gets a list of {@link Spawn} based on a team.
+   * Gets a list of {@link Spawn} based on a team. If no spawn is found, spawns without a team will be returned.
    *
    * @param container The container for the spawns.
    * @return The list of spawns.
    */
   private List<Spawn> getSpawns(@NonNull Match match, @NonNull PlayingPlayerContainer container) {
-    List<Spawn> results = Lists.newArrayList();
-
-    for (Spawn spawn : spawns.get(match)) {
-      if (container.equals(spawn.getTeam())) {
-        results.add(spawn);
-      }
+    List<Spawn> results =
+        spawns.get(match).stream().filter(spawn -> container.equals(spawn.getTeam())).collect(Collectors.toList());
+    if (results.size() == 0) {
+      results = spawns.get(match).stream().filter(
+          spawn -> !spawn.isDefaultSpawn() && spawn.getTeam() == null).collect(Collectors.toList());
     }
     return results;
   }

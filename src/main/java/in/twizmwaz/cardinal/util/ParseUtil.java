@@ -65,4 +65,17 @@ public class ParseUtil {
     return null;
   }
 
+  /**
+   * Adds an element on the front of an array of elements.
+   * @param element  The element to add.
+   * @param elements The element array.
+   * @return A new array with the element and the elements.
+   */
+  public static Element[] addElement(Element element, Element... elements) {
+    Element[] newElements = new Element[elements.length + 1];
+    newElements[0] = element;
+    System.arraycopy(elements, 0, newElements, 1, elements.length);
+    return newElements;
+  }
+
 }
