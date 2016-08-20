@@ -25,11 +25,13 @@
 
 package in.twizmwaz.cardinal.module.objective.wool;
 
+import com.google.common.collect.Lists;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.objective.Objective;
-import in.twizmwaz.cardinal.module.objective.ProximityRule;
+import in.twizmwaz.cardinal.module.proximity.AbstractProximal;
+import in.twizmwaz.cardinal.module.proximity.Proximity;
+import in.twizmwaz.cardinal.module.proximity.ProximityRule;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.Colors;
@@ -48,7 +50,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Wool extends Objective implements Listener {
+public class Wool extends AbstractProximal implements Listener {
 
   private final Team team;
   private final DyeColor color;
@@ -80,7 +82,13 @@ public class Wool extends Objective implements Listener {
    */
   public Wool(Match match, String id, boolean required, Team team, DyeColor color, Region monument, boolean craftable,
               boolean show, Vector location, ProximityRule woolProximityRule, ProximityRule monumentProximityRule) {
-    super(match, id, required, show);
+    super(
+        match, id, required, show,
+        Lists.newArrayList(
+            new Proximity(Proximity.Identifier.BEFORE_TOUCH, Double.POSITIVE_INFINITY),
+            new Proximity(Proximity.Identifier.BEFORE_COMPLETE, Double.POSITIVE_INFINITY)
+        )
+    );
     this.team = team;
     this.color = color;
     this.monument = monument;

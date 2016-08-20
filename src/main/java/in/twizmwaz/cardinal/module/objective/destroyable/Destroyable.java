@@ -25,6 +25,7 @@
 
 package in.twizmwaz.cardinal.module.objective.destroyable;
 
+import com.google.common.collect.Lists;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.NameComponent;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
@@ -35,8 +36,9 @@ import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.objective.Objective;
-import in.twizmwaz.cardinal.module.objective.ProximityMetric;
+import in.twizmwaz.cardinal.module.proximity.AbstractProximal;
+import in.twizmwaz.cardinal.module.proximity.Proximity;
+import in.twizmwaz.cardinal.module.proximity.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
@@ -60,7 +62,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class Destroyable extends Objective implements Listener {
+public class Destroyable extends AbstractProximal implements Listener {
 
   private final String name;
   private final Region region;
@@ -105,7 +107,10 @@ public class Destroyable extends Objective implements Listener {
                      double completion, boolean modeChanges, boolean showProgress,
                      boolean repairable, boolean sparks, boolean show,
                      ProximityMetric proximityMetric, boolean proximityHorizontal) {
-    super(match, id, required, show);
+    super(
+        match, id, required, show,
+        Lists.newArrayList(new Proximity(Proximity.Identifier.BEFORE_TOUCH, Double.POSITIVE_INFINITY))
+    );
     this.name = name;
     this.region = region;
     this.materials = materials;

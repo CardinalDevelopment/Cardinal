@@ -23,10 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.objective;
+package in.twizmwaz.cardinal.module.proximity;
 
-public enum ProximityMetric {
-  CLOSEST_PLAYER,
-  CLOSEST_BLOCK,
-  CLOSEST_KILL
+import lombok.Data;
+
+@Data
+public class ProximityRule {
+
+  private final ProximityMetric metric;
+  private final boolean horizontal;
+
 }

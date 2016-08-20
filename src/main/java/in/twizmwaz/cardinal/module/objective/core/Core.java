@@ -35,8 +35,9 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.objective.Objective;
-import in.twizmwaz.cardinal.module.objective.ProximityMetric;
+import in.twizmwaz.cardinal.module.proximity.AbstractProximal;
+import in.twizmwaz.cardinal.module.proximity.Proximity;
+import in.twizmwaz.cardinal.module.proximity.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
@@ -60,7 +61,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class Core extends Objective implements Listener {
+public class Core extends AbstractProximal implements Listener {
 
   private final String name;
   private final Region region;
@@ -96,7 +97,10 @@ public class Core extends Objective implements Listener {
   public Core(Match match, String id, String name, boolean required, Region region, int leak,
               MaterialPattern material, PlayingPlayerContainer owner, boolean modeChanges,
               boolean show, ProximityMetric proximityMetric, boolean proximityHorizontal) {
-    super(match, id, required, show);
+    super(
+        match, id, required, show,
+        Lists.newArrayList(new Proximity(Proximity.Identifier.BEFORE_TOUCH, Double.POSITIVE_INFINITY))
+    );
     this.name = name;
     this.region = region;
     this.leak = leak;
