@@ -1,6 +1,7 @@
 package in.twizmwaz.cardinal.module.proximity;
 
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.event.player.CardinalDeathEvent;
 import in.twizmwaz.cardinal.event.proximity.ProximityChangeEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
@@ -14,9 +15,11 @@ import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -39,22 +42,59 @@ public class ProximityModule extends AbstractModule implements Listener {
         .forEach(wool -> handleWoolProximity(event, wool));
   }
 
+  @EventHandler(ignoreCancelled = true)
+  public void onBlockPlace(BlockPlaceEvent event) {
+    Match match = Cardinal.getMatch(event.getPlayer());
+
+    Cardinal.getModule(CoreModule.class).getCores(match)
+        .forEach(core -> handleCoreProximity(event, core));
+    Cardinal.getModule(DestroyableModule.class).getDestroyables(match)
+        .forEach(destroyable -> handleDestroyableProximity(event, destroyable));
+    Cardinal.getModule(WoolModule.class).getWools(match)
+        .forEach(wool -> handleWoolProximity(event, wool));
+  }
+
+  @EventHandler
+  public void onCardinalDeath(CardinalDeathEvent event) {
+    Player killer = event.getKiller();
+    if (killer != null) {
+      Match match = Cardinal.getMatch(event.getPlayer());
+
+      Cardinal.getModule(CoreModule.class).getCores(match)
+          .forEach(core -> handleCoreProximity(event, core));
+      Cardinal.getModule(DestroyableModule.class).getDestroyables(match)
+          .forEach(destroyable -> handleDestroyableProximity(event, destroyable));
+      Cardinal.getModule(WoolModule.class).getWools(match)
+          .forEach(wool -> handleWoolProximity(event, wool));
+    }
+  }
+
   private void handleCoreProximity(@NonNull Event event, @NonNull Core core) {
     Proximity proximity = core.getCurrentProximity();
-    if (proximity != null && proximity.getRule().getMetric().equals(ProximityMetric.CLOSEST_PLAYER)) {
+    if (proximity != null) {
+      ProximityMetric metric;
       Location location;
       if (event instanceof PlayerMoveEvent) {
+        metric = ProximityMetric.CLOSEST_PLAYER;
         location = ((PlayerMoveEvent) event).getPlayer().getLocation();
+      } else if (event instanceof BlockPlaceEvent) {
+        metric = ProximityMetric.CLOSEST_BLOCK;
+        location = ((BlockPlaceEvent) event).getBlock().getLocation();
+      } else if (event instanceof CardinalDeathEvent) {
+        metric = ProximityMetric.CLOSEST_KILL;
+        location = ((CardinalDeathEvent) event).getKiller().getLocation();
       } else {
         throw new IllegalArgumentException("Event cannot be used to update proximity");
       }
 
-      double distance = location.distance(core.getRegion().getBounds().getCenter());
-      if (distance < proximity.getProximity()) {
-        ProximityChangeEvent proximityEvent = new ProximityChangeEvent(core, proximity, distance);
-        Bukkit.getPluginManager().callEvent(proximityEvent);
-        if (!proximityEvent.isCancelled()) {
-          proximity.setProximity(proximityEvent.getNewProximity());
+      if (proximity.getRule().getMetric().equals(metric)) {
+        double distance = location.distance(core.getRegion().getBounds().getCenter());
+        if (distance < proximity.getProximity()) {
+          ProximityChangeEvent proximityEvent = new ProximityChangeEvent(core, proximity, distance);
+          Bukkit.getPluginManager().callEvent(proximityEvent);
+          if (!proximityEvent.isCancelled()) {
+            proximity.setProximity(proximityEvent.getNewProximity());
+          }
         }
       }
     }
@@ -62,20 +102,30 @@ public class ProximityModule extends AbstractModule implements Listener {
 
   private void handleDestroyableProximity(@NonNull Event event, @NonNull Destroyable destroyable) {
     Proximity proximity = destroyable.getCurrentProximity();
-    if (proximity != null && proximity.getRule().getMetric().equals(ProximityMetric.CLOSEST_PLAYER)) {
+    if (proximity != null) {
+      ProximityMetric metric;
       Location location;
       if (event instanceof PlayerMoveEvent) {
+        metric = ProximityMetric.CLOSEST_PLAYER;
         location = ((PlayerMoveEvent) event).getPlayer().getLocation();
+      } else if (event instanceof BlockPlaceEvent) {
+        metric = ProximityMetric.CLOSEST_BLOCK;
+        location = ((BlockPlaceEvent) event).getBlock().getLocation();
+      } else if (event instanceof CardinalDeathEvent) {
+        metric = ProximityMetric.CLOSEST_KILL;
+        location = ((CardinalDeathEvent) event).getKiller().getLocation();
       } else {
         throw new IllegalArgumentException("Event cannot be used to update proximity");
       }
 
-      double distance = location.distance(destroyable.getRegion().getBounds().getCenter());
-      if (distance < proximity.getProximity()) {
-        ProximityChangeEvent proximityEvent = new ProximityChangeEvent(destroyable, proximity, distance);
-        Bukkit.getPluginManager().callEvent(proximityEvent);
-        if (!proximityEvent.isCancelled()) {
-          proximity.setProximity(proximityEvent.getNewProximity());
+      if (proximity.getRule().getMetric().equals(metric)) {
+        double distance = location.distance(destroyable.getRegion().getBounds().getCenter());
+        if (distance < proximity.getProximity()) {
+          ProximityChangeEvent proximityEvent = new ProximityChangeEvent(destroyable, proximity, distance);
+          Bukkit.getPluginManager().callEvent(proximityEvent);
+          if (!proximityEvent.isCancelled()) {
+            proximity.setProximity(proximityEvent.getNewProximity());
+          }
         }
       }
     }
@@ -89,6 +139,12 @@ public class ProximityModule extends AbstractModule implements Listener {
       if (event instanceof PlayerMoveEvent) {
         metric = ProximityMetric.CLOSEST_PLAYER;
         location = ((PlayerMoveEvent) event).getPlayer().getLocation();
+      } else if (event instanceof BlockPlaceEvent) {
+        metric = ProximityMetric.CLOSEST_BLOCK;
+        location = ((BlockPlaceEvent) event).getBlock().getLocation();
+      } else if (event instanceof CardinalDeathEvent) {
+        metric = ProximityMetric.CLOSEST_KILL;
+        location = ((CardinalDeathEvent) event).getKiller().getLocation();
       } else {
         throw new IllegalArgumentException("Event cannot be used to update proximity");
       }
