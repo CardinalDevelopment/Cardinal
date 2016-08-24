@@ -26,7 +26,6 @@
 package in.twizmwaz.cardinal.component;
 
 import com.google.common.collect.Lists;
-import in.twizmwaz.cardinal.module.team.Team;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -34,9 +33,14 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import java.util.List;
 
-public class TeamComponentBuilder {
+/**
+ * This is a base for other component builders to use, it has all the {@link BaseComponent} fields.
+ *
+ * @param <B> The builder class, should always be the same as the class.
+ * @param <C> The component output.
+ */
+public abstract class BaseComponentBuilder<B extends BaseComponentBuilder, C extends BaseComponent> {
 
-  private Team team;
   private ChatColor color;
   private boolean bold;
   private boolean italic;
@@ -46,15 +50,13 @@ public class TeamComponentBuilder {
   private ClickEvent clickEvent;
   private HoverEvent hoverEvent;
   private List<BaseComponent> extra;
-  private boolean hover;
+  
+  private B thisObject;
 
   /**
-   * Creates a builder of {@link TeamComponent} based on specified values.
-   *
-   * @param team The team for this component.
+   * This is a base for other component builders to use, it has all the {@link BaseComponent} fields.
    */
-  public TeamComponentBuilder(Team team) {
-    this.team = team;
+  public BaseComponentBuilder() {
     color = null;
     bold = false;
     italic = false;
@@ -64,66 +66,67 @@ public class TeamComponentBuilder {
     clickEvent = null;
     hoverEvent = null;
     extra = Lists.newArrayList();
-    hover = true;
-  }
-
-  public TeamComponentBuilder color(ChatColor color) {
-    this.color = color;
-    return this;
-  }
-
-  public TeamComponentBuilder bold(boolean bold) {
-    this.bold = bold;
-    return this;
-  }
-
-  public TeamComponentBuilder italic(boolean italic) {
-    this.italic = italic;
-    return this;
-  }
-
-  public TeamComponentBuilder underlined(boolean underlined) {
-    this.underlined = underlined;
-    return this;
-  }
-
-  public TeamComponentBuilder strikethrough(boolean strikethrough) {
-    this.strikethrough = strikethrough;
-    return this;
-  }
-
-  public TeamComponentBuilder obfuscated(boolean obfuscated) {
-    this.obfuscated = obfuscated;
-    return this;
-  }
-
-  public TeamComponentBuilder clickEvent(ClickEvent clickEvent) {
-    this.clickEvent = clickEvent;
-    return this;
-  }
-
-  public TeamComponentBuilder hoverEvent(HoverEvent hoverEvent) {
-    this.hoverEvent = hoverEvent;
-    return this;
-  }
-
-  public TeamComponentBuilder extra(List<BaseComponent> extra) {
-    this.extra = extra;
-    return this;
-  }
-
-  public TeamComponentBuilder hover(boolean hover) {
-    this.hover = hover;
-    return this;
+    thisObject = getThis();
   }
 
   /**
-   * Builds a {@link TeamComponent} from the specified values.
+   * Must be implemented by all sub classes, should just be a "return this;".
+   * @return The builder object.
+   */
+  public abstract B getThis();
+
+
+  public B color(ChatColor color) {
+    this.color = color;
+    return thisObject;
+  }
+
+  public B bold(boolean bold) {
+    this.bold = bold;
+    return thisObject;
+  }
+
+  public B italic(boolean italic) {
+    this.italic = italic;
+    return thisObject;
+  }
+
+  public B underlined(boolean underlined) {
+    this.underlined = underlined;
+    return thisObject;
+  }
+
+  public B strikethrough(boolean strikethrough) {
+    this.strikethrough = strikethrough;
+    return thisObject;
+  }
+
+  public B obfuscated(boolean obfuscated) {
+    this.obfuscated = obfuscated;
+    return thisObject;
+  }
+
+  public B clickEvent(ClickEvent clickEvent) {
+    this.clickEvent = clickEvent;
+    return thisObject;
+  }
+
+  public B hoverEvent(HoverEvent hoverEvent) {
+    this.hoverEvent = hoverEvent;
+    return thisObject;
+  }
+
+  public B extra(List<BaseComponent> extra) {
+    this.extra = extra;
+    return thisObject;
+  }
+
+  /**
+   * Builds a {@link C} from the specified values.
    *
    * @return The built component.
    */
-  public TeamComponent build() {
-    TeamComponent component = new TeamComponent(team);
+  public C build(C component) {
     component.setColor(color);
     component.setBold(bold);
     component.setItalic(italic);
@@ -133,7 +136,6 @@ public class TeamComponentBuilder {
     component.setClickEvent(clickEvent);
     component.setHoverEvent(hoverEvent);
     component.setExtra(extra);
-    component.setHover(hover);
     return component;
   }
 

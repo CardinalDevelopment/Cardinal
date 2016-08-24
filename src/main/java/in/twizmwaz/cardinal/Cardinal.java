@@ -33,7 +33,7 @@ import ee.ellytr.command.exception.CommandException;
 import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.command.CommandCycle;
 import in.twizmwaz.cardinal.command.CommandJoin;
-import in.twizmwaz.cardinal.command.CommandSetNext;
+import in.twizmwaz.cardinal.command.CommandNext;
 import in.twizmwaz.cardinal.command.CommandStart;
 import in.twizmwaz.cardinal.command.provider.LoadedMapProvider;
 import in.twizmwaz.cardinal.command.provider.TeamProvider;
@@ -154,7 +154,7 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.addClass(CommandCardinal.class);
     commandRegistry.addClass(CommandCycle.class);
     commandRegistry.addClass(CommandJoin.class);
-    commandRegistry.addClass(CommandSetNext.class);
+    commandRegistry.addClass(CommandNext.class);
     commandRegistry.addClass(CommandStart.class);
     commandRegistry.register();
 

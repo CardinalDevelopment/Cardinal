@@ -23,32 +23,44 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.command.provider;
+package in.twizmwaz.cardinal.component.team;
 
-import ee.ellytr.command.argument.ArgumentProvider;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.repository.RepositoryModule;
-import in.twizmwaz.cardinal.util.Strings;
-import org.bukkit.command.CommandSender;
+import in.twizmwaz.cardinal.component.BaseComponentBuilder;
+import in.twizmwaz.cardinal.module.team.Team;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class TeamComponentBuilder extends BaseComponentBuilder<TeamComponentBuilder, TeamComponent> {
 
-public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
+  private Team team;
+  private boolean hover;
 
-  @Override
-  public LoadedMap getMatch(String input, CommandSender sender) {
-    List<String> mapNames = getSuggestions(input, sender);
-    return mapNames.size() > 0 ? Cardinal.getModule(RepositoryModule.class).getLoadedMaps().get(mapNames.get(0)) : null;
+  /**
+   * Creates a builder of {@link TeamComponent} based on specified values.
+   *
+   * @param team The team for this component.
+   */
+  public TeamComponentBuilder(Team team) {
+    this.team = team;
+    hover = true;
   }
 
-  @Override
-  public List<String> getSuggestions(String input, CommandSender sender) {
-    return Cardinal.getModule(RepositoryModule.class).getLoadedMaps().keySet().stream()
-        .filter(map -> Strings.getSimplifiedName(map).startsWith(Strings.getSimplifiedName(input.toLowerCase())))
-        .collect(Collectors.toList());
-
+  public TeamComponentBuilder hover(boolean hover) {
+    this.hover = hover;
+    return this;
   }
-  
+
+  public TeamComponentBuilder getThis() {
+    return this;
+  }
+
+  /**
+   * Builds a {@link TeamComponent} from the specified values.
+   *
+   * @return The built component.
+   */
+  public TeamComponent build() {
+    TeamComponent component = new TeamComponent(team);
+    component.setHover(hover);
+    return super.build(component);
+  }
+
 }

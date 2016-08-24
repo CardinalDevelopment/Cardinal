@@ -32,7 +32,8 @@ import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.countdown.CountdownModule;
 import in.twizmwaz.cardinal.module.countdown.CycleCountdown;
-import org.bukkit.entity.Player;
+import in.twizmwaz.cardinal.module.cycle.CycleModule;
+import in.twizmwaz.cardinal.module.repository.LoadedMap;
 
 public class CommandCycle {
 
@@ -43,13 +44,35 @@ public class CommandCycle {
    * @param time The time until cycle, defaults to 30.
    */
   @Command(aliases = "cycle", description = "Cycles to the next map")
-  public static void cycle(CommandContext cmd, @Optional Integer time) {
+  public static void cycle(CommandContext cmd, @Optional Integer time, @Optional LoadedMap map) {
     if (time == null) {
       time = 30;
     }
     time *= 20;
-    MatchThread matchThread = cmd.getSender() instanceof Player
-        ? Cardinal.getMatchThread((Player) cmd.getSender()) : Cardinal.getInstance().getMatchThreads().get(0);
+    MatchThread matchThread = Cardinal.getMatchThread(cmd.getSender());
+    if (map != null) {
+      Cardinal.getModule(CycleModule.class).getNextCycle(Cardinal.getMatchThread(cmd.getSender())).setMap(map);
+    }
+    CycleCountdown countdown = Cardinal.getModule(CountdownModule.class).getCycleCountdown(matchThread);
+    countdown.setTime(time);
+    countdown.setCancelled(false);
+  }
+
+  /**
+   * Cycles to the same map.
+   *
+   * @param cmd  The context of this command.
+   * @param time The time until cycle, defaults to 30.
+   */
+  @Command(aliases = "recycle", description = "Cycles to the same map")
+  public static void recycle(CommandContext cmd, @Optional Integer time) {
+    if (time == null) {
+      time = 30;
+    }
+    time *= 20;
+    MatchThread matchThread = Cardinal.getMatchThread(cmd.getSender());
+    Cardinal.getModule(CycleModule.class)
+        .getNextCycle(Cardinal.getMatchThread(cmd.getSender())).setMap(matchThread.getCurrentMatch().getMap());
     CycleCountdown countdown = Cardinal.getModule(CountdownModule.class).getCycleCountdown(matchThread);
     countdown.setTime(time);
     countdown.setCancelled(false);

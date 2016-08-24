@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.component.team.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;

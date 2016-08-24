@@ -23,32 +23,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.command.provider;
+package in.twizmwaz.cardinal.component.map;
 
-import ee.ellytr.command.argument.ArgumentProvider;
-import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.component.BaseComponentBuilder;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.repository.RepositoryModule;
-import in.twizmwaz.cardinal.util.Strings;
-import org.bukkit.command.CommandSender;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class MapComponentBuilder extends BaseComponentBuilder<MapComponentBuilder, MapComponent> {
 
-public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
+  private LoadedMap map;
+  private boolean authors;
 
-  @Override
-  public LoadedMap getMatch(String input, CommandSender sender) {
-    List<String> mapNames = getSuggestions(input, sender);
-    return mapNames.size() > 0 ? Cardinal.getModule(RepositoryModule.class).getLoadedMaps().get(mapNames.get(0)) : null;
+  public MapComponentBuilder(LoadedMap map) {
+    this.map = map;
+  }
+
+  public MapComponentBuilder authors(boolean authors) {
+    this.authors = authors;
+    return this;
   }
 
   @Override
-  public List<String> getSuggestions(String input, CommandSender sender) {
-    return Cardinal.getModule(RepositoryModule.class).getLoadedMaps().keySet().stream()
-        .filter(map -> Strings.getSimplifiedName(map).startsWith(Strings.getSimplifiedName(input.toLowerCase())))
-        .collect(Collectors.toList());
-
+  public MapComponentBuilder getThis() {
+    return this;
   }
-  
+
+  /**
+   * Builds a {@link MapComponent} from the specified values.
+   *
+   * @return The built component.
+   */
+  public MapComponent build() {
+    MapComponent mapComponent = new MapComponent(map);
+    mapComponent.setAuthors(authors);
+    return super.build(mapComponent);
+  }
+
 }

@@ -33,7 +33,7 @@ import ee.ellytr.chat.component.formattable.ListComponent;
 import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.component.team.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveTouchEvent;
 import in.twizmwaz.cardinal.match.Match;

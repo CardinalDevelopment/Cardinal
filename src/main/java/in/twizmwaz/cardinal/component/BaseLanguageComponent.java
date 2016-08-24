@@ -25,37 +25,17 @@
 
 package in.twizmwaz.cardinal.component;
 
-import com.google.common.collect.Lists;
-import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.LanguageComponent;
-import ee.ellytr.chat.component.formattable.LocalizedComponent;
-import ee.ellytr.chat.util.ChatUtil;
-import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.util.Strings;
-import lombok.Getter;
-import lombok.Setter;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
 
-import java.util.List;
-import java.util.Locale;
+public abstract class BaseLanguageComponent<C extends BaseComponent> extends LanguageComponent {
 
-@Getter
-@Setter
-public class TeamComponent extends LanguageComponent {
-
-  private Team team;
-  private boolean hover;
-
-  public TeamComponent(Team team) {
-    this.team = team;
-    hover = true;
-  }
-
-  @Override
-  public TeamComponent duplicate() {
-    TeamComponent component = new TeamComponent(team);
+  /**
+   * Adds regular {@link BaseComponent} fields to a duplicate component.
+   * @param component The BaseComponent to add values to.
+   * @return The BaseComponent with the values.
+   */
+  public C duplicate(C component) {
     component.setColor(getColor());
     component.setBold(isBold());
     component.setItalic(isItalic());
@@ -69,25 +49,7 @@ public class TeamComponent extends LanguageComponent {
         component.addExtra(extra.duplicate());
       }
     }
-    component.setHover(isHover());
     return component;
-  }
-
-  @Override
-  public BaseComponent[] getComponents(Locale locale) {
-    List<BaseComponent> components = Lists.newArrayList();
-    setColor(team.getColor());
-    components.add(ChatUtil.getTextComponent(team.getName(), this));
-    if (hover) {
-      for (BaseComponent component : components) {
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-            new LocalizedComponent(ChatConstant.getConstant("team.hover.join"),
-                new TeamComponentBuilder(team).hover(false).build()).getComponents(locale)));
-        component.setClickEvent(
-            new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/join " + Strings.getFirstWord(team.getName())));
-      }
-    }
-    return components.toArray(new BaseComponent[components.size()]);
   }
 
 }

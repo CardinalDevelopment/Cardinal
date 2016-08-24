@@ -29,7 +29,7 @@ import ee.ellytr.chat.component.NameComponent;
 import ee.ellytr.chat.component.builder.NameComponentBuilder;
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import ee.ellytr.chat.component.formattable.UnlocalizedComponent;
-import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.component.team.TeamComponent;
 import in.twizmwaz.cardinal.module.team.Team;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;

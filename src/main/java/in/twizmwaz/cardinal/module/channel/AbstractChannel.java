@@ -26,15 +26,11 @@
 package in.twizmwaz.cardinal.module.channel;
 
 import com.google.common.collect.Lists;
-import ee.ellytr.chat.component.LanguageComponent;
-import ee.ellytr.chat.util.ChatUtil;
+import in.twizmwaz.cardinal.util.ChatUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 
 public class AbstractChannel implements Channel {
 
@@ -43,16 +39,7 @@ public class AbstractChannel implements Channel {
   @Override
   public void sendMessage(BaseComponent... components) {
     for (Player player : players) {
-      List<BaseComponent> toSend = Lists.newArrayList();
-      Locale locale = ChatUtil.getLocale(player.getLocale());
-      for (BaseComponent component : components) {
-        if (component instanceof LanguageComponent) {
-          toSend.addAll(Arrays.asList(((LanguageComponent) component).getComponents(locale)));
-        } else {
-          toSend.add(component);
-        }
-      }
-      player.sendMessage(toSend.toArray(new BaseComponent[toSend.size()]));
+      ChatUtil.sendMessage(player, components);
     }
   }
 

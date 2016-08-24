@@ -40,6 +40,15 @@ public class Strings {
   }
 
   /**
+   * Sets the string to lower case and removes spaces. Helpful when comparing user input strings.
+   * @param in The string.
+   * @return Lower case space-less string.
+   */
+  public static String getSimplifiedName(String in) {
+    return in.toLowerCase().replaceAll("_", "").replaceAll(" ","");
+  }
+
+  /**
    * Gets the first word of a string.
    *
    * @param str The string.

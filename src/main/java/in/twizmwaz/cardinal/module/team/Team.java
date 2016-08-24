@@ -144,6 +144,16 @@ public class Team implements PlayingPlayerContainer {
   }
 
   /**
+   * Shorthand for getting a team by it's name.
+   *
+   * @param name The name.
+   * @return The team with the specified name.
+   */
+  public static Team getTeamByName(@NonNull Match match, @NonNull String name) {
+    return Cardinal.getModule(TeamModule.class).getTeamByName(match, name);
+  }
+
+  /**
    * Gets the objectives required for a team to complete.
    *
    * @param team The team.

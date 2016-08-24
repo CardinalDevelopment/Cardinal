@@ -23,32 +23,50 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.command.provider;
+package in.twizmwaz.cardinal.util;
 
-import ee.ellytr.command.argument.ArgumentProvider;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.repository.RepositoryModule;
-import in.twizmwaz.cardinal.util.Strings;
+import com.google.common.collect.Lists;
+import ee.ellytr.chat.component.LanguageComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Locale;
 
-public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
+public class ChatUtil {
 
-  @Override
-  public LoadedMap getMatch(String input, CommandSender sender) {
-    List<String> mapNames = getSuggestions(input, sender);
-    return mapNames.size() > 0 ? Cardinal.getModule(RepositoryModule.class).getLoadedMaps().get(mapNames.get(0)) : null;
+  /**
+   * Sends a chat message to a CommandSender.
+   * @param sender The CommandSender, player or console.
+   * @param components The array of base components to send.
+   */
+  public static void sendMessage(CommandSender sender, BaseComponent... components) {
+    List<BaseComponent> toSend = Lists.newArrayList();
+    Locale locale = getLocale(sender);
+    for (BaseComponent component : components) {
+      if (component instanceof LanguageComponent) {
+        toSend.addAll(Arrays.asList(((LanguageComponent) component).getComponents(locale)));
+      } else {
+        toSend.add(component);
+      }
+    }
+    sender.sendMessage(toSend.toArray(new BaseComponent[toSend.size()]));
   }
 
-  @Override
-  public List<String> getSuggestions(String input, CommandSender sender) {
-    return Cardinal.getModule(RepositoryModule.class).getLoadedMaps().keySet().stream()
-        .filter(map -> Strings.getSimplifiedName(map).startsWith(Strings.getSimplifiedName(input.toLowerCase())))
-        .collect(Collectors.toList());
-
+  /**
+   * Gets the locale of a CommandSender.
+   * @param sender The CommandSender.
+   * @return The player's locale if it's a player, default locale for console.
+   */
+  public static Locale getLocale(CommandSender sender) {
+    if (sender instanceof Player) {
+      return ee.ellytr.chat.util.ChatUtil.getLocale(((Player) sender).getLocale());
+    } else {
+      return Locale.getDefault();
+    }
   }
-  
+
+
 }

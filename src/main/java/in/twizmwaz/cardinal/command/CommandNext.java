@@ -23,32 +23,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.command.provider;
+package in.twizmwaz.cardinal.command;
 
-import ee.ellytr.command.argument.ArgumentProvider;
+import ee.ellytr.chat.ChatConstant;
+import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
+import ee.ellytr.command.Command;
+import ee.ellytr.command.CommandContext;
+import ee.ellytr.command.argument.MultiArgs;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.component.map.MapComponentBuilder;
+import in.twizmwaz.cardinal.module.cycle.CycleModule;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.repository.RepositoryModule;
-import in.twizmwaz.cardinal.util.Strings;
-import org.bukkit.command.CommandSender;
+import in.twizmwaz.cardinal.util.ChatUtil;
+import net.md_5.bungee.api.ChatColor;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class CommandNext {
 
-public class LoadedMapProvider implements ArgumentProvider<LoadedMap> {
-
-  @Override
-  public LoadedMap getMatch(String input, CommandSender sender) {
-    List<String> mapNames = getSuggestions(input, sender);
-    return mapNames.size() > 0 ? Cardinal.getModule(RepositoryModule.class).getLoadedMaps().get(mapNames.get(0)) : null;
+  /**
+   * Sets the next map.
+   *
+   * @param cmd The context of this command.
+   */
+  @Command(aliases = {"setnext", "sn"}, description = "Sets the next map.")
+  public static void setNext(CommandContext cmd, @MultiArgs LoadedMap map) {
+    Cardinal.getModule(CycleModule.class).getNextCycle(Cardinal.getMatchThread(cmd.getSender())).setMap(map);
   }
 
-  @Override
-  public List<String> getSuggestions(String input, CommandSender sender) {
-    return Cardinal.getModule(RepositoryModule.class).getLoadedMaps().keySet().stream()
-        .filter(map -> Strings.getSimplifiedName(map).startsWith(Strings.getSimplifiedName(input.toLowerCase())))
-        .collect(Collectors.toList());
-
+  /**
+   * Sets the next map.
+   *
+   * @param cmd The context of this command.
+   */
+  @Command(aliases = {"next"}, description = "Gets the next map.")
+  public static void getNext(CommandContext cmd) {
+    LoadedMap map = Cardinal.getModule(CycleModule.class).getNextMap(Cardinal.getMatchThread(cmd.getSender()));
+    ChatUtil.sendMessage(cmd.getSender(), new LocalizedComponentBuilder(ChatConstant.getConstant("command.next.map"),
+        new MapComponentBuilder(map).color(ChatColor.GOLD).build()).color(ChatColor.DARK_PURPLE).build());
   }
-  
+
 }

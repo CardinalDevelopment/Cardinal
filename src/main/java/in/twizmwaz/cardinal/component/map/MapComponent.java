@@ -23,27 +23,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.command;
+package in.twizmwaz.cardinal.component.map;
 
-import ee.ellytr.command.Command;
-import ee.ellytr.command.CommandContext;
-import ee.ellytr.command.PlayerCommand;
-import ee.ellytr.command.argument.MultiArgs;
-import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.module.cycle.CycleModule;
+import ee.ellytr.chat.util.ChatUtil;
+import in.twizmwaz.cardinal.component.BaseLanguageComponent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
+import lombok.Getter;
+import lombok.Setter;
+import net.md_5.bungee.api.chat.BaseComponent;
 
-public class CommandSetNext {
+import java.util.Locale;
 
-  /**
-   * Sets the next map.
-   *
-   * @param cmd The context of this command.
-   */
-  @Command(aliases = {"setnext", "sn"}, description = "Sets the next map.")
-  @PlayerCommand
-  public static void setNext(CommandContext cmd, @MultiArgs LoadedMap map) {
-    Cardinal.getModule(CycleModule.class).getNextCycle().get(Cardinal.getMatchThread(cmd.getSender())).setMap(map);
+@Getter
+@Setter
+public class MapComponent extends BaseLanguageComponent<MapComponent> {
+
+  private LoadedMap map;
+  private boolean authors;
+
+  public MapComponent(LoadedMap map) {
+    this.map = map;
+  }
+
+  @Override
+  public MapComponent duplicate() {
+    MapComponent component = new MapComponent(map);
+    super.duplicate(this);
+    return component;
+  }
+
+  @Override
+  public BaseComponent[] getComponents(Locale locale) {
+    return new BaseComponent[]{ChatUtil.getTextComponent(map.getName(), this)};
   }
 
 }

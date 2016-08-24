@@ -41,12 +41,12 @@ import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 @ModuleEntry(depends = {RotationModule.class})
 public final class CycleModule extends AbstractListenerModule {
@@ -89,26 +89,31 @@ public final class CycleModule extends AbstractListenerModule {
    *
    * @return If the cycle was successful.
    */
-  public Match cycle(MatchThread matchThread) {
-    World old = matchThread.getCurrentMatch() != null ? matchThread.getCurrentMatch().getWorld() : null;
+  public boolean cycle(MatchThread matchThread) {
+    Match old = matchThread.getCurrentMatch();
     CycleRunnable cycle = nextCycle.get(matchThread);
     cycle.run();
     Match match = new Match(matchThread, cycle.getUuid(), cycle.getMap(), cycle.getWorld());
-    matchThread.setCurrentMatch(match);
-    Cardinal.getInstance().getModuleHandler().loadMatch(match);
-    matchThread.getPlayers().forEach(player -> {
-      PlayerContainerData oldData = PlayerContainerData.of(player);
-      PlayerContainerData newData = new PlayerContainerData(matchThread, null, null);
-      Containers.handleStateChangeEvent(player, oldData, newData);
-    });
-    Bukkit.getPluginManager().callEvent(new MatchLoadCompleteEvent(match));
-    CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
-    next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
-    nextCycle.put(matchThread, next);
-    if (old != null) {
-      Bukkit.getScheduler().scheduleSyncDelayedTask(Cardinal.getInstance(), () -> Bukkit.unloadWorld(old, true), 1);
+    if (Cardinal.getInstance().getModuleHandler().loadMatch(match)) {
+      matchThread.setCurrentMatch(match);
+      matchThread.getPlayers().forEach(player -> {
+        PlayerContainerData oldData = PlayerContainerData.of(player);
+        PlayerContainerData newData = new PlayerContainerData(matchThread, null, null);
+        Containers.handleStateChangeEvent(player, oldData, newData);
+      });
+      Bukkit.getPluginManager().callEvent(new MatchLoadCompleteEvent(match));
+      CycleRunnable next = new CycleRunnable(this, UUID.randomUUID());
+      next.setMap(Cardinal.getModule(RotationModule.class).getRotations().get(matchThread).getNext());
+      nextCycle.put(matchThread, next);
+      if (old != null) {
+        Bukkit.getScheduler()
+            .scheduleSyncDelayedTask(Cardinal.getInstance(), () -> Bukkit.unloadWorld(old.getWorld(), true), 1);
+      }
+      return true;
+    } else {
+      Bukkit.getLogger().log(Level.SEVERE, "Failed to load map:" + match.getMap().getName());
+      return false;
     }
-    return match;
   }
 
   public LoadedMap getNextMap(@NonNull MatchThread matchThread) {

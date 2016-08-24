@@ -33,6 +33,7 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
+import in.twizmwaz.cardinal.util.Strings;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -154,8 +155,7 @@ public class TeamModule extends AbstractModule {
       return null;
     }
     for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "").toLowerCase().startsWith(
-          name.replaceAll(" ", "").toLowerCase())) {
+      if (Strings.getSimplifiedName(team.getName()).startsWith(Strings.getSimplifiedName(name))) {
         return team;
       }
     }

@@ -26,7 +26,7 @@
 package in.twizmwaz.cardinal.module.channel.channels;
 
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
-import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.component.team.TeamComponent;
 import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
 import in.twizmwaz.cardinal.module.channel.AbstractChannel;
 import in.twizmwaz.cardinal.module.team.Team;
