@@ -26,12 +26,10 @@
 package in.twizmwaz.cardinal.module.interact;
 
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.spawn.SpawnModule;
-import in.twizmwaz.cardinal.util.ListUtil;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -68,12 +66,7 @@ public class InteractModule extends AbstractListenerModule {
    */
   @EventHandler(ignoreCancelled = true)
   public void onPlayerMove(PlayerMoveEvent event) {
-    Player player = event.getPlayer();
-    if (!canInteract(player) && event.getTo().getY() < -64) {
-      Match match = Cardinal.getMatch(player);
-      event.setTo(ListUtil.getRandom(Cardinal.getModule(SpawnModule.class).getDefaultSpawn(match).getRegions())
-          .getRandomPoint().toLocation(match.getWorld()));
-    }
+    handlePlayerMove(event);
   }
 
   /**
@@ -83,11 +76,13 @@ public class InteractModule extends AbstractListenerModule {
    */
   @EventHandler(ignoreCancelled = true)
   public void onPlayerTeleport(PlayerTeleportEvent event) {
+    handlePlayerMove(event);
+  }
+
+  private void handlePlayerMove(PlayerMoveEvent event) {
     Player player = event.getPlayer();
     if (!canInteract(player) && event.getTo().getY() < -64) {
-      Match match = Cardinal.getMatch(player);
-      event.setTo(ListUtil.getRandom(Cardinal.getModule(SpawnModule.class).getDefaultSpawn(match).getRegions())
-          .getRandomPoint().toLocation(match.getWorld()));
+      event.setTo(Cardinal.getModule(SpawnModule.class).getDefaultSpawnLocation(Cardinal.getMatch(player)));
     }
   }
 

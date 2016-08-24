@@ -31,6 +31,7 @@ import ee.ellytr.command.PlayerCommand;
 import ee.ellytr.command.argument.Optional;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.playercontainer.Containers;
@@ -50,7 +51,8 @@ public class CommandJoin {
   @PlayerCommand
   public static void join(CommandContext cmd, @Optional Team team) {
     Player player = (Player) cmd.getSender();
-    Match match = Cardinal.getMatch(player);
+    MatchThread thread = Cardinal.getMatchThread(player);
+    Match match = thread.getCurrentMatch();
     PlayingPlayerContainer playing = team;
     if (!match.isFfa()) {
       if (playing == null) {
@@ -59,7 +61,22 @@ public class CommandJoin {
     } else {
       playing = SinglePlayerContainer.of(player);
     }
-    PlayerContainerData newData = new PlayerContainerData(match.getMatchThread(), match, playing);
+    PlayerContainerData newData = new PlayerContainerData(thread, match, playing);
+    PlayerContainerData oldData = PlayerContainerData.of(player);
+    Containers.handleStateChangeEvent(player, oldData, newData);
+  }
+
+  /**
+   * Leave the game.
+   *
+   * @param cmd  The context of this command.
+   */
+  @Command(aliases = "leave", description = "Leave the game")
+  @PlayerCommand
+  public static void leave(CommandContext cmd) {
+    Player player = (Player) cmd.getSender();
+    MatchThread thread = Cardinal.getMatchThread(player);
+    PlayerContainerData newData = new PlayerContainerData(thread, null, null);
     PlayerContainerData oldData = PlayerContainerData.of(player);
     Containers.handleStateChangeEvent(player, oldData, newData);
   }

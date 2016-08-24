@@ -26,7 +26,7 @@
 package in.twizmwaz.cardinal.playercontainer;
 
 import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
-import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
@@ -46,30 +46,30 @@ public class Containers {
     PlayerContainerChangeStateEvent event = new PlayerContainerChangeStateEvent(player, oldData, newData);
     Bukkit.getPluginManager().callEvent(event);
     if (!event.isCancelled()) {
-      if (isNonNullAndHasPlayer(oldData.getMatchThread(), player)) {
-        oldData.getMatchThread().removePlayer(player);
-      }
-      if (isNonNullAndHasPlayer(oldData.getMatch(), player)) {
-        oldData.getMatch().removePlayer(player);
-      }
-      if (isNonNullAndHasPlayer(oldData.getPlaying(), player) && oldData.getPlaying() instanceof Team) {
-        oldData.getPlaying().removePlayer(player);
-      }
-
-      if (newData.getMatchThread() != null) {
-        newData.getMatchThread().addPlayer(player);
-      }
-      if (newData.getMatch() != null) {
-        newData.getMatch().addPlayer(player);
-      }
-      if (newData.getPlaying() != null && newData.getPlaying() instanceof Team) {
-        newData.getPlaying().addPlayer(player);
+      switchPlayer(oldData.getMatchThread(), newData.getMatchThread(), player);
+      switchPlayer(oldData.getMatch(), newData.getMatch(), player);
+      if (oldData.getMatch() == newData.getMatch()) {
+        switchPlayer(oldData.getPlaying(), newData.getPlaying(), player);
+      } else {
+        // If match is not the same, removing the player from the match already kicked the player from the team.
+        addPlayer(newData.getPlaying(), player);
       }
     }
   }
 
-  private static boolean isNonNullAndHasPlayer(PlayerContainer container, Player player) {
-    return container != null && container.hasPlayer(player);
+  private static void switchPlayer(PlayerContainer oldContainer, PlayerContainer newContainer, Player player) {
+    if (oldContainer != newContainer) {
+      if (oldContainer != null && oldContainer.hasPlayer(player)) {
+        oldContainer.removePlayer(player);
+      }
+      addPlayer(newContainer, player);
+    }
+  }
+
+  private static void addPlayer(PlayerContainer newContainer, Player player) {
+    if (newContainer != null && !(newContainer instanceof SinglePlayerContainer)) {
+      newContainer.addPlayer(player);
+    }
   }
 
 }

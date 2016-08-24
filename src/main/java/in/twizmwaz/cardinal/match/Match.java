@@ -135,8 +135,8 @@ public final class Match implements PlayerContainer {
 
   @Override
   public void removePlayer(@NonNull Player player) {
-    players.remove(player);
     PlayingPlayerContainer container = getPlayingContainer(player);
+    players.remove(player);
     if (isFfa()) {
       playerContainers.remove(container);
     } else {

@@ -34,6 +34,7 @@ import in.twizmwaz.cardinal.event.player.CardinalRespawnEvent;
 import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchState;
+import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
@@ -49,6 +50,7 @@ import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Players;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -220,10 +222,15 @@ public class SpawnModule extends AbstractListenerModule {
   @EventHandler
   public void onPlayerChangeTeam(PlayerContainerChangeStateEvent event) {
     Player player = event.getPlayer();
-    if (event.getNewData().getMatchThread().getCurrentMatch().isRunning()) {
-      Match match = Cardinal.getMatch(event.getPlayer());
-      Spawn spawn = ListUtil.getRandom(getSpawns(match, event.getNewData().getPlaying()));
-      Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
+    MatchThread newThread = event.getNewData().getMatchThread();
+    if (newThread != null && newThread.getCurrentMatch().isRunning()) {
+      Match match = newThread.getCurrentMatch();
+      if (event.getNewData().getPlaying() != null) {
+        Spawn spawn = ListUtil.getRandom(getSpawns(match, event.getNewData().getPlaying()));
+        Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
+      } else {
+        Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, getDefaultSpawn(match)));
+      }
     }
   }
 
@@ -273,7 +280,7 @@ public class SpawnModule extends AbstractListenerModule {
    * @return The default spawn.
    */
   @NonNull
-  public Spawn getDefaultSpawn(@NonNull Match match) {
+  private Spawn getDefaultSpawn(@NonNull Match match) {
     for (Spawn spawn : spawns.get(match)) {
       if (spawn.isDefaultSpawn()) {
         return spawn;
@@ -281,6 +288,15 @@ public class SpawnModule extends AbstractListenerModule {
     }
     // This should never happen as the match will not load without a default spawn.
     return null;
+  }
+
+  /**
+   * Gets the location of the default spawn.
+   * @param match The match.
+   */
+  @NonNull
+  public Location getDefaultSpawnLocation(@NonNull Match match) {
+    return getDefaultSpawn(match).getSpawnPoint();
   }
 
   /**
