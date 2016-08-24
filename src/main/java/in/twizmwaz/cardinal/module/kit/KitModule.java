@@ -34,6 +34,8 @@ import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.filter.Filter;
 import in.twizmwaz.cardinal.module.filter.FilterModule;
+import in.twizmwaz.cardinal.module.kit.listener.DoubleJumpListener;
+import in.twizmwaz.cardinal.module.kit.listener.ShieldListener;
 import in.twizmwaz.cardinal.module.kit.type.KitArmor;
 import in.twizmwaz.cardinal.module.kit.type.KitAttribute;
 import in.twizmwaz.cardinal.module.kit.type.KitClear;
@@ -69,6 +71,11 @@ public class KitModule extends AbstractModule {
 
   @Getter
   private final Map<Match, Map<String, Kit>> kits = Maps.newHashMap();
+
+  public KitModule() {
+    Cardinal.registerEvents(new DoubleJumpListener());
+    Cardinal.registerEvents(new ShieldListener());
+  }
 
   @Override
   public boolean loadMatch(Match match) {

@@ -27,13 +27,16 @@ package in.twizmwaz.cardinal.module.itemremove;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.util.MaterialType;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.material.MaterialData;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
@@ -43,14 +46,10 @@ import java.util.List;
 import java.util.Map;
 
 @ModuleEntry
-public class ItemRemoveModule extends AbstractModule {
+public class ItemRemoveModule extends AbstractListenerModule {
 
   @Getter
   private final Map<Match, List<MaterialType>> materials = new HashMap<>();
-
-  public ItemRemoveModule() {
-    Cardinal.registerEvents(new ItemRemoveModuleListener(this));
-  }
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
@@ -83,6 +82,23 @@ public class ItemRemoveModule extends AbstractModule {
   @Override
   public void clearMatch(@NonNull Match match) {
     materials.remove(match);
+  }
+
+  /**
+   * Prevent items from spawning if they are in the item-remove tag in XML.
+   *
+   * @param event The event.
+   */
+  @EventHandler(ignoreCancelled = true)
+  public void onItemSpawn(ItemSpawnEvent event) {
+    Match match = Cardinal.getMatch(event.getWorld());
+    MaterialData data = event.getEntity().getItemStack().getData();
+    for (MaterialType type : materials.get(match)) {
+      if (type.isType(data)) {
+        event.setCancelled(true);
+        break;
+      }
+    }
   }
 
 }

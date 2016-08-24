@@ -29,24 +29,19 @@ import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import lombok.NonNull;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
 import java.util.Map;
 
 @ModuleEntry
-public class CountdownModule extends AbstractModule implements Listener {
+public class CountdownModule extends AbstractListenerModule {
 
   private Map<MatchThread, CycleCountdown> cycleCountdowns = Maps.newHashMap();
   private Map<Match, StartCountdown> startCountdowns = Maps.newHashMap();
-
-  public CountdownModule() {
-    Cardinal.registerEvents(this);
-  }
 
   @EventHandler
   public void onModuleLoadComplete(ModuleLoadCompleteEvent event) {

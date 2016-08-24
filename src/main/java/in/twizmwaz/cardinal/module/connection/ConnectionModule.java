@@ -27,22 +27,17 @@ package in.twizmwaz.cardinal.module.connection;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.playercontainer.Containers;
 import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInitialSpawnEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @ModuleEntry
-public class ConnectionModule extends AbstractModule implements Listener {
-
-  public ConnectionModule() {
-    Cardinal.registerEvents(this);
-  }
+public class ConnectionModule extends AbstractListenerModule {
 
   /**
    * Handles new container data when the player initially joins the server.

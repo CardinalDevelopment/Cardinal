@@ -28,14 +28,13 @@ package in.twizmwaz.cardinal.module.interact;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.spawn.SpawnModule;
 import in.twizmwaz.cardinal.util.ListUtil;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
@@ -55,11 +54,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
 @ModuleEntry
-public class InteractModule extends AbstractModule implements Listener {
-
-  public InteractModule() {
-    Cardinal.registerEvents(this);
-  }
+public class InteractModule extends AbstractListenerModule {
 
   private boolean canInteract(@NonNull Player player) {
     MatchThread thread = Cardinal.getMatchThread(player);

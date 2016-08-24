@@ -34,7 +34,7 @@ import in.twizmwaz.cardinal.event.player.CardinalRespawnEvent;
 import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchState;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.region.Region;
@@ -52,7 +52,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInitialSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.util.Vector;
@@ -65,16 +64,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @ModuleEntry(depends = {TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class})
-public class SpawnModule extends AbstractModule implements Listener {
+public class SpawnModule extends AbstractListenerModule {
 
   private Map<Match, List<Spawn>> spawns = Maps.newHashMap();
-
-  /**
-   * Default constructor to create the module.
-   */
-  public SpawnModule() {
-    Cardinal.registerEvents(this);
-  }
 
   @Override
   public boolean loadMatch(@NonNull Match match) {

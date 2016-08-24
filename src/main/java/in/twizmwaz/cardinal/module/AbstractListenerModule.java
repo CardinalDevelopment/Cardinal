@@ -23,37 +23,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.module.itemremove;
+package in.twizmwaz.cardinal.module;
 
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.Match;
-import in.twizmwaz.cardinal.util.MaterialType;
-import lombok.AllArgsConstructor;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.material.MaterialData;
 
-@AllArgsConstructor
-public class ItemRemoveModuleListener implements Listener {
+public class AbstractListenerModule extends AbstractModule implements Listener {
 
-  ItemRemoveModule itemRemoveModule;
-
-  /**
-   * Prevent items from spawning if they are in the item-remove tag in XML.
-   *
-   * @param event The event.
-   */
-  @EventHandler(ignoreCancelled = true)
-  public void onItemSpawn(ItemSpawnEvent event) {
-    Match match = Cardinal.getMatch(event.getWorld());
-    MaterialData data = event.getEntity().getItemStack().getData();
-    for (MaterialType type : itemRemoveModule.getMaterials().get(match)) {
-      if (type.isType(data)) {
-        event.setCancelled(true);
-        break;
-      }
-    }
+  public AbstractListenerModule() {
+    Cardinal.registerEvents(this);
   }
 
 }

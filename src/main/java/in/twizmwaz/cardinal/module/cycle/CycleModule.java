@@ -31,7 +31,7 @@ import in.twizmwaz.cardinal.event.match.MatchLoadCompleteEvent;
 import in.twizmwaz.cardinal.event.matchthread.MatchThreadMakeEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
@@ -44,20 +44,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 
 import java.util.Map;
 import java.util.UUID;
 
 @ModuleEntry(depends = {RotationModule.class})
-public final class CycleModule extends AbstractModule implements Listener {
+public final class CycleModule extends AbstractListenerModule {
 
   @Getter
   private final Map<MatchThread, CycleRunnable> nextCycle = Maps.newHashMap();
-
-  public CycleModule() {
-    Cardinal.registerEvents(this);
-  }
 
   /**
    * Creates a new cycle object for the initial server cycle.

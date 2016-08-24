@@ -30,7 +30,7 @@ import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.matchthread.MatchThreadMakeEvent;
 import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.AbstractModule;
+import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
@@ -44,14 +44,10 @@ import java.util.List;
 import java.util.Map;
 
 @ModuleEntry(depends = {RepositoryModule.class})
-public class RotationModule extends AbstractModule implements Listener {
+public class RotationModule extends AbstractListenerModule implements Listener {
 
   @Getter
   private final Map<MatchThread, Rotation> rotations = Maps.newHashMap();
-
-  public RotationModule() {
-    Cardinal.registerEvents(this);
-  }
 
   /**
    * Creates a temporary rotation.
