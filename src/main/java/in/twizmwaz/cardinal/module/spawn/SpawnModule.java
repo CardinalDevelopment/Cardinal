@@ -42,6 +42,7 @@ import in.twizmwaz.cardinal.module.kit.Kit;
 import in.twizmwaz.cardinal.module.kit.KitModule;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.type.PointRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.PointProviderRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
@@ -301,8 +302,9 @@ public class SpawnModule extends AbstractListenerModule {
         return spawn;
       }
     }
-    // This should never happen as the match will not load without a default spawn.
-    return null;
+    // This should never happen as the match will not load without a default spawn. But just in case, use world spawn.
+    return new Spawn(true, null, false, false, false, false, false,
+        Lists.newArrayList(new PointRegion(match, match.getWorld().getSpawnLocation())));
   }
 
   /**

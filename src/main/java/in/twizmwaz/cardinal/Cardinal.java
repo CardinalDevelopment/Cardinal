@@ -183,7 +183,7 @@ public final class Cardinal extends JavaPlugin {
         return matchThread;
       }
     }
-    return null;
+    throw new IllegalStateException("Player is not in a match thread");
   }
 
   /**
