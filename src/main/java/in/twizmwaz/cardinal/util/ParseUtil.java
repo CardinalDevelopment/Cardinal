@@ -29,6 +29,7 @@ import lombok.NonNull;
 import org.jdom2.Element;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +85,41 @@ public class ParseUtil {
    * @return Returns value as long as it isn't null, if it's null, it returns fallback.
    */
   public static <T> T fallback(T value, @NonNull T fallback) {
-    return value == null ? fallback : value;
+      return value == null ? fallback : value;
+  }
+
+  /** Utility to get a list of pre-processed elements, with the parent's attributes. Very useful in any module that has
+   * a parent element, with sub elements.
+   * @param parentElement The parent element to search on. Usually the document root element.
+   * @param parent The parent element name. Ex: cores
+   * @param child The child element name.   Ex: core
+   * @return A list of child elements, containing all attributes from their parents, in importance order.
+   */
+  public static List<Element> getElementsIn(Element parentElement, String parent, String child) {
+    List<Element> results = new ArrayList<>();
+    for (Element element : parentElement.getChildren(parent)) {
+      results.addAll(getElementsIn(parent, child, element));
+    }
+    return results;
+  }
+
+  private static List<Element> getElementsIn(String parent, String child, Element... elements) {
+    List<Element> results = new ArrayList<>();
+
+    elements[0].getChildren(child).forEach(childEl -> results.add(getJoinedElements(addElement(childEl, elements))));
+    elements[0].getChildren(parent)
+        .forEach(parentEl -> results.addAll(getElementsIn(parent, child, addElement(parentEl, elements))));
+
+    return results;
+  }
+
+  private static Element getJoinedElements(Element... elements) {
+    Element result = elements[0].clone();
+    for (Element element : elements) {
+      element.getAttributes().stream()
+          .filter(attribute -> result.getAttribute(attribute.getName()) != null).map(result::setAttribute);
+    }
+    return result;
   }
 
 }

@@ -74,115 +74,109 @@ public class CoreModule extends AbstractListenerModule {
   @Override
   public boolean loadMatch(Match match) {
     Document document = match.getMap().getDocument();
-    for (Element coresElement : document.getRootElement().getChildren("cores")) {
-      for (Element coreElement : coresElement.getChildren("core")) {
-        Located located = (Located) coreElement;
+    for (Element coreElement : ParseUtil.getElementsIn(document.getRootElement(), "cores", "core")) {
+      Located located = (Located) coreElement;
 
-        String id = ParseUtil.getFirstAttribute("id", coreElement, coresElement);
+      String id = coreElement.getAttributeValue("id");
+      String name = coreElement.getAttributeValue("name", "Core");
 
-        String nameValue = ParseUtil.getFirstAttribute("name", coreElement, coresElement);
-        String name = nameValue == null ? "Core" : nameValue;
+      boolean required = Numbers.parseBoolean(coreElement.getAttributeValue("required"), true);
 
-        String requiredValue = ParseUtil.getFirstAttribute("required", coreElement, coresElement);
-        boolean required = requiredValue == null || Numbers.parseBoolean(requiredValue);
+      RegionModule regionModule = Cardinal.getModule(RegionModule.class);
+      Region region;
+      try {
+        region = regionModule.getRegion(match, coreElement);
+      } catch (RegionException e) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{RegionModule.getRegionError(e, "region", "core"),
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        continue;
+      }
+      if (region == null && coreElement.getAttribute("region") != null) {
+        region = regionModule.getRegionById(match, coreElement.getAttributeValue("region"));
+      }
+      if (region == null) {
+        errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for core",
+            "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        continue;
+      }
+      if (!region.isBounded()) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{"Region specified for core must be a bounded region",
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        continue;
+      }
 
-        RegionModule regionModule = Cardinal.getModule(RegionModule.class);
-        Region region;
+      String leakValue = coreElement.getAttributeValue("leak");
+      int leak = 5;
+      if (leakValue != null) {
         try {
-          region = regionModule.getRegion(match, coreElement);
-        } catch (RegionException e) {
+          leak = Numbers.parseInteger(leakValue);
+        } catch (NumberFormatException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{RegionModule.getRegionError(e, "region", "core"),
+              new String[]{"Invalid leak distance specified for core",
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
-        if (region == null && coresElement.getAttribute("region") != null) {
-          region = regionModule.getRegionById(match, coresElement.getAttributeValue("region"));
-        }
-        if (region == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No region specified for core",
-              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          continue;
-        }
-        if (!region.isBounded()) {
+      }
+
+      MaterialPattern material = new MaterialPattern(new AbstractMap.SimpleEntry<>(Material.OBSIDIAN,
+          MaterialPattern.ANY_DATA_VALUE));
+      String materialValue = coreElement.getAttributeValue("material");
+      if (materialValue != null) {
+        try {
+          material = MaterialPattern.getSingleMaterialPattern(materialValue);
+        } catch (NumberFormatException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Region specified for core must be a bounded region",
+              new String[]{"Invalid data value of material specified for core",
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
           continue;
         }
+      }
+      String teamValue = coreElement.getAttributeValue("team");
+      if (teamValue == null) {
+        errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for wool",
+            "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        continue;
+      }
+      Team team = Cardinal.getModule(TeamModule.class).getTeamById(match, teamValue);
+      if (team == null) {
+        errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for core",
+            "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        continue;
+      }
 
-        String leakValue = ParseUtil.getFirstAttribute("leak", coreElement, coresElement);
-        int leak = 5;
-        if (leakValue != null) {
-          try {
-            leak = Numbers.parseInteger(leakValue);
-          } catch (NumberFormatException e) {
-            errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid leak distance specified for core",
-                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-            continue;
-          }
-        }
+      String modeChangesValue = coreElement.getAttributeValue("mode-changes");
+      boolean modeChanges = modeChangesValue == null || Numbers.parseBoolean(modeChangesValue);
 
-        MaterialPattern material = new MaterialPattern(new AbstractMap.SimpleEntry<>(Material.OBSIDIAN,
-            MaterialPattern.ANY_DATA_VALUE));
-        String materialValue = ParseUtil.getFirstAttribute("material", coreElement, coresElement);
-        if (materialValue != null) {
-          try {
-            material = MaterialPattern.getSingleMaterialPattern(materialValue);
-          } catch (NumberFormatException e) {
-            errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid data value of material specified for core",
-                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-            continue;
-          }
-        }
-        String teamValue = ParseUtil.getFirstAttribute("team", coreElement, coresElement);
-        if (teamValue == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"No team specified for core",
-              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          continue;
-        }
-        Team team = Cardinal.getModule(TeamModule.class).getTeamById(match, teamValue);
-        if (team == null) {
-          errors.add(new ModuleError(this, match.getMap(), new String[]{"Invalid team specified for core",
-              "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          continue;
-        }
+      String showValue = coreElement.getAttributeValue("show");
+      boolean show = showValue == null || Numbers.parseBoolean(showValue);
 
-        String modeChangesValue = ParseUtil.getFirstAttribute("mode-changes", coreElement, coresElement);
-        boolean modeChanges = modeChangesValue == null || Numbers.parseBoolean(modeChangesValue);
-
-        String showValue = ParseUtil.getFirstAttribute("show", coreElement, coresElement);
-        boolean show = showValue == null || Numbers.parseBoolean(showValue);
-
-        ProximityMetric proximityMetric = ProximityMetric.CLOSEST_PLAYER;
-        String woolProximityMetricValue = ParseUtil.getFirstAttribute("proximity-metric", coreElement, coresElement);
-        if (woolProximityMetricValue != null) {
-          try {
-            proximityMetric =
-                ProximityMetric.valueOf(Strings.getTechnicalName(woolProximityMetricValue));
-          } catch (IllegalArgumentException e) {
-            errors.add(new ModuleError(this, match.getMap(),
-                new String[]{"Invalid proximity metric specified for core",
-                    "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-            continue;
-          }
-        }
-
-        String proximityHorizontalValue = ParseUtil.getFirstAttribute("proximity-horizontal", coreElement,
-            coresElement);
-        boolean proximityHorizontal = proximityHorizontalValue != null
-            && Numbers.parseBoolean(proximityHorizontalValue);
-
-        Core core = new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
-            proximityMetric, proximityHorizontal);
-        if (!IdModule.get().add(match, id, core)) {
+      ProximityMetric proximityMetric = ProximityMetric.CLOSEST_PLAYER;
+      String proximityMetricValue = coreElement.getAttributeValue("proximity-metric");
+      if (proximityMetricValue != null) {
+        try {
+          proximityMetric =
+              ProximityMetric.valueOf(Strings.getTechnicalName(proximityMetricValue));
+        } catch (IllegalArgumentException e) {
           errors.add(new ModuleError(this, match.getMap(),
-              new String[]{"Core id is not valid or already in use",
+              new String[]{"Invalid proximity metric specified for core",
                   "Element at " + located.getLine() + ", " + located.getColumn()}, false));
-          IdModule.get().add(match, null, core, true);
+          continue;
         }
+      }
+
+      String proximityHorizontalValue = coreElement.getAttributeValue("proximity-horizontal");
+      boolean proximityHorizontal = proximityHorizontalValue != null
+          && Numbers.parseBoolean(proximityHorizontalValue);
+
+      Core core = new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
+          proximityMetric, proximityHorizontal);
+      if (!IdModule.get().add(match, id, core)) {
+        errors.add(new ModuleError(this, match.getMap(),
+            new String[]{"Core id is not valid or already in use",
+                "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+        IdModule.get().add(match, null, core, true);
       }
     }
     return true;
