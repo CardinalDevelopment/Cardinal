@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import ee.ellytr.chat.LocaleRegistry;
 import ee.ellytr.command.CommandExecutor;
 import ee.ellytr.command.CommandRegistry;
+import ee.ellytr.command.ProviderRegistry;
 import ee.ellytr.command.exception.CommandException;
 import in.twizmwaz.cardinal.command.CommandCardinal;
 import in.twizmwaz.cardinal.command.CommandCycle;
@@ -156,12 +157,14 @@ public final class Cardinal extends JavaPlugin {
     commandRegistry.addClass(CommandJoin.class);
     commandRegistry.addClass(CommandNext.class);
     commandRegistry.addClass(CommandStart.class);
+
+    ProviderRegistry providerRegistry = commandRegistry.getProviderRegistry();
+    providerRegistry.registerProvider(Team.class, new TeamProvider());
+    providerRegistry.registerProvider(LoadedMap.class, new LoadedMapProvider());
+
     commandRegistry.register();
 
     commandExecutor = new CommandExecutor(commandRegistry.getFactory());
-
-    commandRegistry.getProviderRegistry().registerProvider(Team.class, new TeamProvider());
-    commandRegistry.getProviderRegistry().registerProvider(LoadedMap.class, new LoadedMapProvider());
   }
 
   /**
