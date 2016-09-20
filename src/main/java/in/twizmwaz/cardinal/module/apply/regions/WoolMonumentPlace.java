@@ -27,7 +27,7 @@ package in.twizmwaz.cardinal.module.apply.regions;
 
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
-import in.twizmwaz.cardinal.component.TeamComponentBuilder;
+import in.twizmwaz.cardinal.component.team.TeamComponentBuilder;
 import in.twizmwaz.cardinal.module.apply.AppliedRegion;
 import in.twizmwaz.cardinal.module.apply.ApplyType;
 import in.twizmwaz.cardinal.module.filter.type.MaterialFilter;

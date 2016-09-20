@@ -29,8 +29,8 @@ import com.google.common.collect.Lists;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.filter.Filter;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.kit.Kit;
-import in.twizmwaz.cardinal.module.kit.KitModule;
 import in.twizmwaz.cardinal.module.kit.KitRemovable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -92,7 +92,7 @@ public class KitCluster implements KitRemovable {
   private void evaluateParents() {
     if (parentsRaw != null) {
       parentsRaw.forEach(parent -> {
-        Kit kit = Cardinal.getModule(KitModule.class).getKits().get(match).get(parent);
+        Kit kit = IdModule.get().get(match, parent, Kit.class);
         if (kit != null) {
           parents.add(kit);
         }

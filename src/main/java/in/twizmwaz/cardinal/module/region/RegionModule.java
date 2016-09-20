@@ -30,6 +30,7 @@ import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.region.exception.RegionAttributeException;
 import in.twizmwaz.cardinal.module.region.exception.RegionPropertyException;
 import in.twizmwaz.cardinal.module.region.exception.attribute.InvalidRegionAttributeException;
@@ -76,14 +77,11 @@ import lombok.NonNull;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ModuleEntry
+@ModuleEntry(depends = {IdModule.class})
 public class RegionModule extends AbstractModule {
-
-  private Map<Match, Map<String, Region>> regions = new HashMap<>();
 
   //Static regions. Can be shared across matches
   public static final Region EVERYWHERE = new EverywhereRegion(null);
@@ -91,11 +89,8 @@ public class RegionModule extends AbstractModule {
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
-    Map<String, Region> regions = new HashMap<>();
-    this.regions.put(match, regions);
-
-    regions.put("everywhere", EVERYWHERE);
-    regions.put("nowhere", NOWHERE);
+    IdModule.get().add(match, "everywhere", new EverywhereRegion(match));
+    IdModule.get().add(match, "nowhere", new NowhereRegion(match));
 
     for (Element regionsElement : match.getMap().getDocument().getRootElement().getChildren("regions")) {
       for (Element regionElement : regionsElement.getChildren()) {
@@ -105,9 +100,7 @@ public class RegionModule extends AbstractModule {
         try {
           Map.Entry<String, String> id =
               ParseUtil.getFirstNonNullAttributeValue(regionElement, Lists.newArrayList("id", "name"));
-          if (id != null) {
-            regions.put(id.getValue(), getRegion(match, regionElement));
-          }
+          IdModule.get().add(match, id != null ? id.getValue() : null, getRegion(match, regionElement));
         } catch (RegionException e) {
           errors.add(new ModuleError(this, match.getMap(), new String[]{getRegionError(e, "region", null)}, false));
         }
@@ -121,7 +114,7 @@ public class RegionModule extends AbstractModule {
    * @return The region that has the given ID.
    */
   public Region getRegionById(@NonNull Match match, @NonNull String id) {
-    return regions.get(match).get(id);
+    return IdModule.get().get(match, id, Region.class);
   }
 
   /**

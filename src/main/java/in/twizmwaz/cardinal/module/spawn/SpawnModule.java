@@ -26,7 +26,6 @@
 package in.twizmwaz.cardinal.module.spawn;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
 import in.twizmwaz.cardinal.event.match.MatchLoadCompleteEvent;
@@ -38,6 +37,7 @@ import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.kit.Kit;
 import in.twizmwaz.cardinal.module.kit.KitModule;
 import in.twizmwaz.cardinal.module.region.Region;
@@ -65,24 +65,20 @@ import org.jdom2.Element;
 import org.jdom2.located.Located;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-@ModuleEntry(depends = {TeamModule.class, KitModule.class/*, FilterModule.class*/, RegionModule.class})
+@ModuleEntry(depends = {IdModule.class, TeamModule.class/*, KitModule.class, FilterModule.class*/, RegionModule.class})
 public class SpawnModule extends AbstractListenerModule {
-
-  private Map<Match, List<Spawn>> spawns = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
-    List<Spawn> spawns = Lists.newArrayList();
     Document document = match.getMap().getDocument();
     boolean defaultPresent = false;
     for (Element spawnsElement : document.getRootElement().getChildren("spawns")) {
       for (Element spawnElement : spawnsElement.getChildren("spawn")) {
         Spawn spawn = parseSpawn(match, spawnElement, spawnsElement);
         if (spawn != null) {
-          spawns.add(spawn);
+          IdModule.get().add(match, null, spawn, true);
           if (spawn.isDefaultSpawn()) {
             defaultPresent = true;
           }
@@ -93,8 +89,8 @@ public class SpawnModule extends AbstractListenerModule {
       errors.add(new ModuleError(this, match.getMap(), new String[]{"No valid default spawn"}, true));
       return false;
     }
-    this.spawns.put(match, spawns);
-    StringBuilder builder = new StringBuilder().append("Spawns loaded : ").append(spawns.size());
+    StringBuilder builder = new StringBuilder().append("Spawns loaded : ")
+        .append(IdModule.get().getList(match, Spawn.class).size());
     errors.add(new ModuleError(this, match.getMap(), new String[]{builder.toString()}, false));
     return true;
   }
@@ -297,13 +293,13 @@ public class SpawnModule extends AbstractListenerModule {
    */
   @NonNull
   private Spawn getDefaultSpawn(@NonNull Match match) {
-    for (Spawn spawn : spawns.get(match)) {
+    for (Spawn spawn : IdModule.get().getList(match, Spawn.class)) {
       if (spawn.isDefaultSpawn()) {
         return spawn;
       }
     }
     // This should never happen as the match will not load without a default spawn. But just in case, use world spawn.
-    return new Spawn(true, null, false, false, false, false, false,
+    return new Spawn(true, null, false, false, false, false, false, null,
         Lists.newArrayList(new PointRegion(match, match.getWorld().getSpawnLocation())));
   }
 
@@ -323,10 +319,10 @@ public class SpawnModule extends AbstractListenerModule {
    * @return The list of spawns.
    */
   private List<Spawn> getSpawns(@NonNull Match match, @NonNull PlayingPlayerContainer container) {
-    List<Spawn> results =
-        spawns.get(match).stream().filter(spawn -> container.equals(spawn.getTeam())).collect(Collectors.toList());
+    List<Spawn> results = IdModule.get().getList(match, Spawn.class).stream()
+        .filter(spawn -> container.equals(spawn.getTeam())).collect(Collectors.toList());
     if (results.size() == 0) {
-      results = spawns.get(match).stream().filter(
+      results = IdModule.get().getList(match, Spawn.class).stream().filter(
           spawn -> !spawn.isDefaultSpawn() && spawn.getTeam() == null).collect(Collectors.toList());
     }
     return results;

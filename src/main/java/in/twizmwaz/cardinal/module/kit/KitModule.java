@@ -26,7 +26,6 @@
 package in.twizmwaz.cardinal.module.kit;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
@@ -34,6 +33,7 @@ import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.filter.Filter;
 import in.twizmwaz.cardinal.module.filter.FilterModule;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.kit.listener.DoubleJumpListener;
 import in.twizmwaz.cardinal.module.kit.listener.ShieldListener;
 import in.twizmwaz.cardinal.module.kit.type.KitArmor;
@@ -52,7 +52,6 @@ import in.twizmwaz.cardinal.util.ArmorType;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Strings;
 import in.twizmwaz.cardinal.util.document.DocumentItems;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.AttributeModifier;
@@ -67,11 +66,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@ModuleEntry(depends = {FilterModule.class})
+@ModuleEntry(depends = {IdModule.class, FilterModule.class})
 public class KitModule extends AbstractModule {
-
-  @Getter
-  private final Map<Match, Map<String, Kit>> kits = Maps.newHashMap();
 
   public KitModule() {
     Cardinal.registerEvents(new DoubleJumpListener());
@@ -80,19 +76,17 @@ public class KitModule extends AbstractModule {
 
   @Override
   public boolean loadMatch(Match match) {
-    kits.put(match, Maps.newHashMap());
-    Map<String, Kit> matchKits = kits.get(match);
     for (Element kits : match.getMap().getDocument().getRootElement().getChildren("kits")) {
       for (Element element : kits.getChildren("kit")) {
         Map.Entry<String, Kit> entry = parseKit(match, element);
-        matchKits.put(entry.getKey(), entry.getValue());
+        IdModule.get().add(match, entry.getKey(), entry.getValue());
       }
     }
     return true;
   }
 
   public Kit getKit(@NonNull Match match, @NonNull String id) {
-    return kits.get(match).get(id);
+    return IdModule.get().get(match, id, Kit.class);
   }
 
   private Map.Entry<String, Kit> parseKit(Match match, Element element) {
@@ -104,7 +98,7 @@ public class KitModule extends AbstractModule {
     if (element.getAttributeValue("id") != null) {
       name = element.getAttributeValue("id");
     }
-    for (Map.Entry<String, Kit> kitPair : this.kits.get(match).entrySet()) {
+    for (Map.Entry<String, Kit> kitPair : IdModule.get().getMap(match, Kit.class).entrySet()) {
       if (kitPair.getKey().equalsIgnoreCase(name)) {
         return kitPair;
       }

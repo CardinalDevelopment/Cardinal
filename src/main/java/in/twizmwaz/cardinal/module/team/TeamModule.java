@@ -25,12 +25,11 @@
 
 package in.twizmwaz.cardinal.module.team;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import in.twizmwaz.cardinal.util.Strings;
@@ -40,17 +39,13 @@ import org.bukkit.entity.Player;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
-@ModuleEntry
+@ModuleEntry(depends = {IdModule.class})
 public class TeamModule extends AbstractModule {
-
-  private Map<Match, Set<Team>> teams = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
-    Set<Team> teams = Sets.newHashSet();
     Element element = match.getMap().getDocument().getRootElement().getChild("teams");
     if (element != null) {
       element.getChildren().forEach(child -> {
@@ -98,21 +93,17 @@ public class TeamModule extends AbstractModule {
         if (macOverfill == 0) {
           macOverfill = Math.round(max * 1.25f);
         }
-
-        teams.add(new Team(id, color, overHeadColor, plural, showNameTags, min, max, macOverfill, name));
+        Team team = new Team(id, color, overHeadColor, plural, showNameTags, min, max, macOverfill, name);
+        if (!IdModule.get().add(match, id, team)) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Team id is not valid or already in use",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+          IdModule.get().add(match, null, team, true);
+        }
       });
     }
-    this.teams.put(match, teams);
-
-    match.getPlayerContainers().addAll(teams);
-
+    match.getPlayerContainers().addAll(IdModule.get().getList(match, Team.class));
     return true;
-  }
-
-  @Override
-  public void clearMatch(Match match) {
-    teams.get(match).clear();
-    teams.remove(match);
   }
 
   /**
@@ -120,30 +111,7 @@ public class TeamModule extends AbstractModule {
    * @return The team that has the input ID.
    */
   public Team getTeamById(@NonNull Match match, @NonNull String id) {
-    if (teams.get(match) == null) {
-      return null;
-    }
-    for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "").equalsIgnoreCase(id.replaceAll(" ", ""))) {
-        return team;
-      }
-    }
-    for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "").toLowerCase().startsWith(id.replaceAll(" ", "").toLowerCase())) {
-        return team;
-      }
-    }
-    for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "-").equalsIgnoreCase(id.replaceAll(" ", "-"))) {
-        return team;
-      }
-    }
-    for (Team team : teams.get(match)) {
-      if (team.getId().replaceAll(" ", "-").toLowerCase().startsWith(id.replaceAll(" ", "-").toLowerCase())) {
-        return team;
-      }
-    }
-    return null;
+    return IdModule.get().get(match, id, Team.class, false);
   }
 
   /**
@@ -151,10 +119,7 @@ public class TeamModule extends AbstractModule {
    * @return The team that ha the input name.
    */
   public Team getTeamByName(@NonNull Match match, @NonNull String name) {
-    if (teams.get(match) == null) {
-      return null;
-    }
-    for (Team team : teams.get(match)) {
+    for (Team team : getTeams(match)) {
       if (Strings.getSimplifiedName(team.getName()).startsWith(Strings.getSimplifiedName(name))) {
         return team;
       }
@@ -167,10 +132,7 @@ public class TeamModule extends AbstractModule {
    * @return The team which the player is on.
    */
   public Team getTeamByPlayer(@NonNull Match match, @NonNull Player player) {
-    if (!teams.containsKey(match)) {
-      return null;
-    }
-    for (Team team : teams.get(match)) {
+    for (Team team : getTeams(match)) {
       if (team.getPlayers().contains(player)) {
         return team;
       }
@@ -184,8 +146,8 @@ public class TeamModule extends AbstractModule {
    * @param match The match that contains the teams.
    * @return The teams from this match.
    */
-  public Set<Team> getTeams(@NonNull Match match) {
-    return teams.get(match);
+  public List<Team> getTeams(@NonNull Match match) {
+    return IdModule.get().getList(match, Team.class);
   }
 
 }

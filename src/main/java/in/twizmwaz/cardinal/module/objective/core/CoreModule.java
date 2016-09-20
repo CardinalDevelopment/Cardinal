@@ -25,23 +25,22 @@
 
 package in.twizmwaz.cardinal.module.objective.core;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import ee.ellytr.chat.component.formattable.LocalizedComponent;
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.component.TeamComponent;
+import in.twizmwaz.cardinal.component.team.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
-import in.twizmwaz.cardinal.module.apply.AppliedModule;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
+import in.twizmwaz.cardinal.module.region.type.BlockRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import in.twizmwaz.cardinal.util.Channels;
@@ -68,16 +67,12 @@ import org.jdom2.located.Located;
 
 import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
 
-@ModuleEntry(depends = {TeamModule.class, RegionModule.class, AppliedModule.class})
+@ModuleEntry(depends = {IdModule.class, TeamModule.class, RegionModule.class})
 public class CoreModule extends AbstractListenerModule {
-
-  private Map<Match, List<Core>> cores = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
-    List<Core> cores = Lists.newArrayList();
     Document document = match.getMap().getDocument();
     for (Element coresElement : document.getRootElement().getChildren("cores")) {
       for (Element coreElement : coresElement.getChildren("core")) {
@@ -180,30 +175,29 @@ public class CoreModule extends AbstractListenerModule {
         boolean proximityHorizontal = proximityHorizontalValue != null
             && Numbers.parseBoolean(proximityHorizontalValue);
 
-        cores.add(new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
-            proximityMetric, proximityHorizontal));
+        Core core = new Core(match, id, name, required, region, leak, material, team, modeChanges, show,
+            proximityMetric, proximityHorizontal);
+        if (!IdModule.get().add(match, id, core)) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Core id is not valid or already in use",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+          IdModule.get().add(match, null, core, true);
+        }
       }
     }
-    this.cores.put(match, cores);
     return true;
-  }
-
-  @Override
-  public void clearMatch(Match match) {
-    this.cores.get(match).clear();
-    this.cores.remove(match);
   }
 
   /**
    * @param vector The vector that this method bases the closest core off of.
    * @return The core closest to the given vector.
    */
-  public Core getClosestCore(Match match, Vector vector) {
+  private Core getClosestCore(Match match, Vector vector) {
     Core closestCore = null;
     double closestDistance = Double.POSITIVE_INFINITY;
-    for (Core core : this.cores.get(match)) {
-      Vector center = core.getRegion().getBounds().getCenterBlock().getVector();
-      double distance = vector.distanceSquared(center);
+    for (Core core : IdModule.get().getList(match, Core.class)) {
+      BlockRegion center = core.getRegion().getBounds().getCenterBlock();
+      double distance = vector.distance(center.getVector());
       if (distance < closestDistance) {
         closestCore = core;
         closestDistance = distance;
@@ -212,8 +206,9 @@ public class CoreModule extends AbstractListenerModule {
     return closestCore;
   }
 
-  public List<Core> getCores(@NonNull Match match) {
-    return cores.get(match);
+
+  private List<Core> getCores(@NonNull Match match) {
+    return IdModule.get().getList(match, Core.class);
   }
 
   /**
@@ -225,12 +220,13 @@ public class CoreModule extends AbstractListenerModule {
   public void onBlockBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();
     Match match = Cardinal.getMatch(player);
-    if (match == null || !match.hasPlayer(player) || this.cores.get(match).size() == 0) {
+    List<Core> cores = getCores(match);
+    if (match == null || !match.hasPlayer(player) || cores.size() == 0) {
       return;
     }
     Team team = (Team) match.getPlayingContainer(player);
     Block block = event.getBlock();
-    cores.get(match).forEach(core -> {
+    cores.forEach(core -> {
       if (core.getRegion().contains(block.getLocation())) {
         core.setTouched(team);
         if (core.isShow() && !core.getTouchedPlayers().contains(player)) {
@@ -256,21 +252,23 @@ public class CoreModule extends AbstractListenerModule {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onBlockFromTo(BlockFromToEvent event) {
     Match match = Cardinal.getMatch(event.getWorld());
-    if (match == null || this.cores.get(match).size() == 0) {
+    if (match == null) {
       return;
     }
     Block to = event.getToBlock();
     Material type = event.getBlock().getType();
-    Core core = getClosestCore(match, to.getLocation().clone());
-    if ((type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA)) && !core.isComplete()) {
-      int distance = getBottom(core) - to.getY();
-      if (distance >= core.getLeak()) {
-        core.setComplete(true);
-        Channels.getGlobalChannel(Cardinal.getMatchThread(match)).sendMessage(new LocalizedComponentBuilder(
-            ChatConstant.getConstant("objective.core.completed"),
-            new TeamComponent(core.getOwner()),
-            Components.setColor(core.getComponent(), ChatColor.RED)).color(ChatColor.RED).build());
-        Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(core, null));
+    if (type.equals(Material.STATIONARY_LAVA) || type.equals(Material.LAVA)) {
+      Core core = getClosestCore(match, to.getLocation().clone());
+      if (core != null && !core.isComplete()) {
+        int distance = getBottom(core) - to.getY();
+        if (distance >= core.getLeak()) {
+          core.setComplete(true);
+          Channels.getGlobalChannel(Cardinal.getMatchThread(match)).sendMessage(new LocalizedComponentBuilder(
+              ChatConstant.getConstant("objective.core.completed"),
+              new TeamComponent(core.getOwner()),
+              Components.setColor(core.getComponent(), ChatColor.RED)).color(ChatColor.RED).build());
+          Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(core, null));
+        }
       }
     }
   }
@@ -284,10 +282,11 @@ public class CoreModule extends AbstractListenerModule {
   public void onPlayerDeath(PlayerDeathEvent event) {
     Player player = event.getEntity();
     Match match = Cardinal.getMatch(player);
-    if (match == null || !match.hasPlayer(player) || this.cores.get(match).size() == 0) {
+    List<Core> cores = getCores(match);
+    if (match == null || !match.hasPlayer(player) || cores.size() == 0) {
       return;
     }
-    cores.get(match).forEach(core -> core.getTouchedPlayers().remove(player));
+    cores.forEach(core -> core.getTouchedPlayers().remove(player));
   }
 
   private int getBottom(Core core) {

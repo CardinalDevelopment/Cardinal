@@ -25,7 +25,6 @@
 
 package in.twizmwaz.cardinal.module.objective.wool;
 
-import com.google.common.collect.Lists;
 import ee.ellytr.chat.ChatConstant;
 import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
@@ -41,6 +40,7 @@ import in.twizmwaz.cardinal.module.apply.ApplyType;
 import in.twizmwaz.cardinal.module.apply.regions.WoolMonumentPlace;
 import in.twizmwaz.cardinal.module.filter.FilterState;
 import in.twizmwaz.cardinal.module.filter.type.StaticFilter;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.objective.ProximityRule;
 import in.twizmwaz.cardinal.module.region.Region;
@@ -64,7 +64,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -76,18 +79,13 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.located.Located;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@ModuleEntry(depends = {TeamModule.class, RegionModule.class, AppliedModule.class})
+@ModuleEntry(depends = {IdModule.class, TeamModule.class, RegionModule.class, AppliedModule.class})
 public class WoolModule extends AbstractListenerModule {
-
-  private Map<Match, List<Wool>> wools = new HashMap<>();
 
   @Override
   public boolean loadMatch(Match match) {
-    List<Wool> wools = Lists.newArrayList();
     Document document = match.getMap().getDocument();
     for (Element woolsElement : document.getRootElement().getChildren("wools")) {
       for (Element woolElement : woolsElement.getChildren("wool")) {
@@ -227,7 +225,12 @@ public class WoolModule extends AbstractListenerModule {
             new ProximityRule(woolProximityMetric, woolProximityHorizontal),
             new ProximityRule(monumentProximityMetric, monumentProximityHorizontal)
         );
-        wools.add(wool);
+        if (!IdModule.get().add(match, id, wool)) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Wool id is not valid or already in use",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+          IdModule.get().add(match, null, wool, true);
+        }
         AppliedModule appliedModule = Cardinal.getModule(AppliedModule.class);
         appliedModule.add(match, new WoolMonumentPlace(wool), true);
         appliedModule.add(match,
@@ -238,18 +241,11 @@ public class WoolModule extends AbstractListenerModule {
                 ).color(ChatColor.RED).build()), true);
       }
     }
-    this.wools.put(match, wools);
     return true;
   }
 
-  @Override
-  public void clearMatch(Match match) {
-    wools.get(match).forEach(HandlerList::unregisterAll);
-    wools.remove(match);
-  }
-
   public List<Wool> getWools(@NonNull Match match) {
-    return wools.get(match);
+    return IdModule.get().getList(match, Wool.class);
   }
 
 
@@ -260,7 +256,7 @@ public class WoolModule extends AbstractListenerModule {
    */
   @EventHandler(ignoreCancelled = true)
   public void onInventoryClick(InventoryClickEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getActor()))) {
+    for (Wool wool : getWools(Cardinal.getMatch(event.getWorld()))) {
       Player player = event.getActor();
       ItemStack item = event.getCurrentItem();
       Team team = wool.getTeam();
@@ -297,7 +293,7 @@ public class WoolModule extends AbstractListenerModule {
    */
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getPlayer()))) {
+    for (Wool wool : getWools(Cardinal.getMatch(event.getWorld()))) {
       Player player = event.getPlayer();
       ItemStack item = event.getItem().getItemStack();
       Team team = wool.getTeam();
@@ -332,7 +328,7 @@ public class WoolModule extends AbstractListenerModule {
    */
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getWorld()))) {
+    for (Wool wool : getWools(Cardinal.getMatch(event.getWorld()))) {
       if (wool.isComplete()) {
         continue;
       }
@@ -352,7 +348,6 @@ public class WoolModule extends AbstractListenerModule {
                   wool.getComponent(),
                   new TeamComponent(team)).color(ChatColor.GRAY).build());
         }
-
         Bukkit.getPluginManager().callEvent(new ObjectiveCompleteEvent(wool, player));
       }
     }
@@ -365,7 +360,7 @@ public class WoolModule extends AbstractListenerModule {
    */
   @EventHandler(ignoreCancelled = true)
   public void onCraftItem(CraftItemEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getActor()))) {
+    for (Wool wool : getWools(Cardinal.getMatch(event.getWorld()))) {
       if (event.getRecipe().getResult().equals(new ItemStack(Material.WOOL, 1, wool.getColor().getData()))
           && !wool.isCraftable()) {
         event.setCancelled(true);
@@ -381,7 +376,7 @@ public class WoolModule extends AbstractListenerModule {
    */
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent event) {
-    for (Wool wool : wools.get(Cardinal.getMatch(event.getEntity()))) {
+    for (Wool wool : getWools(Cardinal.getMatch(event.getWorld()))) {
       wool.removePlayerTouched(event.getEntity());
     }
   }

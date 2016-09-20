@@ -25,7 +25,6 @@
 
 package in.twizmwaz.cardinal.module.filter;
 
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.event.match.MatchModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.match.Match;
@@ -75,6 +74,7 @@ import in.twizmwaz.cardinal.module.filter.type.modifiers.DenyFilter;
 import in.twizmwaz.cardinal.module.filter.type.modifiers.NotFilter;
 import in.twizmwaz.cardinal.module.filter.type.modifiers.OneFilter;
 import in.twizmwaz.cardinal.module.filter.type.modifiers.RangeFilter;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.team.TeamModule;
 import lombok.NonNull;
@@ -84,12 +84,9 @@ import org.jdom2.Element;
 import org.jdom2.located.Located;
 
 import java.util.Collection;
-import java.util.Map;
 
-@ModuleEntry(depends = {RegionModule.class, TeamModule.class})
+@ModuleEntry(depends = {IdModule.class, RegionModule.class, TeamModule.class})
 public class FilterModule extends AbstractModule implements Listener {
-
-  private Map<Match, Map<String, Filter>> filters = Maps.newHashMap();
 
   //Static filters. Can be shared across matches, because they use no arguments
   public static final Filter ALLOW = new StaticFilter(FilterState.ALLOW);
@@ -113,11 +110,10 @@ public class FilterModule extends AbstractModule implements Listener {
 
   @Override
   public boolean loadMatch(@NonNull Match match) {
-    filters.put(match, Maps.newHashMap());
+    IdModule.get().add(match, "always", ALLOW);
+    IdModule.get().add(match, "deny", DENY);
     for (Element filtersElement : match.getMap().getDocument().getRootElement().getChildren("filters")) {
       for (Element filterElement : filtersElement.getChildren()) {
-        filters.get(match).put("always", ALLOW);
-        filters.get(match).put("never", DENY);
         try {
           getFilter(match, filterElement);
         } catch (FilterException e) {
@@ -128,17 +124,12 @@ public class FilterModule extends AbstractModule implements Listener {
     return true;
   }
 
-  @Override
-  public void clearMatch(@NonNull Match match) {
-    filters.remove(match);
-  }
-
   /**
    * Runs load() on filters that implement the LoadLateFilter interface.
    */
   @EventHandler
   public void onModuleLoad(MatchModuleLoadCompleteEvent event) {
-    loadFilters(event.getMatch(), filters.get(event.getMatch()).values());
+    loadFilters(event.getMatch(), IdModule.get().getList(event.getMatch(), Filter.class));
   }
 
   /**
@@ -155,7 +146,7 @@ public class FilterModule extends AbstractModule implements Listener {
   }
 
   public Filter getFilter(@NonNull Match match, @NonNull String id) {
-    return filters.get(match).get(id);
+    return IdModule.get().get(match, id, Filter.class);
   }
 
   /**
@@ -332,11 +323,10 @@ public class FilterModule extends AbstractModule implements Listener {
 
   private Filter checkFilter(Match match, String id, Filter filter) throws FilterException {
     if (id != null) {
-      if (!filters.get(match).containsKey(id)) {
+      if (!IdModule.get().add(match, id, filter)) {
         //Fixme: needs descriptive exception
         throw new FilterException();
       }
-      filters.get(match).put(id, filter);
     }
     return filter;
   }

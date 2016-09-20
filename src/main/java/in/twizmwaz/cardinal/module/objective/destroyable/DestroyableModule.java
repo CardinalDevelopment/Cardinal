@@ -25,14 +25,13 @@
 
 package in.twizmwaz.cardinal.module.objective.destroyable;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.apply.AppliedModule;
+import in.twizmwaz.cardinal.module.id.IdModule;
 import in.twizmwaz.cardinal.module.objective.ProximityMetric;
 import in.twizmwaz.cardinal.module.region.Region;
 import in.twizmwaz.cardinal.module.region.RegionException;
@@ -55,17 +54,13 @@ import org.jdom2.Element;
 import org.jdom2.located.Located;
 
 import java.util.List;
-import java.util.Map;
 
-@ModuleEntry(depends = {TeamModule.class, RegionModule.class, AppliedModule.class})
+@ModuleEntry(depends = {IdModule.class, TeamModule.class, RegionModule.class, AppliedModule.class})
 public class DestroyableModule extends AbstractListenerModule {
-
-  private Map<Match, List<Destroyable>> destroyables = Maps.newHashMap();
 
   @Override
   public boolean loadMatch(Match match) {
     Document document = match.getMap().getDocument();
-    List<Destroyable> destroyables = Lists.newArrayList();
     for (Element destroyablesElement : document.getRootElement().getChildren("destroyables")) {
       for (Element destroyableElement : destroyablesElement.getChildren("destroyable")) {
         Located located = (Located) destroyableElement;
@@ -171,21 +166,20 @@ public class DestroyableModule extends AbstractListenerModule {
 
         Destroyable destroyable = new Destroyable(match, id, name, required, region, materials, owner,
             completion, modeChanges, showProgress, repairable, sparks, show, proximityMetric, proximityHorizontal);
-        destroyables.add(destroyable);
+        if (!IdModule.get().add(match, id, destroyable)) {
+          errors.add(new ModuleError(this, match.getMap(),
+              new String[]{"Destroyable id is not valid or already in use",
+                  "Element at " + located.getLine() + ", " + located.getColumn()}, false));
+          IdModule.get().add(match, null, destroyable, true);
+        }
       }
     }
-    this.destroyables.put(match, destroyables);
     return true;
   }
 
-  @Override
-  public void clearMatch(Match match) {
-    this.destroyables.get(match).clear();
-    this.destroyables.remove(match);
-  }
 
   public List<Destroyable> getDestroyables(@NonNull Match match) {
-    return destroyables.get(match);
+    return IdModule.get().getList(match, Destroyable.class);
   }
 
   /**
@@ -197,11 +191,12 @@ public class DestroyableModule extends AbstractListenerModule {
   public void onBlockBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();
     Match match = Cardinal.getMatch(player);
-    if (match == null || !match.hasPlayer(player) || this.destroyables.get(match).size() == 0) {
+    List<Destroyable> destroyables = getDestroyables(match);
+    if (match == null || !match.hasPlayer(player) || destroyables.size() == 0) {
       return;
     }
     Block block = event.getBlock();
-    destroyables.get(match).forEach(destroyable -> {
+    destroyables.forEach(destroyable -> {
       if (destroyable.isPartOf(block)) {
         destroyable.addBrokenPiecesFor(player, 1);
       }
@@ -217,10 +212,11 @@ public class DestroyableModule extends AbstractListenerModule {
   public void onPlayerDeath(PlayerDeathEvent event) {
     Player player = event.getEntity();
     Match match = Cardinal.getMatch(player);
-    if (match == null || !match.hasPlayer(player) || this.destroyables.get(match).size() == 0) {
+    List<Destroyable> destroyables = getDestroyables(match);
+    if (match == null || !match.hasPlayer(player) || destroyables.size() == 0) {
       return;
     }
-    destroyables.get(match).forEach(core -> core.getTouchedPlayers().remove(player));
+    destroyables.forEach(core -> core.getTouchedPlayers().remove(player));
   }
 
 }

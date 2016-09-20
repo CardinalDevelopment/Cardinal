@@ -105,7 +105,7 @@ public class Team implements PlayingPlayerContainer {
    *
    * @return The teams from the current match.
    */
-  public static Set<Team> getTeams(@NonNull Match match) {
+  public static List<Team> getTeams(@NonNull Match match) {
     return Cardinal.getModule(TeamModule.class).getTeams(match);
   }
 
@@ -115,7 +115,7 @@ public class Team implements PlayingPlayerContainer {
    * @param teams The set of teams.
    * @return The least full team.
    */
-  public static Team getEmptiestTeam(@NonNull Set<Team> teams) {
+  public static Team getEmptiestTeam(@NonNull List<Team> teams) {
     Team emptiestTeam = null;
     double emptiestFill = Integer.MAX_VALUE;
     for (Team team : teams) {
