@@ -37,7 +37,7 @@ public class PlayerContainerData {
 
   private final MatchThread matchThread;
   private final Match match;
-  private final PlayingPlayerContainer playing;
+  private final CompetitorContainer playing;
 
   /**
    * Creates new container data under a match thread, match, and player container.
@@ -46,7 +46,7 @@ public class PlayerContainerData {
    * @param match The match.
    * @param playing The player container.
    */
-  public PlayerContainerData(MatchThread matchThread, Match match, PlayingPlayerContainer playing) {
+  public PlayerContainerData(MatchThread matchThread, Match match, CompetitorContainer playing) {
     if (match != null && playing == null) {
       throw new IllegalArgumentException("Playing cannot be null when match is not null");
     }
@@ -64,7 +64,7 @@ public class PlayerContainerData {
   public static PlayerContainerData of(@NonNull Player player) {
     MatchThread thread = Cardinal.getMatchThread(player);
     if (thread.getCurrentMatch().hasPlayer(player)) {
-      PlayingPlayerContainer container = thread.getCurrentMatch().getPlayingContainer(player);
+      CompetitorContainer container = thread.getCurrentMatch().getPlayingContainer(player);
       return new PlayerContainerData(thread, thread.getCurrentMatch(), container);
     } else {
       return new PlayerContainerData(thread, null, null);

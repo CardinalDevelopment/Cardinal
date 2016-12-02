@@ -27,7 +27,7 @@ package in.twizmwaz.cardinal.module.team;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,7 +38,7 @@ import org.bukkit.entity.Player;
 import java.util.Iterator;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SinglePlayerContainer implements PlayingPlayerContainer {
+public class SinglePlayerContainer implements CompetitorContainer {
 
   @NonNull
   private final Player player;

@@ -28,8 +28,8 @@ package in.twizmwaz.cardinal.module.scoreboard;
 
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import java.util.Map;
 public class MatchScoreboardManager {
 
   private final Match match;
-  private Map<PlayingPlayerContainer, ScoreboardDisplay> displays = new HashMap<>();
+  private Map<CompetitorContainer, ScoreboardDisplay> displays = new HashMap<>();
   private ScoreboardDisplay defaultDisplay;
 
   /**
@@ -52,18 +52,18 @@ public class MatchScoreboardManager {
   }
 
   /**
-   * Adds a new ScoreboardDisplay for a PlayingPlayerContainer, used in FFA when a new player joins.
+   * Adds a new ScoreboardDisplay for a CompetitorContainer, used in FFA when a new player joins.
    * @param container The player container.
    */
-  public void addPlayerContainerDisplay(PlayingPlayerContainer container) {
+  public void addPlayerContainerDisplay(CompetitorContainer container) {
     displays.put(container, new ScoreboardDisplay(match, container));
   }
 
   /**
-   * Removes a ScoreboardDisplay for a PlayingPlayerContainer, used in FFA when a new player leaves.
+   * Removes a ScoreboardDisplay for a CompetitorContainer, used in FFA when a new player leaves.
    * @param container The player container.
    */
-  public void removePlayerContainerDisplay(PlayingPlayerContainer container) {
+  public void removePlayerContainerDisplay(CompetitorContainer container) {
     displays.remove(container);
   }
 

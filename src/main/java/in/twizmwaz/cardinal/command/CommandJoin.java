@@ -34,9 +34,9 @@ import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
 import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.playercontainer.Containers;
 import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import org.bukkit.entity.Player;
 
 public class CommandJoin {
@@ -53,7 +53,7 @@ public class CommandJoin {
     Player player = (Player) cmd.getSender();
     MatchThread thread = Cardinal.getMatchThread(player);
     Match match = thread.getCurrentMatch();
-    PlayingPlayerContainer playing = team;
+    CompetitorContainer playing = team;
     if (!match.isFfa()) {
       if (playing == null) {
         playing = Team.getEmptiestTeam(Team.getTeams(Cardinal.getMatch(player)));

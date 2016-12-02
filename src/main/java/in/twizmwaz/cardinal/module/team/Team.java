@@ -35,7 +35,7 @@ import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.OwnedObjective;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-public class Team implements PlayingPlayerContainer {
+public class Team implements CompetitorContainer {
 
   private final String id;
   private final ChatColor color;
@@ -129,7 +129,7 @@ public class Team implements PlayingPlayerContainer {
   }
 
   public static ChatColor getTeamColor(@NonNull Player player) {
-    PlayingPlayerContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
+    CompetitorContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
     return container instanceof Team ? ((Team) container).getColor() : ChatColor.YELLOW;
   }
 

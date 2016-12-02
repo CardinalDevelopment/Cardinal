@@ -32,7 +32,7 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
@@ -73,7 +73,7 @@ public class ScoreModule extends AbstractModule {
    * @param match The match.
    * @param container The container to create a score for.
    */
-  public void addScoreModule(Match match, PlayingPlayerContainer container) {
+  public void addScoreModule(Match match, CompetitorContainer container) {
     PlayerContainerScore score = getScore(match, container);
     if (score == null) {
       scores.get(match).add(new PlayerContainerScore(container, rules.get(match)));
@@ -85,7 +85,7 @@ public class ScoreModule extends AbstractModule {
    * @param match The match.
    * @param container The container to remove the score from.
    */
-  public void removeScoreModule(Match match, PlayingPlayerContainer container) {
+  public void removeScoreModule(Match match, CompetitorContainer container) {
     PlayerContainerScore score = getScore(match, container);
     if (score != null) {
       scores.get(match).remove(score);
@@ -97,12 +97,12 @@ public class ScoreModule extends AbstractModule {
   }
 
   /**
-   * Returns a score for a PlayingPlayerContainer in a match.
+   * Returns a score for a CompetitorContainer in a match.
    * @param match The match.
-   * @param container The PlayingPlayerContainer
+   * @param container The CompetitorContainer
    * @return A PlayerContainerScore for that container.
    */
-  public PlayerContainerScore getScore(Match match, PlayingPlayerContainer container) {
+  public PlayerContainerScore getScore(Match match, CompetitorContainer container) {
     for (PlayerContainerScore score : scores.get(match)) {
       if (score.getContainer().equals(container)) {
         return score;

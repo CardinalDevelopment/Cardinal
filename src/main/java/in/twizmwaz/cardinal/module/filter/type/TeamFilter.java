@@ -28,7 +28,7 @@ package in.twizmwaz.cardinal.module.filter.type;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.filter.FilterState;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 
@@ -42,7 +42,7 @@ public class TeamFilter extends SingleObjectFilter {
     if (evaluating instanceof Team) {
       return FilterState.fromBoolean(team.equals(evaluating));
     } else if (evaluating instanceof Player) {
-      PlayingPlayerContainer container =
+      CompetitorContainer container =
           Cardinal.getMatch((Player) evaluating).getPlayingContainer((Player) evaluating);
       return FilterState.fromBoolean(container != null && team.equals(container));
     }

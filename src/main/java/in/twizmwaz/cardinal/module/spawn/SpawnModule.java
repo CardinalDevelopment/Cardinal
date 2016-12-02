@@ -46,7 +46,7 @@ import in.twizmwaz.cardinal.module.region.type.PointRegion;
 import in.twizmwaz.cardinal.module.region.type.modifications.PointProviderRegion;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.util.ListUtil;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
@@ -318,7 +318,7 @@ public class SpawnModule extends AbstractListenerModule {
    * @param container The container for the spawns.
    * @return The list of spawns.
    */
-  private List<Spawn> getSpawns(@NonNull Match match, @NonNull PlayingPlayerContainer container) {
+  private List<Spawn> getSpawns(@NonNull Match match, @NonNull CompetitorContainer container) {
     List<Spawn> results = IdModule.get().getList(match, Spawn.class).stream()
         .filter(spawn -> container.equals(spawn.getTeam())).collect(Collectors.toList());
     if (results.size() == 0) {

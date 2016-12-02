@@ -32,8 +32,8 @@ import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
 import in.twizmwaz.cardinal.module.team.Team;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.playercontainer.PlayerContainer;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -55,7 +55,7 @@ public final class Match implements PlayerContainer {
   private final LoadedMap map;
   private final World world;
   private final Set<Player> players;
-  private final Set<PlayingPlayerContainer> playerContainers;
+  private final Set<CompetitorContainer> competitors;
 
   private final int matchNumber;
 
@@ -74,7 +74,7 @@ public final class Match implements PlayerContainer {
     this.map = map;
     this.world = world;
     players = Sets.newHashSet();
-    playerContainers = Sets.newHashSet();
+    competitors = Sets.newHashSet();
     this.matchNumber = matchCounter++;
 
     state = MatchState.WAITING;
@@ -107,7 +107,7 @@ public final class Match implements PlayerContainer {
    * @return If the match is a free-for-all.
    */
   public boolean isFfa() {
-    for (PlayingPlayerContainer container : playerContainers) {
+    for (CompetitorContainer container : competitors) {
       if (container instanceof Team) {
         return false;
       }
@@ -129,16 +129,16 @@ public final class Match implements PlayerContainer {
   public void addPlayer(@NonNull Player player) {
     players.add(player);
     if (isFfa()) {
-      playerContainers.add(SinglePlayerContainer.of(player));
+      competitors.add(SinglePlayerContainer.of(player));
     }
   }
 
   @Override
   public void removePlayer(@NonNull Player player) {
-    PlayingPlayerContainer container = getPlayingContainer(player);
+    CompetitorContainer container = getPlayingContainer(player);
     players.remove(player);
     if (isFfa()) {
-      playerContainers.remove(container);
+      competitors.remove(container);
     } else {
       container.removePlayer(player);
     }
@@ -150,21 +150,21 @@ public final class Match implements PlayerContainer {
   }
 
   /**
-   * Gets the {@link PlayingPlayerContainer} of a player in the match.
+   * Gets the {@link CompetitorContainer} of a player in the match.
    *
    * @param player The player.
    * @return The container of the player.
    */
-  public PlayingPlayerContainer getPlayingContainer(@NonNull Player player) {
+  public CompetitorContainer getPlayingContainer(@NonNull Player player) {
     if (!players.contains(player)) {
-      throw new IllegalArgumentException("Cannot get PlayingPlayerContainer of player not in match");
+      throw new IllegalArgumentException("Cannot get CompetitorContainer of player not in match");
     } else {
-      for (PlayingPlayerContainer container : playerContainers) {
+      for (CompetitorContainer container : competitors) {
         if (container.hasPlayer(player)) {
           return container;
         }
       }
-      throw new IllegalStateException("Player is in match but is missing a PlayingPlayerContainer.");
+      throw new IllegalStateException("Player is in match but is missing a CompetitorContainer.");
     }
   }
 }

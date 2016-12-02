@@ -27,7 +27,7 @@ package in.twizmwaz.cardinal.playercontainer;
 
 import net.md_5.bungee.api.ChatColor;
 
-public interface PlayingPlayerContainer extends PlayerContainer {
+public interface CompetitorContainer extends PlayerContainer {
 
   String getName();
 

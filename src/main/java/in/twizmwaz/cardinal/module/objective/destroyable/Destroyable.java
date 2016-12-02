@@ -53,7 +53,7 @@ import in.twizmwaz.cardinal.module.region.type.FiniteBlockRegion;
 import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryHolder;
 import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryUpdater;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Characters;
 import in.twizmwaz.cardinal.util.Components;
@@ -176,7 +176,7 @@ public class Destroyable extends Objective implements OwnedObjective, EntryUpdat
    * @param contribution The amount of pieces this player broke.
    */
   public void addBrokenPiecesFor(Player player, int contribution) {
-    PlayingPlayerContainer container = match.getPlayingContainer(player);
+    CompetitorContainer container = match.getPlayingContainer(player);
     if (!isCompleted() && container instanceof Team) {
       Team team = (Team) container;
       setTouched(team);

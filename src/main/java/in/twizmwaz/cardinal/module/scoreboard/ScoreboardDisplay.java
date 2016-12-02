@@ -39,7 +39,7 @@ import in.twizmwaz.cardinal.module.scoreboard.displayables.TeamName;
 import in.twizmwaz.cardinal.module.scoreboard.displayables.WoolScoreboardEntry;
 import in.twizmwaz.cardinal.module.scores.ScoreModule;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.PlayingPlayerContainer;
+import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -58,7 +58,7 @@ public class ScoreboardDisplay extends ScoreboardGroup {
 
   Match match;
   @Getter
-  PlayingPlayerContainer viewer;
+  CompetitorContainer viewer;
   private final Scoreboard scoreboard;
   @Getter
   private final Objective objective;
@@ -74,7 +74,7 @@ public class ScoreboardDisplay extends ScoreboardGroup {
 
   EmptyScoreboardEntry defaultEntry;
 
-  ScoreboardDisplay(Match match, PlayingPlayerContainer viewer) {
+  ScoreboardDisplay(Match match, CompetitorContainer viewer) {
     this.match = match;
     this.viewer = viewer;
     scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
