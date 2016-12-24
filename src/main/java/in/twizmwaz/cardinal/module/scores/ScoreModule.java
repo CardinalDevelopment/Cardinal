@@ -26,13 +26,13 @@
 package in.twizmwaz.cardinal.module.scores;
 
 import com.google.common.collect.Lists;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.ModuleError;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.ParseUtil;
 import lombok.NonNull;
@@ -73,7 +73,7 @@ public class ScoreModule extends AbstractModule {
    * @param match The match.
    * @param container The container to create a score for.
    */
-  public void addScoreModule(Match match, CompetitorContainer container) {
+  public void addScoreModule(Match match, CompetitorGroup container) {
     PlayerContainerScore score = getScore(match, container);
     if (score == null) {
       scores.get(match).add(new PlayerContainerScore(container, rules.get(match)));
@@ -85,7 +85,7 @@ public class ScoreModule extends AbstractModule {
    * @param match The match.
    * @param container The container to remove the score from.
    */
-  public void removeScoreModule(Match match, CompetitorContainer container) {
+  public void removeScoreModule(Match match, CompetitorGroup container) {
     PlayerContainerScore score = getScore(match, container);
     if (score != null) {
       scores.get(match).remove(score);
@@ -97,12 +97,12 @@ public class ScoreModule extends AbstractModule {
   }
 
   /**
-   * Returns a score for a CompetitorContainer in a match.
+   * Returns a score for a CompetitorGroup in a match.
    * @param match The match.
-   * @param container The CompetitorContainer
+   * @param container The CompetitorGroup
    * @return A PlayerContainerScore for that container.
    */
-  public PlayerContainerScore getScore(Match match, CompetitorContainer container) {
+  public PlayerContainerScore getScore(Match match, CompetitorGroup container) {
     for (PlayerContainerScore score : scores.get(match)) {
       if (score.getContainer().equals(container)) {
         return score;

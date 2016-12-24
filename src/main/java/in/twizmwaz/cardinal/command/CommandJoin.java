@@ -30,13 +30,12 @@ import ee.ellytr.command.CommandContext;
 import ee.ellytr.command.PlayerCommand;
 import ee.ellytr.command.argument.Optional;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.match.MatchThread;
-import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
+import in.twizmwaz.cardinal.module.team.SinglePlayerGroup;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
-import in.twizmwaz.cardinal.playercontainer.Containers;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.module.group.groups.GroupData;
 import org.bukkit.entity.Player;
 
 public class CommandJoin {
@@ -53,16 +52,16 @@ public class CommandJoin {
     Player player = (Player) cmd.getSender();
     MatchThread thread = Cardinal.getMatchThread(player);
     Match match = thread.getCurrentMatch();
-    CompetitorContainer playing = team;
+    CompetitorGroup playing = team;
     if (!match.isFfa()) {
       if (playing == null) {
         playing = Team.getEmptiestTeam(Team.getTeams(Cardinal.getMatch(player)));
       }
     } else {
-      playing = SinglePlayerContainer.of(player);
+      playing = SinglePlayerGroup.of(player);
     }
-    PlayerContainerData newData = new PlayerContainerData(thread, match, playing);
-    PlayerContainerData oldData = PlayerContainerData.of(player);
+    GroupData newData = new GroupData(thread, match, playing);
+    GroupData oldData = GroupData.of(player);
     Containers.handleStateChangeEvent(player, oldData, newData);
   }
 
@@ -76,8 +75,8 @@ public class CommandJoin {
   public static void leave(CommandContext cmd) {
     Player player = (Player) cmd.getSender();
     MatchThread thread = Cardinal.getMatchThread(player);
-    PlayerContainerData newData = new PlayerContainerData(thread, null, null);
-    PlayerContainerData oldData = PlayerContainerData.of(player);
+    GroupData newData = new GroupData(thread, null, null);
+    GroupData oldData = GroupData.of(player);
     Containers.handleStateChangeEvent(player, oldData, newData);
   }
 

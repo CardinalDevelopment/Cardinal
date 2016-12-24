@@ -29,11 +29,11 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.event.match.MatchChangeStateEvent;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
-import in.twizmwaz.cardinal.module.team.SinglePlayerContainer;
+import in.twizmwaz.cardinal.module.team.SinglePlayerGroup;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainer;
+import in.twizmwaz.cardinal.module.group.groups.PlayerGroup;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -45,7 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
-public final class Match implements PlayerContainer {
+public final class Match implements PlayerGroup {
 
   private static int matchCounter = -1;
 
@@ -55,7 +55,7 @@ public final class Match implements PlayerContainer {
   private final LoadedMap map;
   private final World world;
   private final Set<Player> players;
-  private final Set<CompetitorContainer> competitors;
+  private final Set<CompetitorGroup> competitors;
 
   private final int matchNumber;
 
@@ -107,7 +107,7 @@ public final class Match implements PlayerContainer {
    * @return If the match is a free-for-all.
    */
   public boolean isFfa() {
-    for (CompetitorContainer container : competitors) {
+    for (CompetitorGroup container : competitors) {
       if (container instanceof Team) {
         return false;
       }
@@ -129,13 +129,13 @@ public final class Match implements PlayerContainer {
   public void addPlayer(@NonNull Player player) {
     players.add(player);
     if (isFfa()) {
-      competitors.add(SinglePlayerContainer.of(player));
+      competitors.add(SinglePlayerGroup.of(player));
     }
   }
 
   @Override
   public void removePlayer(@NonNull Player player) {
-    CompetitorContainer container = getPlayingContainer(player);
+    CompetitorGroup container = getPlayingContainer(player);
     players.remove(player);
     if (isFfa()) {
       competitors.remove(container);
@@ -150,21 +150,21 @@ public final class Match implements PlayerContainer {
   }
 
   /**
-   * Gets the {@link CompetitorContainer} of a player in the match.
+   * Gets the {@link CompetitorGroup} of a player in the match.
    *
    * @param player The player.
    * @return The container of the player.
    */
-  public CompetitorContainer getPlayingContainer(@NonNull Player player) {
+  public CompetitorGroup getPlayingContainer(@NonNull Player player) {
     if (!players.contains(player)) {
-      throw new IllegalArgumentException("Cannot get CompetitorContainer of player not in match");
+      throw new IllegalArgumentException("Cannot get CompetitorGroup of player not in match");
     } else {
-      for (CompetitorContainer container : competitors) {
+      for (CompetitorGroup container : competitors) {
         if (container.hasPlayer(player)) {
           return container;
         }
       }
-      throw new IllegalStateException("Player is in match but is missing a CompetitorContainer.");
+      throw new IllegalStateException("Player is in match but is missing a CompetitorGroup.");
     }
   }
 }

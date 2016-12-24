@@ -30,6 +30,7 @@ import ee.ellytr.chat.component.builder.LocalizedComponentBuilder;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.component.team.TeamComponent;
 import in.twizmwaz.cardinal.event.objective.ObjectiveCompleteEvent;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -48,7 +49,6 @@ import in.twizmwaz.cardinal.module.region.RegionException;
 import in.twizmwaz.cardinal.module.region.RegionModule;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import in.twizmwaz.cardinal.util.Channels;
 import in.twizmwaz.cardinal.util.Components;
 import in.twizmwaz.cardinal.util.Numbers;
@@ -257,7 +257,7 @@ public class WoolModule extends AbstractListenerModule {
       ItemStack item = event.getCurrentItem();
       Team team = wool.getTeam();
       Match match = Cardinal.getMatch(player);
-      CompetitorContainer container = match.getPlayingContainer(player);
+      CompetitorGroup container = match.getPlayingContainer(player);
       if (!wool.isComplete()
           && item.getType().equals(Material.WOOL)
           && item.getData().getData() == wool.getColor().getData()
@@ -294,7 +294,7 @@ public class WoolModule extends AbstractListenerModule {
       ItemStack item = event.getItem().getItemStack();
       Team team = wool.getTeam();
       Match match = Cardinal.getMatch(player);
-      CompetitorContainer container = match.getPlayingContainer(player);
+      CompetitorGroup container = match.getPlayingContainer(player);
       if (!wool.isComplete()
           && item.getType().equals(Material.WOOL)
           && item.getData().getData() == wool.getColor().getData()

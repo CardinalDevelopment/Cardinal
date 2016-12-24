@@ -27,7 +27,7 @@ package in.twizmwaz.cardinal.module.team;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,7 +38,7 @@ import org.bukkit.entity.Player;
 import java.util.Iterator;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SinglePlayerContainer implements CompetitorContainer {
+public class SinglePlayerGroup implements CompetitorGroup {
 
   @NonNull
   private final Player player;
@@ -67,12 +67,12 @@ public class SinglePlayerContainer implements CompetitorContainer {
 
   @Override
   public void addPlayer(Player player) {
-    throw new IllegalArgumentException("Cannot add additional players to a SinglePlayerContainer");
+    throw new IllegalArgumentException("Cannot add additional players to a SinglePlayerGroup");
   }
 
   @Override
   public void removePlayer(Player player) {
-    throw new IllegalArgumentException("Cannot remove players to a SinglePlayerContainer");
+    throw new IllegalArgumentException("Cannot remove players to a SinglePlayerGroup");
   }
 
   @Override
@@ -80,8 +80,8 @@ public class SinglePlayerContainer implements CompetitorContainer {
     return ImmutableSet.of(player).iterator();
   }
 
-  public static SinglePlayerContainer of(@NonNull Player player) {
-    return new SinglePlayerContainer(player);
+  public static SinglePlayerGroup of(@NonNull Player player) {
+    return new SinglePlayerGroup(player);
   }
 
 

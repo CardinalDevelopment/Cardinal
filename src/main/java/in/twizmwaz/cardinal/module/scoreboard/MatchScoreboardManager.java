@@ -26,10 +26,10 @@
 package in.twizmwaz.cardinal.module.scoreboard;
 
 
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.team.Team;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.module.group.groups.GroupData;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import java.util.Map;
 public class MatchScoreboardManager {
 
   private final Match match;
-  private Map<CompetitorContainer, ScoreboardDisplay> displays = new HashMap<>();
+  private Map<CompetitorGroup, ScoreboardDisplay> displays = new HashMap<>();
   private ScoreboardDisplay defaultDisplay;
 
   /**
@@ -52,18 +52,18 @@ public class MatchScoreboardManager {
   }
 
   /**
-   * Adds a new ScoreboardDisplay for a CompetitorContainer, used in FFA when a new player joins.
+   * Adds a new ScoreboardDisplay for a CompetitorGroup, used in FFA when a new player joins.
    * @param container The player container.
    */
-  public void addPlayerContainerDisplay(CompetitorContainer container) {
+  public void addPlayerContainerDisplay(CompetitorGroup container) {
     displays.put(container, new ScoreboardDisplay(match, container));
   }
 
   /**
-   * Removes a ScoreboardDisplay for a CompetitorContainer, used in FFA when a new player leaves.
+   * Removes a ScoreboardDisplay for a CompetitorGroup, used in FFA when a new player leaves.
    * @param container The player container.
    */
-  public void removePlayerContainerDisplay(CompetitorContainer container) {
+  public void removePlayerContainerDisplay(CompetitorGroup container) {
     displays.remove(container);
   }
 
@@ -72,7 +72,7 @@ public class MatchScoreboardManager {
    * @param player The player.
    * @param data The new player container data.
    */
-  public void updatePlayer(Player player, PlayerContainerData data) {
+  public void updatePlayer(Player player, GroupData data) {
     if (data.getPlaying() != null && displays.containsKey(data.getPlaying())) {
       displays.get(data.getPlaying()).setScoreboard(player);
     } else {

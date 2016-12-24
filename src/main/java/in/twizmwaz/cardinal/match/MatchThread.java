@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.event.player.PlayerJoinMatchThreadEvent;
 import in.twizmwaz.cardinal.event.player.PlayerQuitMatchThreadEvent;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainer;
+import in.twizmwaz.cardinal.module.group.groups.PlayerGroup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -47,7 +47,7 @@ import java.util.Iterator;
 
 @Getter
 @Setter
-public class MatchThread implements PlayerContainer {
+public class MatchThread implements PlayerGroup {
 
   private static int counter = -1;
 

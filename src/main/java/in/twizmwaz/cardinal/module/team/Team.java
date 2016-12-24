@@ -31,11 +31,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import in.twizmwaz.cardinal.Cardinal;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.objective.Objective;
 import in.twizmwaz.cardinal.module.objective.OwnedObjective;
 import in.twizmwaz.cardinal.module.objective.wool.Wool;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-public class Team implements CompetitorContainer {
+public class Team implements CompetitorGroup {
 
   private final String id;
   private final ChatColor color;
@@ -129,7 +129,7 @@ public class Team implements CompetitorContainer {
   }
 
   public static ChatColor getTeamColor(@NonNull Player player) {
-    CompetitorContainer container = Cardinal.getMatch(player).getPlayingContainer(player);
+    CompetitorGroup container = Cardinal.getMatch(player).getPlayingContainer(player);
     return container instanceof Team ? ((Team) container).getColor() : ChatColor.YELLOW;
   }
 

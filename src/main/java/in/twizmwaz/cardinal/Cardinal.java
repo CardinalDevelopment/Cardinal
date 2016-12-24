@@ -168,6 +168,15 @@ public final class Cardinal extends JavaPlugin {
   }
 
   /**
+   * Gets the default match thread, which is index 0 in the list of running match threads.
+   *
+   * @return The default match thread
+   */
+  public static MatchThread getDefaultMatchThread() {
+    return getInstance().getMatchThreads().get(0);
+  }
+
+  /**
    * @param who A command sender.
    * @return The match thread that contains this player.
    */

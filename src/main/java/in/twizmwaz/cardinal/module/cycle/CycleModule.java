@@ -36,8 +36,7 @@ import in.twizmwaz.cardinal.module.ModuleEntry;
 import in.twizmwaz.cardinal.module.event.ModuleLoadCompleteEvent;
 import in.twizmwaz.cardinal.module.repository.LoadedMap;
 import in.twizmwaz.cardinal.module.rotation.RotationModule;
-import in.twizmwaz.cardinal.playercontainer.Containers;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.module.group.groups.GroupData;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -97,8 +96,8 @@ public final class CycleModule extends AbstractListenerModule {
     if (Cardinal.getInstance().getModuleHandler().loadMatch(match)) {
       matchThread.setCurrentMatch(match);
       matchThread.getPlayers().forEach(player -> {
-        PlayerContainerData oldData = PlayerContainerData.of(player);
-        PlayerContainerData newData = new PlayerContainerData(matchThread, null, null);
+        GroupData oldData = GroupData.of(player);
+        GroupData newData = new GroupData(matchThread, null, null);
         Containers.handleStateChangeEvent(player, oldData, newData);
       });
       Bukkit.getPluginManager().callEvent(new MatchLoadCompleteEvent(match));

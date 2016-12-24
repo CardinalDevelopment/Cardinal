@@ -26,11 +26,12 @@
 package in.twizmwaz.cardinal.module.connection;
 
 import in.twizmwaz.cardinal.Cardinal;
-import in.twizmwaz.cardinal.match.MatchThread;
+import in.twizmwaz.cardinal.event.player.PlayerChangeGroupEvent;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
-import in.twizmwaz.cardinal.playercontainer.Containers;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.module.group.groups.GroupData;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInitialSpawnEvent;
@@ -46,10 +47,13 @@ public class ConnectionModule extends AbstractListenerModule {
    */
   @EventHandler(priority = EventPriority.LOWEST)
   public void onPlayerJoin(PlayerInitialSpawnEvent event) {
-    MatchThread thread = Cardinal.getInstance().getMatchThreads().get(0);
-    PlayerContainerData newData = new PlayerContainerData(thread, null, null);
-    PlayerContainerData oldData = PlayerContainerData.empty();
-    Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
+    Bukkit.getPluginManager().callEvent(
+        new PlayerChangeGroupEvent(
+            event.getPlayer(),
+            new GroupData(Cardinal.getDefaultMatchThread(), null, null),
+            GroupData.empty()
+        )
+    );
   }
 
   /**
@@ -59,9 +63,12 @@ public class ConnectionModule extends AbstractListenerModule {
    */
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onPlayerQuit(PlayerQuitEvent event) {
-    PlayerContainerData oldData = PlayerContainerData.of(event.getPlayer());
-    PlayerContainerData newData = PlayerContainerData.empty();
-    Containers.handleStateChangeEvent(event.getPlayer(), oldData, newData);
+    Player player = event.getPlayer();
+    Bukkit.getPluginManager().callEvent(new PlayerChangeGroupEvent(
+        player,
+        GroupData.of(player),
+        GroupData.empty()
+    ));
   }
 
 }

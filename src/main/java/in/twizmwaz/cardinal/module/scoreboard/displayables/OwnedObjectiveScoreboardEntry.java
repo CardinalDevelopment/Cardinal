@@ -39,7 +39,7 @@ public class OwnedObjectiveScoreboardEntry extends ScoreboardEntry {
    * Creates a display entry for an OwnedObjective on a scoreboard.
    * @param objective The objective this entry represents.
    * @param display The ScoreboardDisplay this entry belongs to.
-   * @param attacker The team scoreboard group this entry is inside of.
+   * @param attacker The team scoreboard groups this entry is inside of.
    */
   public OwnedObjectiveScoreboardEntry(OwnedObjective objective, ScoreboardDisplay display, Team attacker) {
     super(display, "", display.getEntry(" " + ChatColor.WHITE + objective.getComponent().toPlainText(), null));

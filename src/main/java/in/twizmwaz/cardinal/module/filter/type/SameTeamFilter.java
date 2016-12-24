@@ -28,7 +28,7 @@ package in.twizmwaz.cardinal.module.filter.type;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.module.filter.Filter;
 import in.twizmwaz.cardinal.module.filter.FilterState;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 
@@ -45,7 +45,7 @@ public class SameTeamFilter extends ObjectTypeFilter<Player> {
   @Override
   public Boolean evaluate(Player evaluating) {
     //fixme: Is this how you get a player's team?
-    CompetitorContainer container = Cardinal.getMatch(evaluating).getPlayingContainer(evaluating);
+    CompetitorGroup container = Cardinal.getMatch(evaluating).getPlayingContainer(evaluating);
     for (Player player : container.getPlayers()) {
       if (child.evaluate(player).equals(FilterState.ALLOW)) {
         return true;

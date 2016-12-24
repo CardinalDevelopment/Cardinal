@@ -33,7 +33,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * Represents a scoreboard group, this can be any group of lines that should be displayed in the scoreboard.
+ * Represents a scoreboard groups, this can be any groups of lines that should be displayed in the scoreboard.
  */
 @Data
 public class ScoreboardGroup implements Displayable {
@@ -45,7 +45,7 @@ public class ScoreboardGroup implements Displayable {
   private List<Displayable> entries = Lists.newArrayList();
 
   /**
-   * This will move the whole list of entries this group has, and put them in a new index, in the same order they had.
+   * This will move the whole list of entries this groups has, and put them in a new index, in the same order they had.
    * @param index the top most index.
    */
   @Override
@@ -57,8 +57,8 @@ public class ScoreboardGroup implements Displayable {
   }
 
   /**
-   * Gets the size of the scoreboard group.
-   * @return the group size.
+   * Gets the size of the scoreboard groups.
+   * @return the groups size.
    */
   @Override
   public int getSize() {

@@ -23,11 +23,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.group.groups;
 
 import net.md_5.bungee.api.ChatColor;
 
-public interface CompetitorContainer extends PlayerContainer {
+public interface CompetitorGroup extends PlayerGroup {
 
   String getName();
 

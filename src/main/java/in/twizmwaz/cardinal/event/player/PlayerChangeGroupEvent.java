@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.event.player;
 
-import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.module.group.groups.GroupData;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -34,27 +34,25 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 @Getter
-public class PlayerContainerChangeStateEvent extends PlayerEvent implements Cancellable {
+public class PlayerChangeGroupEvent extends PlayerEvent implements Cancellable {
 
-  @Getter
-  private static final HandlerList handlerList = new HandlerList();
-  private final PlayerContainerData oldData;
-  private final PlayerContainerData newData;
-  @Setter
-  private boolean cancelled;
+  @Getter private static final HandlerList handlerList = new HandlerList();
+
+  private final GroupData from;
+  private final GroupData to;
+  @Setter private boolean cancelled;
 
   /**
    * Called when a player switches from one team to another.
    *
    * @param who     The player that is switching teams.
-   * @param oldData The containers that the player is switching from.
-   * @param newData The containers that the player is switching to.
+   * @param from The containers that the player is switching from.
+   * @param to The containers that the player is switching to.
    */
-  public PlayerContainerChangeStateEvent(
-      Player who, PlayerContainerData oldData, PlayerContainerData newData) {
+  public PlayerChangeGroupEvent(Player who, GroupData from, GroupData to) {
     super(who);
-    this.oldData = oldData;
-    this.newData = newData;
+    this.from = from;
+    this.to = to;
   }
 
   @Override

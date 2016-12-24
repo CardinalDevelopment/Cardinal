@@ -25,7 +25,7 @@
 
 package in.twizmwaz.cardinal.module.scoreboard;
 
-import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
+import in.twizmwaz.cardinal.event.player.PlayerChangeGroupEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.AbstractListenerModule;
 import in.twizmwaz.cardinal.module.ModuleEntry;
@@ -34,7 +34,7 @@ import in.twizmwaz.cardinal.module.objective.destroyable.DestroyableModule;
 import in.twizmwaz.cardinal.module.objective.wool.WoolModule;
 import in.twizmwaz.cardinal.module.scores.ScoreModule;
 import in.twizmwaz.cardinal.module.team.TeamModule;
-import in.twizmwaz.cardinal.playercontainer.PlayerContainerData;
+import in.twizmwaz.cardinal.module.group.groups.GroupData;
 import lombok.NonNull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -61,11 +61,11 @@ public class ScoreboardModule extends AbstractListenerModule implements Listener
 
   /**
    * Tells the MatchScoreboardManager for the new match to update the player.
-   * @param event The PlayerContainerChangeStateEvent.
+   * @param event The PlayerChangeGroupEvent.
    */
   @EventHandler
-  public void onPlayerChangeContainer(PlayerContainerChangeStateEvent event) {
-    PlayerContainerData newData = event.getNewData();
+  public void onPlayerChangeContainer(PlayerChangeGroupEvent event) {
+    GroupData newData = event.getNewData();
     if (newData.getMatchThread() != null) {
       scoreboards.get(newData.getMatchThread().getCurrentMatch()).updatePlayer(event.getPlayer(), newData);
     }

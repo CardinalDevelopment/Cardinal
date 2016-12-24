@@ -27,7 +27,7 @@ package in.twizmwaz.cardinal.module.channel.channels;
 
 import ee.ellytr.chat.component.builder.UnlocalizedComponentBuilder;
 import in.twizmwaz.cardinal.component.team.TeamComponent;
-import in.twizmwaz.cardinal.event.player.PlayerContainerChangeStateEvent;
+import in.twizmwaz.cardinal.event.player.PlayerChangeGroupEvent;
 import in.twizmwaz.cardinal.module.channel.AbstractChannel;
 import in.twizmwaz.cardinal.module.team.Team;
 import in.twizmwaz.cardinal.util.Components;
@@ -50,7 +50,7 @@ public class TeamChannel extends AbstractChannel implements Listener {
    * @param event The event.
    */
   @EventHandler
-  public void onPlayerChangeTeam(PlayerContainerChangeStateEvent event) {
+  public void onPlayerChangeTeam(PlayerChangeGroupEvent event) {
     Player player = event.getPlayer();
     if (event.getNewData().getPlaying() != null && event.getNewData().getPlaying().equals(team)) {
       addPlayer(player);

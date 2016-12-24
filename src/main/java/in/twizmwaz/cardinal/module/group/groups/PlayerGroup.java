@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.group.groups;
 
 import com.google.common.collect.ImmutableCollection;
 import org.bukkit.entity.Player;
@@ -31,7 +31,7 @@ import org.bukkit.entity.Player;
 /**
  * Represents a class that stores a collection of players.
  */
-public interface PlayerContainer extends Iterable<Player> {
+public interface PlayerGroup extends Iterable<Player> {
 
   ImmutableCollection<Player> getPlayers();
 

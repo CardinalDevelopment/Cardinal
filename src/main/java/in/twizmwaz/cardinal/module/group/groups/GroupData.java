@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package in.twizmwaz.cardinal.playercontainer;
+package in.twizmwaz.cardinal.module.group.groups;
 
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.match.Match;
@@ -33,26 +33,26 @@ import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Getter
-public class PlayerContainerData {
+public class GroupData<T extends PlayerGroup> {
 
   private final MatchThread matchThread;
   private final Match match;
-  private final CompetitorContainer playing;
+  private final T group;
 
   /**
    * Creates new container data under a match thread, match, and player container.
    *
    * @param matchThread The match thread.
    * @param match The match.
-   * @param playing The player container.
+   * @param group The player group.
    */
-  public PlayerContainerData(MatchThread matchThread, Match match, CompetitorContainer playing) {
-    if (match != null && playing == null) {
-      throw new IllegalArgumentException("Playing cannot be null when match is not null");
+  public GroupData(MatchThread matchThread, Match match, T group) {
+    if (match != null && (group == null || !(group instanceof CompetitorGroup))) {
+      throw new IllegalArgumentException("No competitor group when match is not null");
     }
     this.matchThread = matchThread;
     this.match = match;
-    this.playing = playing;
+    this.group = group;
   }
 
   /**
@@ -61,18 +61,18 @@ public class PlayerContainerData {
    * @param player The player.
    * @return The container data.
    */
-  public static PlayerContainerData of(@NonNull Player player) {
+  public static GroupData of(@NonNull Player player) {
     MatchThread thread = Cardinal.getMatchThread(player);
     if (thread.getCurrentMatch().hasPlayer(player)) {
-      CompetitorContainer container = thread.getCurrentMatch().getPlayingContainer(player);
-      return new PlayerContainerData(thread, thread.getCurrentMatch(), container);
+      CompetitorGroup container = thread.getCurrentMatch().getPlayingContainer(player);
+      return new PlayerGroupData(thread, thread.getCurrentMatch(), container);
     } else {
-      return new PlayerContainerData(thread, null, null);
+      return new GroupData(thread, null, null);
     }
   }
 
-  public static PlayerContainerData empty() {
-    return new PlayerContainerData(null, null, null);
+  public static GroupData empty() {
+    return new GroupData(null, null, null);
   }
 
 }

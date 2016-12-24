@@ -27,7 +27,7 @@ package in.twizmwaz.cardinal.module.scores;
 
 import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryHolder;
 import in.twizmwaz.cardinal.module.scoreboard.displayables.EntryUpdater;
-import in.twizmwaz.cardinal.playercontainer.CompetitorContainer;
+import in.twizmwaz.cardinal.module.group.groups.CompetitorGroup;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class PlayerContainerScore implements EntryUpdater {
 
   @Getter
-  private final CompetitorContainer container;
+  private final CompetitorGroup container;
   @Getter
   private final ScoreRule rule;
   private double score = 0;
