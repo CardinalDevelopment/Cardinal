@@ -176,7 +176,7 @@ public class Destroyable extends Objective implements OwnedObjective, EntryUpdat
    * @param contribution The amount of pieces this player broke.
    */
   public void addBrokenPiecesFor(Player player, int contribution) {
-    CompetitorGroup container = match.getPlayingContainer(player);
+    CompetitorGroup container = match.getCompetitorGroup(player);
     if (!isCompleted() && container instanceof Team) {
       Team team = (Team) container;
       setTouched(team);

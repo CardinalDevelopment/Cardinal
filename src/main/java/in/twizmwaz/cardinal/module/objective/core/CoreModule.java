@@ -218,7 +218,7 @@ public class CoreModule extends AbstractListenerModule {
     if (match == null || !match.hasPlayer(player) || cores.size() == 0) {
       return;
     }
-    Team team = (Team) match.getPlayingContainer(player);
+    Team team = (Team) match.getCompetitorGroup(player);
     Block block = event.getBlock();
     cores.forEach(core -> {
       if (core.getRegion().contains(block.getLocation())) {

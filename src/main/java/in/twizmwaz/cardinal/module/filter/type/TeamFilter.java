@@ -43,7 +43,7 @@ public class TeamFilter extends SingleObjectFilter {
       return FilterState.fromBoolean(team.equals(evaluating));
     } else if (evaluating instanceof Player) {
       CompetitorGroup container =
-          Cardinal.getMatch((Player) evaluating).getPlayingContainer((Player) evaluating);
+          Cardinal.getMatch((Player) evaluating).getCompetitorGroup((Player) evaluating);
       return FilterState.fromBoolean(container != null && team.equals(container));
     }
     return FilterState.ABSTAIN;

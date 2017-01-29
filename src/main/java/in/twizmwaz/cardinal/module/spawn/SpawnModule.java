@@ -252,7 +252,7 @@ public class SpawnModule extends AbstractListenerModule {
   public void onMatchStart(MatchChangeStateEvent event) {
     if (event.getState() == MatchState.PLAYING) {
       for (Player player : event.getMatch()) {
-        Spawn spawn = ListUtil.getRandom(getSpawns(event.getMatch(), event.getMatch().getPlayingContainer(player)));
+        Spawn spawn = ListUtil.getRandom(getSpawns(event.getMatch(), event.getMatch().getCompetitorGroup(player)));
         Bukkit.getPluginManager().callEvent(new CardinalRespawnEvent(player, spawn));
       }
     }

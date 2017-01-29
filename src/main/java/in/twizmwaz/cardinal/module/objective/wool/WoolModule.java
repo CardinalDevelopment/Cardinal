@@ -257,7 +257,7 @@ public class WoolModule extends AbstractListenerModule {
       ItemStack item = event.getCurrentItem();
       Team team = wool.getTeam();
       Match match = Cardinal.getMatch(player);
-      CompetitorGroup container = match.getPlayingContainer(player);
+      CompetitorGroup container = match.getCompetitorGroup(player);
       if (!wool.isComplete()
           && item.getType().equals(Material.WOOL)
           && item.getData().getData() == wool.getColor().getData()
@@ -294,7 +294,7 @@ public class WoolModule extends AbstractListenerModule {
       ItemStack item = event.getItem().getItemStack();
       Team team = wool.getTeam();
       Match match = Cardinal.getMatch(player);
-      CompetitorGroup container = match.getPlayingContainer(player);
+      CompetitorGroup container = match.getCompetitorGroup(player);
       if (!wool.isComplete()
           && item.getType().equals(Material.WOOL)
           && item.getData().getData() == wool.getColor().getData()
@@ -337,7 +337,7 @@ public class WoolModule extends AbstractListenerModule {
         if (wool.isShow()) {
           //fixme: unchecked cast
           Match match = Cardinal.getMatch(event.getWorld());
-          Team team = (Team) match.getPlayingContainer(player);
+          Team team = (Team) match.getCompetitorGroup(player);
           Channels.getGlobalChannel(match.getMatchThread()).sendMessage(
               new LocalizedComponentBuilder(ChatConstant.getConstant("objective.wool.completed"),
                   Components.getName(player).build(),

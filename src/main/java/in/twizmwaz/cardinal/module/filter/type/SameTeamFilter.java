@@ -45,7 +45,7 @@ public class SameTeamFilter extends ObjectTypeFilter<Player> {
   @Override
   public Boolean evaluate(Player evaluating) {
     //fixme: Is this how you get a player's team?
-    CompetitorGroup container = Cardinal.getMatch(evaluating).getPlayingContainer(evaluating);
+    CompetitorGroup container = Cardinal.getMatch(evaluating).getCompetitorGroup(evaluating);
     for (Player player : container.getPlayers()) {
       if (child.evaluate(player).equals(FilterState.ALLOW)) {
         return true;

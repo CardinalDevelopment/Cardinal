@@ -129,7 +129,7 @@ public class Team implements CompetitorGroup {
   }
 
   public static ChatColor getTeamColor(@NonNull Player player) {
-    CompetitorGroup container = Cardinal.getMatch(player).getPlayingContainer(player);
+    CompetitorGroup container = Cardinal.getMatch(player).getCompetitorGroup(player);
     return container instanceof Team ? ((Team) container).getColor() : ChatColor.YELLOW;
   }
 

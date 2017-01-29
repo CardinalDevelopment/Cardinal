@@ -135,12 +135,12 @@ public final class Match implements PlayerGroup {
 
   @Override
   public void removePlayer(@NonNull Player player) {
-    CompetitorGroup container = getPlayingContainer(player);
+    CompetitorGroup group = getCompetitorGroup(player);
     players.remove(player);
     if (isFfa()) {
-      competitors.remove(container);
+      competitors.remove(group);
     } else {
-      container.removePlayer(player);
+      group.removePlayer(player);
     }
   }
 
@@ -155,16 +155,16 @@ public final class Match implements PlayerGroup {
    * @param player The player.
    * @return The container of the player.
    */
-  public CompetitorGroup getPlayingContainer(@NonNull Player player) {
+  public CompetitorGroup getCompetitorGroup(@NonNull Player player) {
     if (!players.contains(player)) {
       throw new IllegalArgumentException("Cannot get CompetitorGroup of player not in match");
     } else {
-      for (CompetitorGroup container : competitors) {
-        if (container.hasPlayer(player)) {
-          return container;
+      for (CompetitorGroup group : competitors) {
+        if (group.hasPlayer(player)) {
+          return group;
         }
       }
-      throw new IllegalStateException("Player is in match but is missing a CompetitorGroup.");
+      throw new IllegalStateException("Player is in match but does not have a CompetitorGroup");
     }
   }
 }

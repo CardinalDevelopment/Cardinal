@@ -64,15 +64,15 @@ public class GroupData<T extends PlayerGroup> {
   public static GroupData of(@NonNull Player player) {
     MatchThread thread = Cardinal.getMatchThread(player);
     if (thread.getCurrentMatch().hasPlayer(player)) {
-      CompetitorGroup container = thread.getCurrentMatch().getPlayingContainer(player);
+      CompetitorGroup container = thread.getCurrentMatch().getCompetitorGroup(player);
       return new PlayerGroupData(thread, thread.getCurrentMatch(), container);
     } else {
-      return new GroupData(thread, null, null);
+      return new GroupData<>(thread, null, null);
     }
   }
 
   public static GroupData empty() {
-    return new GroupData(null, null, null);
+    return new GroupData<>(null, null, null);
   }
 
 }
